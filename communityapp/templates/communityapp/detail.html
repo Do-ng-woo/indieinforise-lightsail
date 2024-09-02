@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load bootstrap4 %}
+<style>
+    .custom-tag {
+        display: inline-block;
+        margin: 0 5px 5px 0;
+        padding: 5px 10px;
+        background-color: #e9ecef;
+        border-radius: 20px;
+        color: black;
+        text-decoration: none;
+    }
+
+    .custom-container {
+        text-align: left;
+        padding: 10px;
+    }
+    /* ========================================댓글섹션 스타일링====================================== */
+    /* 전체 댓글 섹션 스타일링 */
+.comment-section {
+    font-family: 'Arial', sans-serif;
+    max-width: 800px;
+    margin: auto;
+}
+
+/* 정렬 버튼 스타일링 */
+.sorting-buttons {
+    text-align: right;
+    margin: 20px 0;
+}
+
+.sorting-buttons a {
+    text-decoration: none;
+    color: #1a0dab;
+    font-size: 0.9em;
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: 1px solid #dfe1e5;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.sorting-buttons a:hover {
+    background-color: #f8f9fa;
+}
+
+/* 댓글 목록 스타일링 */
+.comment {
+    background-color: #f1f3f4;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* 페이지네이션 스타일링 */
+.pagination {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: #1a0dab;
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #dfe1e5;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #f8f9fa;
+}
+
+.pagination .current-page {
+    padding: 5px 10px;
+    margin: 0 5px;
+    background-color: #e8f0fe;
+    border-radius: 4px;
+}
+img.responsive {
+    max-width: 100%;
+    height: auto;
+}
+</style>
+<div>
+    <div class="container mt-4">
+        <h1 class="text-center">{{ target_community.title }}</h1>
+        <hr>
+        <div class="text-center my-3">
+            <span>카테고리: {{ target_community.board_type }}</span> | 
+            <span>추천 수: {{ target_community.like }}</span> | 
+            <span>댓글 수: {{ target_community.comment_count }}</span> | 
+            <span>작성자: {{ target_community.writer }}</span> | 
+            {% load tz %} <!-- 시간대 처리를 위한 태그 로드 -->
+            {% now "Y-m-d" as today %}
+            <span>작성 일시: 
+            {% if target_community.created_at|date:"Y-m-d" == today %}
+                {{ target_community.created_at|date:"g:i A" }} <!-- 오늘이면 시간만 표시 -->
+            {% else %}
+                {{ target_community.created_at|date:"y.m.d g:i A" }} <!-- 오늘이 아니면 날짜와 시간 표시 -->
+            {% endif %}
+            </span>
+        </div>
+        <hr>
+        <div class="custom-container">
+            {% for project in target_community.project.all %}
+                <a href="{% url 'projectapp:detail' pk=project.pk %}" class="custom-tag">{{ project.title }}</a>
+            {% endfor %}
+            {% for artist in target_community.artist.all %}
+                <a href="{% url 'artistapp:detail' pk=artist.pk %}" class="custom-tag">{{ artist.title }}</a>
+            {% endfor %}
+            {% for person in target_community.person.all %}
+                <a href="{% url 'personapp:detail' pk=person.pk %}" class="custom-tag">{{ person.title }}</a>
+            {% endfor %}
+            {% for article in target_community.article.all %}
+                <a href="{% url 'articleapp:detail' pk=article.pk %}" class="custom-tag">{{ article.title }}</a>
+            {% endfor %}
+            {% for sing in target_community.sing.all %}
+                <a href="{% url 'singapp:detail' pk=sing.pk %}" class="custom-tag">{{ sing.title }}</a>
+            {% endfor %}
+            {% for album in target_community.album.all %}
+                <a href="{% url 'albumapp:detail' pk=album.pk %}" class="custom-tag">{{ album.title }}</a>
+            {% endfor %}
+            {% for genre in target_community.genre.all %}
+                <a href="{% url 'genreapp:detail' pk=genre.pk %}" class="custom-tag">{{ genre.title }}</a>
+            {% endfor %}
+            {% for instrument in target_community.instrument.all %}
+                <a href="{% url 'instrumentapp:detail' pk=instrument.pk %}" class="custom-tag">{{ instrument.title }}</a>
+            {% endfor %}
+        </div>
+
+        {% if target_community.image %}
+        <div class="text-center">
+            <img src="{{ target_community.image.url }}" alt="{{ target_community.title }}" style="width: 100%; border-radius: 1rem; margin: 2rem 0;">
+        </div>
+        {% endif %}
+        <div class="my-3">
+            {{ target_community.content | safe }}
+        </div>
+        <div class="text-center" style="height: 2rem; margin: 4rem auto;">
+            <a href="{% url 'likeapp:community_like' pk=target_community.pk %}">
+                <i style="vertical-align: middle; font-size: 3rem; color: #f77" class="material-icons">
+                    favorite
+                </i>
+            </a>
+            <span style="vertical-align: middle; font-size: 1.2rem;">
+                {{ target_community.like }}
+            </span>
+        </div>
+    </div>
+    <div style="text-align: center; max-width:500px; margin: 4rem auto">
+        {% if target_community.writer == user %}
+        <a href="{% url 'communityapp:update' pk=target_community.pk %}"
+           class= "btn btn-primary rounded-pill col-3">
+        Update 
+        </a>
+         <a href="{% url 'communityapp:delete' pk=target_community.pk %}"
+            class= "btn btn-danger rounded-pill col-3">
+        Delete
+        </a>
+        {% endif %}
+    </div>
+    <div class="comment-section">
+        <div class="make">
+        {% include 'commentapp/create.html' with content_type_id=content_type_id object_id=object_id %}
+        </div>
+        <div class="sorting-buttons">
+            <a href="{{ request.path }}?sort=recent{% if comment_page_obj.number %}&page={{ comment_page_obj.number }}{% endif %}">최신순</a>
+            <a href="{{ request.path }}?sort=likes{% if comment_page_obj.number %}&page={{ comment_page_obj.number }}{% endif %}">좋아요순</a>
+        </div>
+
+        <!-- 페이지네이션된 댓글 목록 -->
+        <div class="comment">
+            {% for comment in comments %}
+                {% include 'commentapp/detail.html' with comment=comment %}
+            {% empty %}
+                <p>댓글이 없습니다.</p>
+            {% endfor %}
+        </div>
+
+        <!-- 페이지네이션 링크 -->
+        <div class="pagination">
+            {% if comment_page_obj.has_previous %}
+                <a href="?sort={{ sort }}&page=1">&laquo; 처음</a>
+                <a href="?sort={{ sort }}&page={{ comment_page_obj.previous_page_number }}">이전</a>
+            {% endif %}
+            <span class="current-page">{{ comment_page_obj.number }}/{{ comment_page_obj.paginator.num_pages }}</span>
+            {% if comment_page_obj.has_next %}
+                <a href="?sort={{ sort }}&page={{ comment_page_obj.next_page_number }}">다음</a>
+                <a href="?sort={{ sort }}&page={{ comment_page_obj.paginator.num_pages }}">마지막 &raquo;</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function(){
+    // 댓글 컨테이너에 대한 클릭 이벤트 위임
+    $('.comment').on('click', 'button.like-button', function(e){
+        e.preventDefault();
+        var commentId = $(this).data('id');
+        var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '/comments/like_comment/' + commentId + '/',
+            data: {
+                csrfmiddlewaretoken: csrftoken,
+            },
+            success: function(response){
+                $('#like-count-' + commentId).text(response.total_likes);
+                if(response.liked){
+                    $('#like-icon-' + commentId).css('color', 'red');
+                } else {
+                    $('#like-icon-' + commentId).css('color', 'grey');
+                }
+            },
+            error: function(xhr, status, error){
+                alert('Something went wrong: ' + error);
+            }
+        });
+    });
+
+    // 싫어요 버튼 이벤트 위임
+    $('.comment').on('click', 'button.dislike-button', function(e){
+        e.preventDefault();
+        var commentId = $(this).data('id');
+        var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '/comments/dislike_comment/' + commentId + '/',
+            data: {
+                csrfmiddlewaretoken: csrftoken,
+            },
+            success: function(response){
+                $('#dislike-count-' + commentId).text(response.total_dislikes); // 싫어요 개수 업데이트
+                if(response.disliked){
+                    $('#dislike-icon-' + commentId).css('color', 'blue'); // 싫어요 눌린 상태로 스타일 변경
+                } else {
+                    $('#dislike-icon-' + commentId).css('color', 'grey'); // 싫어요 눌리지 않은 상태로 스타일 변경
+                }
+            },
+            error: function(xhr, status, error){
+                alert('Something went wrong: ' + error);
+            }
+        });
+    });
+});
+
+</script>
+
+{% endblock %}

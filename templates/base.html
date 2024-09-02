@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+    
+{% include 'head.html'%}
+<style>
+:root {
+  --background-color-light: #FFFFFF;
+  --text-color-light: #000000;
+  --background-color-dark: #363537;
+  --text-color-dark: #FAFAFA;
+  --button-color-dark: #78909C;
+}
+
+.light-mode {
+  background-color: var(--background-color-light);
+}
+
+.dark-mode {
+  background-color: var(--background-color-dark);
+}
+.card_title {
+  color: var(--text-color-light); /* 기본 텍스트 색상 */
+}
+
+.header, .login-section{
+    background-color: var(--background-color-light);
+}
+.dark-mode .header, .dark-mode .login-section{
+  background-color: var(--background-color-dark);
+}
+.dark-mode .header a{
+    color: var(--text-color-dark); /* 다크모드 텍스트 색상 */
+}
+.dark-mode .btn-dark{
+    background-color: var(--button-color-dark);
+    color: var(--text-color-light); /* 기본 텍스트 색상 */
+}
+.dark-mode .create_update_delete{
+    background-color: #f8f9fa; /* 배경색 회색으로 설정 */
+    padding: 20px; /* 패딩 추가 */
+    border-radius: 1rem; /* 모서리 둥글게 */
+    }
+.create_update_delete{
+    padding: 20px; /* 패딩 추가 */
+}
+.dark-mode .delete_content{
+    color:#FFFFFF;
+}
+.dark-mode .comment-section{
+    background-color: #f8f9fa; /* 배경색 회색으로 설정 */
+    padding: 20px; /* 패딩 추가 */
+    border-radius: 1rem; /* 모서리 둥글게 */
+}
+.dark-mode .table-container {
+    margin: 0 auto;
+    width: 70%;
+    border-radius: 1rem;
+    overflow: hidden; /* border-radius 적용을 위해 추가 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* 다크모드에 어울리는 그림자 효과 */
+    background-color:#FFFFFF;
+}
+/* ----------------헤더 토글 ------------*/
+/* 기본적으로 모바일 헤더를 숨기고 데스크톱 헤더를 보여줍니다. */
+.mobile-header-container {
+    display: none;
+}
+
+.desktop-header-container {
+    display: block;
+}
+/* 화면 크기가 768px 이하일 때 */
+@media (max-width: 768px) {
+    /* 모바일 헤더를 보여주고 데스크톱 헤더를 숨깁니다. */
+    .mobile-header-container {
+        display: block;
+    }
+    .desktop-header-container {
+        display: none;
+    }
+}
+</style>
+<body style="font-family: 'NanumSquareR';">
+    <div class="mobile-header-container">
+        {% include 'mobile_header.html' %}
+    </div>
+    <div class="desktop-header-container">
+        {% include 'header.html' %}
+    </div>
+    {% include 'righter.html'%}
+    
+    
+    {% for message in messages %}
+    <div class="text-center">
+        <div class="btn btn-{{ message.tags }} rounded-pill px-5 my-3">
+            {{ message }}            
+        </div>
+    
+        
+    </div>
+
+    {% endfor %}
+    
+    {% block content %}
+    
+    {% endblock %}
+    
+    
+    {% include 'footer.html'%}
+    
+
+</body>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 현재 페이지 경로를 가져옵니다.
+    var currentPath = window.location.pathname;
+    // 로그인 창을 찾습니다.
+    var lefter = document.querySelector('.lefter');
+    // 로그인 폼 내의 `next` 입력 필드를 찾아 현재 경로를 설정합니다.
+    var nextInputField = document.querySelector('input[name="next"]');
+    if (nextInputField) {
+        nextInputField.value = currentPath;
+    }
+
+    // 로그인 창을 처음에는 숨깁니다.
+    lefter.style.display = 'none';
+
+    // 모든 로그인 버튼을 찾습니다.
+    var loginLinks = document.querySelectorAll('.loginButton');
+    // 각 로그인 링크에 대해 클릭 이벤트 리스너를 추가합니다.
+    loginLinks.forEach(function(loginLink) {
+        loginLink.addEventListener('click', function(e) {
+            e.preventDefault(); // 기본 링크 동작을 방지합니다.
+            // 로그인 창의 표시 상태를 토글합니다.
+            lefter.style.display = lefter.style.display === 'none' || lefter.style.display === '' ? 'flex' : 'none';
+        });
+    });
+
+    // 닫기 버튼에 대한 클릭 이벤트 리스너를 추가합니다.
+    var closeButton = document.querySelector('.close-button');
+    closeButton.addEventListener('click', function() {
+        lefter.style.display = 'none'; // 창을 숨깁니다.
+    });
+});
+</script>
+<script>
+const toggleButton = document.getElementById('toggle-mode');
+const iconSpan = toggleButton.querySelector('.material-icons');
+
+toggleButton.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  localStorage.setItem('mode', isDarkMode ? 'dark-mode' : 'light-mode');
+
+  // 현재 모드에 따라 아이콘 텍스트 변경
+  iconSpan.textContent = isDarkMode ? 'light_mode' : 'dark_mode';
+});
+
+// 페이지 로드 시 로컬 스토리지에서 모드 상태를 읽어와서 적용
+document.addEventListener('DOMContentLoaded', () => {
+  const currentMode = localStorage.getItem('mode') || 'light-mode';
+  document.body.className = currentMode;
+
+  // 페이지 로드 시 아이콘 텍스트 설정
+  iconSpan.textContent = currentMode === 'dark-mode' ? 'light_mode' : 'dark_mode';
+});
+</script>
+</html>

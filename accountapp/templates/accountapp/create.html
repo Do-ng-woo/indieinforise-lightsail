@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+<style>
+    .container {
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,.1);
+    }
+    button.btn {
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+</style>
+<div class="container" style="max-width: 700px; margin-top: 40px;">
+    <div class="text-center mb-4">
+        <h4>회원가입</h4>
+    </div>
+    <form action="{% url 'accountapp:create' %}" method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        {% bootstrap_form form layout='horizontal' %}
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">가입하기</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

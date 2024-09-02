@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="text-align:center; margin: 2rem 0;"> 
+    <!-- 통합된 구독 목록 제목 -->
+    <h2>내 구독 목록</h2>
+</div>
+    
+<div>
+    <!-- 기존의 리스트 표시 코드를 유지합니다. -->
+    {% include 'snippets/list_fragment.html' with article_list=article_list %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+.container {
+    padding: 0;
+    margin: 0, auto;
+}
+
+.container div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 1rem;
+}
+    
+.container img {
+    width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+    height: 13.5rem; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+    object-fit: cover; /* 이미지 비율 유지 */
+    border-radius: 1rem; /* 이미지 모서리 둥글기 */
+}
+    
+a {
+    color: black;
+     text-decoration-line: none;
+}
+.container a {
+    flex: 0 0 30%; /* flex-grow, flex-shrink, flex-basis */
+    box-sizing: border-box; /* 패딩과 보더를 너비에 포함 */
+    margin: 1%; /* 각 요소 사이의 마진 */
+    text-align: center; /* 내용을 중앙 정렬 */
+    border-radius: 1rem;
+    padding: 15px; /* 내부 패딩 */
+    background-color: #FFFFFF; /* 배경색 */
+    height: 300px; /* 카드의 높이, 필요에 따라 조정 */
+    width:250px;
+    flex-wrap: wrap; /* 요소들이 컨테이너를 벗어나지 않도록 줄바꿈 설정 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* X축, Y축, 흐림 반경, 색상 */
+}
+@media (max-width: 600px) {
+    .container{
+        margin-top:20px;
+    }
+    .container img {
+        width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+        height: 12rem; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+        object-fit: cover; /* 이미지 비율 유지 */
+        border-radius: 1rem; /* 이미지 모서리 둥글기 */
+    }
+    .container a {
+        height: 280px; /* 카드의 높이, 필요에 따라 조정 */
+        width: 45%;
+    }
+}
+@media (max-width: 500px) {
+    .container img {
+        width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+        height: 160px; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+    }
+    .container a {
+        height: 240px; /* 카드의 높이, 필요에 따라 조정 */
+    }
+}
+@media (max-width: 420px) {
+    .container img {
+        width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+        height: 130px; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+    }
+    .container a {
+        height: 200px; /* 카드의 높이, 필요에 따라 조정 */
+    }
+}
+</style>
+<div style="text-align:center; margin: 2rem 0;"> 
+<a href="{% url 'subscribeapp:Artist_list' %}" style="margin: 0rem 0.5rem" class="btn btn-info rounded-pill px-3">
+    <span>구독 아티스트</span> 
+</a>
+<a href="{% url 'subscribeapp:Project_list' %}" style="margin: 0rem 0.5rem"class="btn btn-info rounded-pill px-3">
+    <span>구독 공연장</span>
+</a>
+<a href="{% url 'subscribeapp:Person_list' %}" style="margin: 0rem 0.5rem"class="btn btn-info rounded-pill px-3">
+    <span>구독 인물</span>
+</a>
+</div>
+
+    {% if artist_list %}
+    <div class="container">
+        
+        {% for artist in artist_list %}
+        <a href="{% url 'artistapp:detail' pk=artist.pk %}">
+            {% include 'snippets/card_artist.html' with artist=artist %}
+        </a>
+        {% endfor %}
+            
+    </div>
+    <script src="{% static 'js/magicgrid.js' %}"></script>
+    {% else %}
+    <div style="text-align:center">
+        <h1>No Subscribed Artists Yet!</h1>
+    </div>
+    {% endif %}
+    
+    {% include 'snippets/pagination.html' with pageobj=page_obj %}
+    
+
+{% endblock %}

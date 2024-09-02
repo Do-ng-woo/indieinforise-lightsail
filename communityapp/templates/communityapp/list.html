@@ -1,0 +1,1122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+.main_community{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 90%;
+    margin: 50px auto; /* 위아래로 마진 추가하여 중앙 정렬 */
+}
+/*------------------------------------------------------------------------  */
+
+.community_list_header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width:80%;
+    margin: 0 auto;
+}
+.open_favorite_buttons{
+    display: flex;
+    align-items: center;
+    justify-content: start; 
+    width:80%;
+    margin: 0 auto;
+}    
+.hidden_favorite_header {
+    display: flex; /* 플렉스 박스로 설정 */
+    align-items: center; /* 수직 중앙 정렬 */
+    flex-wrap: nowrap; /* 줄바꿈 방지 */
+    justify-content: start; 
+    width:100%;
+    margin: 0 auto;
+}
+.favoriteKeyword_view {
+    text-align: center; /* 버튼을 중앙 정렬 */
+    padding: 20px; /* 버튼 주위에 여백 추가 */
+    display: flex; /* 플렉스 박스로 설정 */
+    align-items: center; /* 수직 중앙 정렬 */
+}
+.manage_favoriteKeyword {
+    text-align: center; /* 버튼을 중앙 정렬 */
+    padding: 20px; /* 버튼 주위에 여백 추가 */
+    display: flex; /* 플렉스 박스로 설정 */
+    align-items: center; /* 수직 중앙 정렬 */
+}
+.manage_favoriteKeyword button{
+    background-color: #007BFF; /* 밝은 파란색 */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    border-radius: 5px; /* 둥근 모서리 */
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.24), 0 2px 10px 0 rgba(0, 0, 0, 0.19);
+    min-width:132px;
+
+}
+/* 버튼 호버 시 효과 */
+.manage_favoriteKeyword button:hover {
+    background-color: #0056b3; /* 어두운 파란색으로 변경 */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.favoriteKeyword_view button {
+    background-color: #007BFF; /* 밝은 파란색 */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    border-radius: 5px; /* 둥근 모서리 */
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.24), 0 2px 10px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* 버튼 호버 시 효과 */
+.favoriteKeyword_view button:hover {
+    background-color: #0056b3; /* 어두운 파란색으로 변경 */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.search-form {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.search-form div {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.search-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    min-width:60px;
+}
+.search-field{
+    height:44px;
+    margin-right:10px;
+}
+.date-range{
+    height:44px;
+    margin-right:10px;
+}
+.search-keyword{
+    height:44px;
+    margin-right:10px;
+}
+.search_2{
+    width:370px;
+    height:44px;
+    margin-right:10px;
+}
+.favorite-keywords {
+    display: none; /* 초기에는 숨김 처리 */
+    position: fixed; /* 스크롤해도 화면 상단에 고정 */
+    top: 22%;
+    left: 50%;
+    transform: translateX(-50%); /* 중앙 정렬 */
+    z-index: 1000; /* 다른 요소 위에 표시 */
+    width: 550px; /* 화면 전체 너비 */
+    max-height:500px;
+    max-width: 700px; /* 최대 너비 제한 */
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f8f9fa; /* 밝은 회색조로 배경 설정 */
+    border: 1px solid #e3e6e8; /* 경계선 추가 */
+    border-radius: 10px; /* 경계선 둥글게 처리 */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 그림자 효과 추가 */
+    flex-direction: column; /* 자식 요소를 세로로 배열 */
+    justify-content: flex-start;
+    gap: 20px; /* 요소 사이의 간격 */
+    overflow: auto;  /* 내용이 넘칠 경우 숨김 처리 */
+}
+.favorite_close_button{
+    color: #000000;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: none;
+    background: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+.favorite_close_button:hover {
+    color: #f44336; /* 호버 시 색상 변경 */
+}
+/* 활성화시 표시 */
+.favorite-keywords.active {
+    display: flex; /* 활성화시 flex로 변경하여 내용 표시 */
+}
+.favorite-keywords h3 {
+    color: #495057; /* 제목 색상 */
+    margin-bottom: 15px;
+    text-align: center; /* 제목 가운데 정렬 */
+}
+
+.favorite-keywords ul {
+    list-style: none; /* 기본 목록 스타일 제거 */
+    padding: 0;
+    margin: 0;
+}
+
+.favorite-keywords ul li {
+    background-color: #ffffff; /* 항목 배경색 */
+    border: 1px solid #e3e6e8; /* 항목 경계선 */
+    border-radius: 5px; /* 항목 경계선 둥글게 처리 */
+    padding: 10px;
+    margin-bottom: 10px; /* 항목 사이의 간격 */
+    display: flex;
+    justify-content: space-between; /* 내용과 삭제 버튼을 양 끝으로 배치 */
+    align-items: center;
+}
+
+.favorite-keywords ul li a {
+    text-decoration: none; /* 링크 밑줄 제거 */
+    color: #007bff; /* 링크 색상 */
+}
+
+
+.additional_search_keyword_button {
+    background-color: #007bff; /* 버튼 배경색 */
+    color: white; /* 버튼 텍스트 색상 */
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px; /* 버튼 경계선 둥글게 처리 */
+    cursor: pointer; /* 마우스 오버시 커서 변경 */
+}
+
+.favorite-keywords form button:hover {
+    background-color: #0056b3; /* 마우스 오버시 버튼 배경색 변경 */
+}
+    
+.keyword-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.keyword-item:hover {
+    background-color: #f0f0f0; /* 마우스 오버 시 배경색 변경 */
+}
+
+.keyword-link {
+    display: block;
+    color: #000;
+    text-decoration: none;
+    width: 100%; /* 링크가 전체 너비를 차지하도록 설정 */
+}
+
+.deleteButton a {
+    color: #ff0000; /* 삭제 버튼 색상 */
+    text-decoration: underline; /* 삭제 링크에 밑줄 추가 */
+}
+.keyword-link.active {
+    color: #ff5722; /* 예: 밝은 오렌지 색상 */
+    font-weight: bold; /* 텍스트를 두껍게 */
+}
+
+.keyword-link.active:hover {
+    text-decoration: underline; /* 마우스 오버 시 밑줄 추가 */
+}
+.FavoriteSearch-select{
+    height:38px;
+}
+/* --------------------------------------------------------- */
+.table-container {
+    margin: 0 auto;
+    padding: 0;
+    width: 90%; /* 컨테이너 너비 조정 */
+    max-width: 150rem; /* 최대 너비 설정 */
+    min-height:1000px;
+}
+
+
+.table-responsive {
+    margin-bottom: 20px;
+}
+
+.community-list {
+    margin: 20px;
+}
+
+.community-item {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.top-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+}
+
+.top-line h2 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.top-line{
+    font-size: 24px;
+    color: #666;
+}
+.likes{
+    display: flex;
+    color: #666;
+    align-items: center;
+}
+.like_count{
+    font-size: 20px;
+    margin-left:10px;
+}
+
+.bottom-line {
+    display: flex;
+    justify-content: start;
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.bottom-line span {
+    margin-right: 10px;
+}
+
+.no-communities {
+    text-align: center;
+}
+.favoriteKeyword_button button {
+    background-color: #007BFF; /* 밝은 파란색 */
+    border: none;
+    color: white;
+    width:30%;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    border-radius: 5px; /* 둥근 모서리 */
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.24), 0 2px 10px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* 버튼 호버 시 효과 */
+.favoriteKeyword_button button:hover {
+    background-color: #0056b3; /* 어두운 파란색으로 변경 */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* 활성화된 버튼 스타일 */
+.favoriteKeyword_button button.active {
+    background-color: #004085; /* 더 어두운 파란색 */
+}
+/* ======================즐겨찾는 버튼 스타일 ======================*/
+.position-buttons-container {
+    display: none;
+    width: 70%;
+    margin: 1rem auto;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(1, 1fr);
+    gap: 1rem;
+    justify-items: center;
+    align-items: center;
+}
+
+.position-buttons-container button {
+    width: 130px;
+    height: 50px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #000;
+    cursor: pointer;
+}
+.position-buttons-container button:hover {
+    background-color: #f0f0f0;
+}
+/* 활성화된 버튼 스타일 */
+.position-buttons-container button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+/* 펼치기/닫기 버튼 스타일 */
+.toggle-button {
+    display: block;
+    margin-right: 10px;
+    padding: 10px 6px 10px 10px;
+    height:44px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+.toggle-button:hover {
+    background-color: #45a049;
+}
+/*==============favoriteKeyword 추가 파트  */
+.favorite-form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
+}
+
+.search-field-group{
+    flex: 2;
+}
+.keyword-field-group {
+    flex: 5;
+}
+
+.search-field-group select{
+    width: 100%;
+}
+.keyword-field-group select,
+.keyword-field-group input {
+    width: 100%;
+}
+
+.favorite-form button {
+    flex-shrink: 0;
+}
+@media (max-width: 1550px) {
+    .position-buttons-container {
+        width: 80%;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+
+    }
+}
+@media (max-width: 1380px) {
+    .search_2{
+        width:200px;
+        height:44px;
+        margin-right:10px;
+    }
+    .favoriteKeyword_view {
+    padding: 10px; /* 버튼 주위에 여백 추가 */
+    }
+    .manage_favoriteKeyword {
+        padding: 10px; /* 버튼 주위에 여백 추가 */
+    }
+    .search-keyword{
+        width:150px;
+        margin-right:0px;
+    }
+}
+@media (max-width: 1280px) {
+    .position-buttons-container {
+        width: 80%;
+        grid-template-columns: repeat(6, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+
+    }
+}
+@media (max-width: 1080px) {
+    .community_list_header{
+        width:85%;
+    }
+    .position-buttons-container {
+        width: 80%;
+    }
+    .main_community{
+        width: 100%;
+        margin: 50px auto; /* 위아래로 마진 추가하여 중앙 정렬 */
+    }
+    .manage_favoriteKeyword button{
+        padding: 11px 10px;
+        font-size: 14px;
+        margin: 4px 2px;
+        min-width:100px;
+        height:44px;
+    }
+    .search_2{
+        width:150px;
+        height:44px;
+        margin-right:10px;
+    }
+    .search-keyword{
+        width:110px;
+        margin-right:0px;
+    }
+    .position-buttons-container {
+        width: 80%;
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+
+    }
+}
+@media (max-width: 880px) {
+    .community_list_header{
+        width:90%;
+    }
+    .position-buttons-container {
+        width: 85%;
+    }
+    .main_community{
+        width: 100%;
+        margin: 50px auto; /* 위아래로 마진 추가하여 중앙 정렬 */
+    }
+    .table-container {
+        width: 95%; /* 컨테이너 너비 조정 */
+    }
+}
+@media (max-width: 830px) {
+    .position-buttons-container {
+        width: 80%;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+    }
+}
+@media (max-width: 810px) {
+    .community_list_header {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* 두 열로 설정 */
+        grid-template-columns: 20% 80%; /* 두 줄로 나눔 */
+    }
+
+    .open_favorite_buttons {
+        order: 1; /* 첫 번째 줄 */
+        grid-column: 1 / 2; /* 첫 번째 열 */
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start; /* 왼쪽 정렬 */
+        margin-right:70px;
+    }
+
+    .search-form {
+        order: 2; /* 첫 번째 줄 */
+        grid-column: 2 / 3; /* 두 번째 열 */
+        width: 100%;
+        justify-content: flex-end; /* 오른쪽 정렬 */
+        display: flex;
+        align-items: center;
+    }
+
+    .hidden_favorite_header {
+        order: 3; /* 두 번째 줄 */
+        grid-column: 1 / -1; /* 두 열을 차지 */
+        width: 100%;
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+    }
+    .search_2{
+        width:400px;
+        height:44px;
+        margin-right:10px;
+    }
+    .search-keyword{
+        width:273px;
+        margin-right:0px;
+    }
+    .search-field{
+        height:44px;
+        margin-right:10px;
+        width:120px;
+    }
+    .favoriteKeyword_view button {
+        padding: 10px 5px 10px 5px;
+        font-size:12px;
+        height:44px;
+        width:100px;
+    }
+}
+@media (max-width: 700px) {
+    .community_list_header{
+        width:95%;
+    }
+    .main_community{
+        width: 100%;
+        margin: 50px auto; /* 위아래로 마진 추가하여 중앙 정렬 */
+    }
+    .position-buttons-container {
+        width:95%;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+    }
+}
+@media (max-width: 650px) {
+    .search_2{
+        width:300px;
+        height:44px;
+        margin-right:10px;
+    }
+    .search-keyword{
+        width:213px;
+        margin-right:0px;
+    }
+    .search-field{
+        height:44px;
+        margin-right:10px;
+        width:80px;
+    }
+    .favoriteKeyword_view button {
+        padding: 10px 5px 10px 5px;
+        font-size:12px;
+        height:44px;
+        width:100px;
+    }
+    .favorite-keywords {
+        top: 22%;
+        left: 50%;
+        transform: translateX(-50%); /* 중앙 정렬 */
+        width: 400px; /* 화면 전체 너비 */
+        max-height:500px;
+        max-width: 700px; /* 최대 너비 제한 */
+        overflow: auto;  /* 내용이 넘칠 경우 숨김 처리 */
+    }
+    .favoriteKeyword_button button {
+        width:140px;
+    }
+    .search-field-group select{
+        width: 90px;
+    }
+    .keyword-field-group select,
+    .keyword-field-group input {
+        width: 100%;
+        height:38px;
+    }
+}
+@media (max-width: 610px) {
+    .position-buttons-container button {
+        width: 110px;
+        height: 45px;
+        font-size: 14px;
+    }
+}
+@media (max-width: 540px) {
+    .position-buttons-container button {
+        width: 100px;
+        height: 45px;
+        font-size: 14px;
+    }
+    .search_2{
+        width:250px;
+        height:44px;
+        margin-right:10px;
+    }
+    .search-keyword{
+        width:173px;
+        margin-right:0px;
+    }
+    .search-field{
+        height:44px;
+        margin-right:10px;
+        width:70px;
+        font-size:13px;
+    }
+    .favoriteKeyword_view button {
+        padding: 10px 5px 10px 5px;
+        font-size:12px;
+        height:44px;
+        width:100px;
+    }
+    .additional_search_keyword_button{
+        width:60px;
+    }
+}
+@media (max-width: 540px) {
+    .FavoriteSearch-select{
+        height:31.25px;
+    }
+    .favorite-form button {
+        padding: 3px 12px;
+        min-height:32px;
+    }
+    .search-field-group select{
+        height:32px;
+    }
+    .keyword-field-group select,
+    .keyword-field-group input {
+        width: 100%;
+        height:32px;
+    }
+    #keyword-field-container{
+        max-width:130px;   
+    }
+}
+@media (max-width: 490px) {
+    .position-buttons-container button {
+        width: 90px;
+        height: 45px;
+        font-size: 13px;
+    }
+    .search_2{
+        width:180px;
+        height:44px;
+        margin-right:10px;
+    }
+    .search-keyword{
+        width:103px;
+        margin-right:0px;
+    }
+    .search-field{
+        height:44px;
+        margin-right:10px;
+        width:70px;
+        font-size:12px;
+    }
+    .favoriteKeyword_view button {
+        padding: 10px 5px 10px 5px;
+        font-size:12px;
+        height:44px;
+        width:100px;
+    }
+    .additional_search_keyword_button{
+        width:60px;
+    }
+    .favorite-keywords {
+        width: 350px; /* 화면 전체 너비 */
+    }
+    .favoriteKeyword_button button {
+        width:140px;
+    }
+}
+@media (max-width: 435px) {
+    .position-buttons-container button {
+        width: 80px;
+        height: 45px;
+        font-size: 13px;
+    }
+}
+@media (max-width: 415px) {
+    .position-buttons-container button {
+        width: 80px;
+        height: 45px;
+        font-size: 13px;
+    }
+    .manage_favoriteKeyword button, .favoriteKeyword_view button{ 
+        max-width:80px;
+        min-width:80px;
+        font-size:11px;
+        padding:11px 5px;
+    }
+    .additional_search_keyword_button{
+        padding:10px 5px;
+        max-width:45px;
+        height:44px;
+    }
+    .search-button{
+        padding:10px 5px;
+        max-width:45px;
+        min-width:45px;
+        height:44px;
+    }
+}
+@media (max-width: 400px) {
+    .position-buttons-container button {
+        width: 80px;
+        height: 45px;
+        font-size: 13px;
+    }
+    .manage_favoriteKeyword button, .favoriteKeyword_view button{ 
+        max-width:80px;
+        min-width:80px;
+        font-size:11px;
+        padding:11px 5px;
+    }
+    .position-buttons-container {
+        gap: 3px;
+    }
+    .search_2{
+        width:170px;
+        height:44px;
+        margin-right:5px;
+    }
+    .search-keyword{
+        width:88px;
+        margin-right:0px;
+    }
+    .favorite-keywords {
+        width: 350px; /* 화면 전체 너비 */
+    }
+    .favoriteKeyword_button button {
+        width:140px;
+    }
+}
+</style>
+<div class="community_list_header">
+    <div class="open_favorite_buttons">
+        <div class="favoriteKeyword_view">
+            {% if request.user.is_authenticated %}
+                <button id="togglegirdButton" class="toggle-button"><span class="material-icons">menu_open</span></button>
+            {% else %}
+                <a class="loginButton" href="#">
+                    <button class="toggle-button"><span class="material-icons">menu_open</span></button>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    <!-- 추가 검색 폼 -->
+    <div id="searchFavoriteForm" class="hidden_favorite_header" style="display: none;">
+        <div class="manage_favoriteKeyword">
+            {% if request.user.is_authenticated %}
+                <button id="toggleViewButton">즐겨찾기관리</button>
+            {% else %}
+                <a class="loginButton" href="#">
+                    <button>즐겨찾기관리</button>
+                </a>
+            {% endif %}
+        </div>
+        <form method="get" action="">
+            <!-- 초기 검색 파라미터를 숨겨진 필드로 포함 -->
+            <input type="hidden" name="search_field" value="{{ request.GET.search_field }}">
+            <input type="hidden" name="search_keyword" value="{{ request.GET.search_keyword }}">
+            <input type="hidden" name="date_range" value="{{ request.GET.date_range }}">
+            <input class="search_2"type="text" name="additional_search_keyword" placeholder="현재 즐겨찾기 내 검색" value="{{ request.GET.additional_search_keyword }}">
+            <button class="additional_search_keyword_button" type="submit">검색</button>
+        </form>
+    </div>
+    <form method="get" action="{% url 'communityapp:list' %}" class="search-form">
+        <div>
+            {{ search_form.search_field }}
+            {{ search_form.search_keyword }}
+            {{ search_form.date_range }}
+        </div>
+        <button type="submit" class="search-button">검색</button>
+    </form>
+</div>
+<div class="position-buttons-container" id="position-buttons">
+    {% for keyword in favorite_keywords %}
+        <button onclick="location.href='{% url 'communityapp:list' %}?search_field={{ keyword.search_field }}&search_keyword={{ keyword.keyword }}'"
+            class="{% if request.GET.search_field == keyword.search_field and request.GET.search_keyword == keyword.keyword %}active{% endif %}">
+            <!-- {% if keyword.search_field == 'title' %}
+                제목
+            {% elif keyword.search_field == 'person' %}
+                인물
+            {% elif keyword.search_field == 'project' %}
+                공연장
+            {% elif keyword.search_field == 'artist' %}
+                아티스트
+            {% elif keyword.search_field == 'article' %}
+                공연
+            {% elif keyword.search_field == 'sing' %}
+                노래
+            {% elif keyword.search_field == 'album' %}
+                앨범
+            {% elif keyword.search_field == 'instrument' %}
+                악기
+            {% elif keyword.search_field == 'genre' %}
+                장르
+            {% else %}
+                {{ keyword.search_field }}
+            {% endif %} -->
+            {{ keyword.keyword | truncatechars:20 }}
+        </button>
+    {% endfor %}
+</div>
+<div class="favorite-keywords">
+    <!-- 즐겨찾기 검색 추가 폼 -->
+    <span class="favorite_close_button material-icons">close</span>
+    <h3>즐겨찾기</h3>
+    <div id="addFavoriteForm" style="display: none;">
+        <form method="post" id="favorite-search-form" action="{% url 'accountapp:add_favorite_search' %}" class="favorite-form">
+            {% csrf_token %}
+            <div class="form-group search-field-group">
+                {{ favorite_search_form.search_field }}
+            </div>
+            <div class="form-group keyword-field-group" id="keyword-field-container">
+                <select id="id_add_keyword" name="keyword" class="django-select2"></select>
+            </div>
+            <button type="submit" class="btn btn-primary">추가</button>
+        </form>
+    </div>
+    <!-- 즐겨찾기 키워드 목록 -->
+    <ul id="favoriteKeywords">
+        {% for keyword in favorite_keywords %}
+            <li class="keyword-item">
+                <a href="{% url 'communityapp:list' %}?search_field={{ keyword.search_field }}&search_keyword={{ keyword.keyword }}" class="keyword-link {% if request.GET.search_field == keyword.search_field and request.GET.search_keyword == keyword.keyword %}active{% endif %}">
+                    <span>
+                        {% if keyword.search_field == 'title' %}
+                            제목
+                        {% elif keyword.search_field == 'person' %}
+                            인물
+                        {% elif keyword.search_field == 'project' %}
+                            공연장
+                        {% elif keyword.search_field == 'artist' %}
+                            아티스트
+                        {% elif keyword.search_field == 'article' %}
+                            공연
+                        {% elif keyword.search_field == 'sing' %}
+                            노래
+                        {% elif keyword.search_field == 'album' %}
+                            앨범
+                        {% elif keyword.search_field == 'instrument' %}
+                            악기
+                        {% elif keyword.search_field == 'genre' %}
+                            장르
+                        {% else %}
+                            {{ keyword.search_field }}
+                        {% endif %}
+                        - {{ keyword.keyword }}
+                    </span>
+                </a>
+                <!-- 삭제 버튼; 'deleteButton' 클래스를 span에서 a 태그로 이동 -->
+                <a href="{% url 'accountapp:delete_favorite_keyword' keyword.id %}" class="deleteButton material-icons" style="display: none;" onclick="event.stopPropagation();">do_not_disturb_on</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <div class="favoriteKeyword_button">
+        {% if request.user.is_authenticated %}
+            <button id="toggleEditButton">즐겨찾기 관리</button>
+        {% else %}
+            <a class="loginButton" href="#">
+                <button>즐겨찾기 관리</button>
+            </a>
+        {% endif %}
+    </div>        
+</div>
+<div class="main_community">
+    <div class="table-container">
+        <h2 style="text-align: center;">전체글보기</h2>
+        <div class="community-list">
+            {% if community_list %}
+                {% for community in community_list %}
+                <div class="community-item">
+                    <div class="top-line">
+                        <h2><a href="{% url 'communityapp:detail' pk=community.pk %}">{{ community.title }}</a></h2>
+                        <div class="likes">
+                            <span class="material-icons">favorite</span>
+                            <span class="like_count">{{ community.like }}</span>  
+                        </div>
+                    </div>
+                    <div class="bottom-line">
+                        <span class="author">작성자: {{ community.writer.username }}</span>
+                        <span class="created-at"> 
+                            {% if community.created_at|date:"Y-m-d" == today %}
+                                {{ community.created_at|date:"g:i A" }} <!-- 오늘이면 시간만 표시 -->
+                            {% else %}
+                                {{ community.created_at|date:"y.m.d" }} <!-- 오늘이 아니면 날짜와 시간 표시 -->
+                            {% endif %}
+                        </span>
+                        <span class="views">조회수: {{ community.views }}</span>
+                        <span class="comments">댓글: {{ community.comment_count }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% include 'snippets/pagination.html' with pageobj=page_obj %}
+            {% else %}
+                <div class="no-communities">
+                    <h1>게시물이 존재하지 않습니다</h1>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div style="text-align: center">
+    <a href="{% url 'communityapp:create' %}" class="btn btn-dark rounded-pill col-3 mt-3 mb-3 px-3">
+        Create Community
+    </a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var searchField = document.getElementById('id_search_field');
+    var keywordField = document.getElementById('id_search_keyword');
+    var dateField = document.getElementById('id_date_range');
+
+    function toggleDateField() {
+        if (searchField.value === 'date') {
+            keywordField.style.display = 'none';
+            dateField.style.display = 'block';
+        } else {
+            keywordField.style.display = 'block';
+            dateField.style.display = 'none';
+        }
+    }
+
+    toggleDateField();
+    searchField.addEventListener('change', toggleDateField);
+});
+</script>
+
+<script>
+var isEditMode = false; // 현재 편집 모드 상태를 추적하는 변수
+
+document.addEventListener('DOMContentLoaded', function() {
+    var toggleEditButton = document.getElementById('toggleEditButton');
+    var favoriteKeywordsList = document.getElementById('favoriteKeywords');
+    var keywordLinks = document.querySelectorAll('.keyword-link'); // 모든 키워드 링크 선택
+
+    toggleEditButton.addEventListener('click', function() {
+        isEditMode = !isEditMode; // 편집 모드 상태 토글
+
+        if (isEditMode) {
+            // 편집 모드 활성화
+            this.textContent = '수정끝내기'; // 버튼 텍스트 변경
+            document.getElementById('addFavoriteForm').style.display = 'block'; // 즐겨찾기 추가 폼 표시
+            document.querySelectorAll('.deleteButton').forEach(function(button) {
+                button.style.display = 'inline'; // 삭제 버튼 표시
+            });
+
+            // 즐겨찾기 키워드 링크 비활성화
+            keywordLinks.forEach(function(link) {
+                link.addEventListener('click', preventLink);
+            });
+        } else {
+            // 편집 모드 비활성화
+            this.textContent = '수정하기'; // 버튼 텍스트 원래대로 변경
+            document.getElementById('addFavoriteForm').style.display = 'none'; // 즐겨찾기 추가 폼 숨김
+            document.querySelectorAll('.deleteButton').forEach(function(button) {
+                button.style.display = 'none'; // 삭제 버튼 숨김
+            });
+
+            // 즐겨찾기 키워드 링크 활성화
+            keywordLinks.forEach(function(link) {
+                link.removeEventListener('click', preventLink);
+            });
+        }
+    });
+
+    function preventLink(e) {
+        e.preventDefault(); // 링크의 기본 동작 방지
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    var toggleViewButton = document.getElementById('toggleViewButton');
+    var togglegirdButton = document.getElementById('togglegirdButton');
+    var favoriteKeywords = document.querySelector('.favorite-keywords');
+    var positionButtonsContainer = document.getElementById('position-buttons');
+    var searchFavoriteForm = document.getElementById('searchFavoriteForm');
+    var openFavoriteButtons = document.querySelector('.open_favorite_buttons'); // 추가된 부분
+
+    // 페이지 로드 시 저장된 그리드 상태를 확인하여 적용
+    if (localStorage.getItem('gridState') === 'expanded') {
+        togglePositionButtons(true); // 그리드를 펼친 상태로 설정
+    }
+
+    toggleViewButton.addEventListener('click', function() {
+        // active 클래스를 토글하여 즐겨찾기 키워드 섹션을 표시하거나 숨김
+        favoriteKeywords.classList.toggle('active');
+    });
+
+    togglegirdButton.addEventListener('click', function() {
+        togglePositionButtons(); // 그리드 펼치기/접기 함수 호출
+    });
+
+    // close 버튼에 이벤트 리스너 추가
+    var closeButton = document.querySelector('.favorite_close_button');
+    closeButton.addEventListener('click', function() {
+        favoriteKeywords.classList.remove('active'); // active 클래스 제거하여 섹션 숨김
+        positionButtonsContainer.style.display = 'none'; // 그리드 숨김
+        searchFavoriteForm.style.display = 'none'; // 검색 폼 숨김
+        openFavoriteButtons.style.width = '80%'; // 너비 변경
+        localStorage.removeItem('gridState'); // 그리드 상태 저장 제거
+    });
+
+    // 그리드 내 버튼 활성화 상태 관리
+    var buttons = document.querySelectorAll('.position-buttons-container button');
+    var searchParams = new URLSearchParams(window.location.search);
+    var searchField = searchParams.get('search_field');
+    var searchKeyword = searchParams.get('search_keyword');
+
+    buttons.forEach(function(button) {
+        var url = new URL(button.getAttribute('onclick').split("'")[1], window.location.origin);
+        var params = new URLSearchParams(url.search);
+        if (params.get('search_field') === searchField && params.get('search_keyword') === searchKeyword) {
+            button.classList.add('active');
+        }
+    });
+});
+
+// 그리드 펼치기/접기 함수
+function togglePositionButtons(restore = false) {
+    var container = document.getElementById('position-buttons');
+    var buttons = container.querySelectorAll('button');
+    var searchFavoriteForm = document.getElementById('searchFavoriteForm');
+    var openFavoriteButtons = document.querySelector('.open_favorite_buttons'); // 추가된 부분
+
+    if (container.style.display === 'none' || container.style.display === '') {
+        container.style.display = 'grid';
+        buttons.forEach(button => {
+            button.style.display = 'flex';
+        });
+        searchFavoriteForm.style.display = 'flex'; // 검색 폼 표시
+        openFavoriteButtons.style.width = 'auto'; // 너비 변경
+        if (!restore) {
+            localStorage.setItem('gridState', 'expanded'); // 그리드 상태 저장
+        }
+    } else {
+        container.style.display = 'none';
+        buttons.forEach(button => {
+            button.style.display = 'none';
+        });
+        searchFavoriteForm.style.display = 'none'; // 검색 폼 숨김
+        openFavoriteButtons.style.width = '80%'; // 너비 변경
+        if (!restore) {
+            localStorage.removeItem('gridState'); // 그리드 상태 저장 제거
+        }
+    }
+}
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var searchField = document.getElementById('custom_search_field');
+    var keywordFieldContainer = document.getElementById('keyword-field-container');
+
+    function updateKeywordField() {
+        var selectedValue = searchField.value;
+        var url = "{% url 'accountapp:get_field_data' %}?field=" + selectedValue;
+
+        if (selectedValue === 'title') {
+            // 제목일 때는 텍스트 입력 필드로 변경
+            keywordFieldContainer.innerHTML = '<input type="text" id="id_add_keyword" name="keyword" class="form-control" />';
+        } else {
+            // 다른 필드일 때는 Select2 필드로 변경
+            $.ajax({
+                url: url,
+                success: function(data) {
+                    keywordFieldContainer.innerHTML = '<select id="id_add_keyword" name="keyword" class="django-select2" style="width: 100%;"></select>';
+                    var keywordField = document.getElementById('id_add_keyword');
+                    data.forEach(function(item) {
+                        var newOption = new Option(item.title, item.title, false, false);
+                        keywordField.add(newOption);
+                    });
+                    $('.django-select2').select2();
+                }
+            });
+        }
+    }
+
+    searchField.addEventListener('change', updateKeywordField);
+    updateKeywordField();
+
+    $('.django-select2').select2();
+});
+</script>
+{% endblock %}

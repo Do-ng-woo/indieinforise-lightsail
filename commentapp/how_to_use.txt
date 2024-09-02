@@ -1,0 +1,190 @@
+범용 사용법이다 
+
+1. 앱 내 detail.html 변경 
+/* ========================================댓글섹션 스타일링====================================== */
+    /* 전체 댓글 섹션 스타일링 */
+.comment-section {
+    font-family: 'Arial', sans-serif;
+    max-width: 800px;
+    margin: auto;
+}
+
+/* 정렬 버튼 스타일링 */
+.sorting-buttons {
+    text-align: right;
+    margin: 20px 0;
+}
+
+.sorting-buttons a {
+    text-decoration: none;
+    color: #1a0dab;
+    font-size: 0.9em;
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: 1px solid #dfe1e5;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.sorting-buttons a:hover {
+    background-color: #f8f9fa;
+}
+
+/* 댓글 목록 스타일링 */
+.comment {
+    background-color: #f1f3f4;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* 페이지네이션 스타일링 */
+.pagination {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: #1a0dab;
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #dfe1e5;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #f8f9fa;
+}
+
+.pagination .current-page {
+    padding: 5px 10px;
+    margin: 0 5px;
+    background-color: #e8f0fe;
+    border-radius: 4px;
+}
+
+
+<div class="comment-section">
+        <span>댓글 수: {{ target_article.comment_count }}</span>
+        <span>조회 수: {{ target_article.views }}</span>
+        <div class="make">
+        {% include 'commentapp/create.html' with content_type_id=content_type_id object_id=object_id %}
+        </div>
+        <div class="sorting-buttons">
+            <a href="{{ request.path }}?sort=recent{% if comment_page_obj.number %}&page={{ comment_page_obj.number }}{% endif %}">최신순</a>
+            <a href="{{ request.path }}?sort=likes{% if comment_page_obj.number %}&page={{ comment_page_obj.number }}{% endif %}">좋아요순</a>
+        </div>
+
+        <!-- 페이지네이션된 댓글 목록 -->
+        <div class="comment">
+            {% for comment in comments %}
+                {% include 'commentapp/detail.html' with comment=comment %}
+            {% empty %}
+                <p>댓글이 없습니다.</p>
+            {% endfor %}
+        </div>
+
+        <!-- 페이지네이션 링크 -->
+        <div class="pagination">
+            {% if comment_page_obj.has_previous %}
+                <a href="?sort={{ sort }}&page=1">&laquo; 처음</a>
+                <a href="?sort={{ sort }}&page={{ comment_page_obj.previous_page_number }}">이전</a>
+            {% endif %}
+            <span class="current-page">{{ comment_page_obj.number }}/{{ comment_page_obj.paginator.num_pages }}</span>
+            {% if comment_page_obj.has_next %}
+                <a href="?sort={{ sort }}&page={{ comment_page_obj.next_page_number }}">다음</a>
+                <a href="?sort={{ sort }}&page={{ comment_page_obj.paginator.num_pages }}">마지막 &raquo;</a>
+            {% endif %}
+        </div>
+    </div>
+<script>
+$(document).ready(function(){
+    // 댓글 컨테이너에 대한 클릭 이벤트 위임
+    $('.comment').on('click', 'button.like-button', function(e){
+        e.preventDefault();
+        var commentId = $(this).data('id');
+        var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '/comments/like_comment/' + commentId + '/',
+            data: {
+                csrfmiddlewaretoken: csrftoken,
+            },
+            success: function(response){
+                $('#like-count-' + commentId).text(response.total_likes);
+                if(response.liked){
+                    $('#like-icon-' + commentId).css('color', 'red');
+                } else {
+                    $('#like-icon-' + commentId).css('color', 'grey');
+                }
+            },
+            error: function(xhr, status, error){
+                alert('Something went wrong: ' + error);
+            }
+        });
+    });
+
+    // 싫어요 버튼 이벤트 위임
+    $('.comment').on('click', 'button.dislike-button', function(e){
+        e.preventDefault();
+        var commentId = $(this).data('id');
+        var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '/comments/dislike_comment/' + commentId + '/',
+            data: {
+                csrfmiddlewaretoken: csrftoken,
+            },
+            success: function(response){
+                $('#dislike-count-' + commentId).text(response.total_dislikes); // 싫어요 개수 업데이트
+                if(response.disliked){
+                    $('#dislike-icon-' + commentId).css('color', 'blue'); // 싫어요 눌린 상태로 스타일 변경
+                } else {
+                    $('#dislike-icon-' + commentId).css('color', 'grey'); // 싫어요 눌리지 않은 상태로 스타일 변경
+                }
+            },
+            error: function(xhr, status, error){
+                alert('Something went wrong: ' + error);
+            }
+        });
+    });
+});
+
+</script>
+2. view 변경 
+
+from commentapp.models import Comment 
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count
+
+ #################### ContentType을 사용하여 Article 객체에 대한 댓글 필터링
+        content_type = ContentType.objects.get_for_model(self.object)
+        comments = Comment.objects.filter(content_type=content_type, object_id=self.object.pk) \
+                                  .annotate(likes_count=Count('likes'))
+        
+        # URL 쿼리에 따라 정렬 방식 결정
+        sort = self.request.GET.get('sort')
+        if sort == 'likes':
+            comments = comments.order_by('-likes_count', '-created_at')
+        else:  # 기본 정렬 방식은 최신순
+            comments = comments.order_by('-created_at')
+
+        # 페이징 처리
+        paginator = Paginator(comments, 2)  # 페이지 당 보여줄 댓글 수
+        page_number = self.request.GET.get('page')
+        comment_page_obj = paginator.get_page(page_number)
+
+        # 컨텍스트에 추가
+        context['comments'] = comment_page_obj
+        context['comment_page_obj'] = comment_page_obj
+        context['sort'] = sort
+        
+        # ContentType 정보 추가 (이미 존재함)
+        context['content_type_id'] = content_type.id  # id 사용
+        context['object_id'] = self.object.pk
+
+3. 댓글 카운트 시그널 변경 

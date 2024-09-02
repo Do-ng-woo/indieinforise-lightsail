@@ -1,0 +1,516 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .title {
+        background-color: #f8f9fa; /* 배경색 설정 */
+        padding: 20px;
+        border-radius: 10px; /* 모서리 둥글게 */
+        font-weight: bold; /* 글씨 굵게 */
+        margin: 20px auto 40px; /* 자동 마진으로 중앙 정렬, 위 아래 마진 조정 */
+        width: 700px; /* 내용에 맞게 너비 조정 */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 효과 추가 */
+    }
+
+    .entire_article {
+        flex-direction: column; /* 세로 정렬로 변경 */
+        align-items: center; /* 중앙 정렬 */
+        display: flex; /* Flex 컨테이너 설정 */
+        width: 700px; /* 전체 너비 */
+        margin: auto; /* 자동 마진으로 중앙 정렬 */
+    }
+
+    .poster_content {
+        width: 100%;
+        background-color: #f8f9fa; /* 배경색 회색으로 설정 */
+        padding: 20px; /* 패딩 추가 */
+        margin-bottom: 20px; /* 아래쪽 마진 추가 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+    }
+
+    /* 공연 정보 박스 내부 패딩 및 마진 조정 */
+    .infomation {
+        padding: 20px; /* 패딩 추가 */
+        background-color: #f8f9fa; /* 배경색 변경 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+    }
+
+    .lineup,
+    .date,
+    .place {
+        background-color: #e9ecef; /* 배경색 회색으로 설정 */
+        padding: 20px; /* 패딩 추가 */
+        margin-left: 20px; /* 왼쪽 마진 추가 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+    }
+
+    /* 아티스트 카드를 포함하는 컨테이너 스타일 수정 */
+    .lineup {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px; /* 카드 사이의 간격 */
+        margin-bottom: 20px; /* 섹션 아래쪽 마진 */
+        padding: 20px;
+        background-color: #e9ecef; /* 배경색 회색으로 설정 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+    }
+
+    /* 카드 스타일 */
+    .lineup a {
+        text-decoration: none; /* 링크 밑줄 제거 */
+        color: black; /* 텍스트 색상 */
+    }
+
+    /* 개별 아티스트 카드 스타일 */
+    .card_artist {
+        flex: 0 0 30%; /* flex-grow, flex-shrink, flex-basis */
+    }
+
+    .card_project {
+        flex: 0 0 45%; /* flex-grow, flex-shrink, flex-basis */
+    }
+
+    .card_artist,
+    .card_project h5 {
+        margin-top: 10px; /* 이미지와 텍스트 사이 마진 */
+    }
+
+    .lineup div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 1rem;
+    }
+
+    .lineup img {
+        width: 5rem;
+        height: 5rem;
+        object-fit: cover;
+        border-radius: 1rem;
+    }
+
+    .place {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; /* 카드를 왼쪽 정렬 */
+        gap: 20px; /* 카드 사이의 간격 */
+        margin-bottom: 20px; /* 섹션 아래쪽 마진 */
+        padding: 20px;
+        background-color: #e9ecef; /* 배경색 회색으로 설정 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+    }
+
+    .place div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 1rem;
+    }
+
+    .place img {
+        width: 11rem;
+        height: 11rem;
+        object-fit: cover;
+        border-radius: 1rem;
+    }
+
+    /* 정보 섹션 내부 텍스트 정렬 수정 */
+    .date,
+    .place,
+    .lineup {
+        text-align: left; /* 텍스트 왼쪽 정렬 */
+    }
+
+    .date p,
+    .place p,
+    .lineup p {
+        margin: 10px 0; /* 위 아래 마진 추가 */
+    }
+
+    /* 아티스트 및 프로젝트 카드 내부 스타일 조정 */
+    .card_artist,
+    .card_project {
+        text-align: center; /* 텍스트 중앙 정렬 */
+        display: block; /* 블록 요소로 표시 */
+    }
+
+    .card_artist img,
+    .card_project img {
+        margin-bottom: 10px; /* 이미지 아래쪽 마진 추가 */
+    }
+
+    /* 공연 정보 세부 항목 스타일 */
+    .infomation h2 {
+        color: #333; /* 글자색 변경 */
+        margin-top: 20px; /* 위쪽 마진 추가 */
+    }
+
+    .righter {
+        width: 100%;
+    }
+
+    .table th,
+    .table td {
+        text-align: center;
+    }
+
+    .table th.title,
+    .table td.title {
+        width: 50%; /* 제목 열의 너비 설정 */
+        text-align: left; /* 제목 텍스트를 왼쪽으로 정렬 */
+        padding-left: 3rem; /* 텍스트와 셀 경계 사이에 약간의 여백을 추가 */
+    }
+
+    .table th.short,
+    .table td.short {
+        width: 20%; /* 다른 열의 너비를 짧게 설정 */
+    }
+
+    .community {
+        padding: 20px; /* 패딩 추가 */
+        margin-left: 20px; /* 왼쪽 마진 추가 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+        background-color: #f8f9fa; /* 배경색 변경 */
+        margin-top: 20px;
+        height: 650px; /* 고정 높이 설정 */
+        overflow-y: auto; /* 세로 스크롤바 설정 */
+        margin-right: 0px;
+    }
+
+    .modify {
+        text-align: center;
+    }
+
+    .top-buttons {
+        margin: auto;
+        width: 700px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .top-buttons a {
+        text-decoration: none;
+        color: black;
+        background-color: #e0e0e0;
+        padding: 10px 20px 5px 20px;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+
+    .top-buttons a:hover {
+        background-color: #b0b0b0;
+    }
+
+    /*======================모달==================      */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        width: 700px;
+        max-width: 100%;
+        text-align: center;
+        z-index: 1001;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        display: none;
+        height: auto;
+        margin-bottom: 20px; /* 바닥과의 간격을 위해 약간의 마진 추가 */
+        transform: translate(-50%, 60%);
+    }
+
+    .modal h2 {
+        margin-top: 0;
+    }
+
+    .modal .options {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+    }
+
+    .modal .options div {
+        width: 30%;
+        padding: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .modal .options div.selected {
+        background: #007bff;
+        color: white;
+    }
+
+    .rating {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+    .rating i {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+    }
+
+    .rating i.selected {
+        color: #f5a623;
+    }
+
+    .save-button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .options {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+    }
+
+    .options div {
+        width: 30%;
+        padding: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 2px solid #ccc; /* 테두리 추가 */
+        text-align: center;
+    }
+
+    .options div.selected {
+        border-color: #007bff; /* 선택된 옵션의 테두리 색 변경 */
+        background-color: #f0f8ff; /* 선택된 옵션의 배경 색 변경 */
+    }
+
+    .options i {
+        font-size: 2rem; /* 아이콘 크기 */
+        display: block; /* 블록 요소로 변경하여 줄바꿈 */
+        margin-bottom: 5px; /* 아이콘과 텍스트 사이 간격 */
+    }
+    @media (max-width: 1100px) {
+        .entire_article {
+            flex-direction: column;
+            /* 세로 정렬로 변경 */
+            align-items: center;
+            /* 중앙 정렬 */
+            width: 90%;
+        }
+
+        .poster_content,
+        .righter {
+            width: 100%;
+            /* 너비를 100%로 설정하여 화면을 꽉 채우게 함 */
+            margin-bottom: 20px;
+            /* 요소들 사이에 마진 추가 */
+        }
+
+        .righter {
+            order: 2;
+            /* righter를 poster_content 위로 올림 */
+            margin-left: 0px;
+        }
+
+        .poster_content {
+            order: 1;
+            /* poster_content를 righter 아래로 내림 */
+        }
+
+        .infomation {
+            margin-left: 0;
+        }
+
+        .place img {
+            width: 13rem;
+            height: 13rem;
+        }
+
+        .community {
+            padding: 20px;
+            /* 패딩 추가 */
+            margin-left: 0px;
+            /* 왼쪽 마진 추가 */
+        }
+    }
+
+    @media (max-width: 1700px) {
+        .card_artist {
+            flex: 0 0 45%;
+            /* flex-grow, flex-shrink, flex-basis */
+        }
+    }
+
+    @media (max-width: 1100px) {
+        .card_artist {
+            flex: 0 0 30%;
+            /* flex-grow, flex-shrink, flex-basis */
+        }
+    }
+
+    @media (max-width: 650px) {
+        .card_artist {
+            flex: 0 0 45%;
+            /* flex-grow, flex-shrink, flex-basis */
+        }
+    }
+
+    @media (max-width: 400px) {
+        .place img {
+            width: 11rem;
+            height: 11rem;
+        }
+
+        .card_artist {
+            flex: 0 0 45%;
+            /* flex-grow, flex-shrink, flex-basis */
+        }
+
+        .lineup {
+            gap: 10px;
+            /* 카드 사이의 간격 */
+        }
+    }
+</style>
+<div class="top-buttons">
+    <a href="javascript:history.back()"><span class="material-icons">arrow_back</span></a>
+    <a href="javascript:openModal()">저장</a>
+</div>
+<div>
+    <h1 class="title">{{ target_article.title }}</h1>
+    <div class="entire_article">
+        <div class="poster_content">
+            <img src="{{ target_article.image.url }}" alt="" style="width: 100%; border-radius: 1rem;">
+        </div>
+        <div class="righter">
+            <div class="infomation">
+                <h2> 공연 소개</h2>
+                <div class="date">
+                    {{ target_article.content|safe|linebreaksbr }}
+                </div>
+                <h2> 공연 날짜</h2>
+                <div class="date">
+                    {% if target_article.datetime %}
+                    <p> {{ target_article.datetime|date:"Y년 n월 j일 H시 i분" }}</p>
+                    {% else %}
+                    <p>{{ target_article.date|date:"Y년 n월 j일" }}</p>
+                    {% endif %}
+                </div>
+                <div class="place_and_lineup">
+                    <div class="place_container">
+                        <h2>공연 장소</h2>
+                        <div class="place">
+                            {% for project in target_article.project.all %}
+                            <a href="{% url 'projectapp:detail' pk=project.pk %}">
+                                {% include 'snippets/card_project.html' with project=project %}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="lineup_container">
+                        <h2>출연 아티스트</h2>
+                        <div class="lineup">
+                            {% for artist in target_article.artist.all %}
+                            <a href="{% url 'artistapp:detail' pk=artist.pk %}" class="card_artist">
+                                {% include 'snippets/card_artist.html' with artist=artist %}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 모달 -->
+<div class="overlay" id="overlay" onclick="closeModal()"></div>
+<div class="modal" id="modal">
+    <h2>어떤공연인가요?</h2>
+    <div class="options">
+        <div onclick="selectOption(this, 'W')">
+            <i class="material-icons">check_circle</i>
+            본 공연
+        </div>
+        <div onclick="selectOption(this, 'S')">
+            <i class="material-icons">schedule</i>
+            볼 예정인 공연
+        </div>
+        <div onclick="selectOption(this, 'L')">
+            <i class="material-icons">favorite</i>
+            보고싶은 공연
+        </div>
+    </div>
+    <div class="rating">
+        <i class="material-icons" onclick="rate(this, 1)">star_border</i>
+        <i class="material-icons" onclick="rate(this, 2)">star_border</i>
+        <i class="material-icons" onclick="rate(this, 3)">star_border</i>
+        <i class="material-icons" onclick="rate(this, 4)">star_border</i>
+        <i class="material-icons" onclick="rate(this, 5)">star_border</i>
+    </div>
+    <button class="save-button" onclick="save()">저장하기</button>
+</div>
+
+<form method="post" style="display:none;" id="user-performance-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="status" id="status" value="">
+    <input type="hidden" name="rating" id="rating" value="">
+</form>
+
+<script>
+function openModal() {
+    document.getElementById('overlay').style.display = 'flex';
+    document.getElementById('modal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('modal').style.display = 'none';
+}
+
+function selectOption(element, status) {
+    const options = document.querySelectorAll('.modal .options div');
+    options.forEach(option => option.classList.remove('selected'));
+    element.classList.add('selected');
+    document.getElementById('status').value = status;
+}
+
+function rate(element, rating) {
+    const stars = document.querySelectorAll('.rating i');
+    stars.forEach(star => star.classList.remove('selected'));
+    for (let i = 0; i < rating; i++) {
+        stars[i].classList.add('selected');
+    }
+    document.getElementById('rating').value = rating;
+}
+
+function save() {
+    const status = document.getElementById('status').value;
+    const rating = document.getElementById('rating').value;
+
+    if (!status || !rating) {
+        alert('상태와 별점을 모두 선택해주세요.');
+        return;
+    }
+
+    document.getElementById('user-performance-form').submit();
+}
+</script>
+{% endblock %}

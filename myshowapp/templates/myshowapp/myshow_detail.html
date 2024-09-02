@@ -1,0 +1,620 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .title {
+        background-color: #f8f9fa; /* 배경색 설정 */
+        padding: 20px;
+        border-radius: 10px; /* 모서리 둥글게 */
+        font-weight: bold; /* 글씨 굵게 */
+        margin: 20px auto 40px; /* 자동 마진으로 중앙 정렬, 위 아래 마진 조정 */
+        width: 700px; /* 내용에 맞게 너비 조정 */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 효과 추가 */
+    }
+
+    .entire_article {
+        flex-direction: column; /* 세로 정렬로 변경 */
+        align-items: center; /* 중앙 정렬 */
+        display: flex; /* Flex 컨테이너 설정 */
+        width: 700px; /* 전체 너비 */
+        margin: auto; /* 자동 마진으로 중앙 정렬 */
+    }
+
+    .poster_content {
+        width: 100%;
+        background-color: #f8f9fa; /* 배경색 회색으로 설정 */
+        padding: 20px; /* 패딩 추가 */
+        margin-bottom: 20px; /* 아래쪽 마진 추가 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+    }
+
+    .modify {
+        text-align: center;
+    }
+
+    .top-buttons {
+        margin: auto;
+        width: 700px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        align-items: center;
+    }
+
+    .top-buttons-left,
+    .top-buttons-right {
+        display: flex;
+        gap: 10px;
+    }
+
+    .top-buttons-left a,
+    .top-buttons-right a {
+        text-decoration: none;
+        color: black;
+        background-color: #e0e0e0;
+        padding: 10px 20px 10px 20px;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+
+    .top-buttons-left a:hover,
+    .top-buttons-right a:hover {
+        background-color: #b0b0b0;
+    }
+
+    .top-buttons-left a .material-icons {
+        vertical-align: middle;
+    }
+    /*======================모달==================      */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        width: 700px;
+        max-width: 100%;
+        text-align: center;
+        z-index: 1001;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        display: none;
+        height: auto;
+        margin-bottom: 20px; /* 바닥과의 간격을 위해 약간의 마진 추가 */
+        transform: translate(-50%, 5%);
+    }
+
+    .modal h2 {
+        margin-top: 0;
+    }
+
+    .modal .options {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+    }
+
+    .modal .options div {
+        width: 30%;
+        padding: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .modal .options div.selected {
+        background: #007bff;
+        color: white;
+    }
+
+    .rating {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+    .rating i {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+    }
+
+    .rating i.selected {
+        color: #f5a623;
+    }
+
+    .save-button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .options {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+    }
+
+    .options div {
+        width: 30%;
+        padding: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 2px solid #ccc; /* 테두리 추가 */
+        text-align: center;
+    }
+
+    .options div.selected {
+        border-color: #007bff; /* 선택된 옵션의 테두리 색 변경 */
+        background-color: #f0f8ff; /* 선택된 옵션의 배경 색 변경 */
+    }
+
+    .options i {
+        font-size: 2rem; /* 아이콘 크기 */
+        display: block; /* 블록 요소로 변경하여 줄바꿈 */
+        margin-bottom: 5px; /* 아이콘과 텍스트 사이 간격 */
+    }
+/*===============모달 끝=========================*/
+/* 삭제 모달 스타일 */
+.delete-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.delete-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    width: 300px;
+    max-width: 90%;
+    text-align: center;
+    z-index: 1001;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    display: none;
+    transform: translate(-50%, -50%);
+}
+
+.delete-modal h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    color: #e74c3c;
+}
+
+.delete-modal p {
+    font-size: 1rem;
+    color: #333;
+}
+
+.delete-modal button.delete-confirm-button, .delete-modal a.delete-cancel-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.delete-modal button.delete-confirm-button {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.delete-modal a.delete-cancel-button {
+    background-color: #95a5a6;
+    color: white;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.delete-modal button.delete-confirm-button:hover {
+    background-color: #c0392b;
+}
+
+.delete-modal a.delete-cancel-button:hover {
+    background-color: #7f8c8d;
+}
+/*=======================삭제모달=======================  */
+/*===========================메인 정보 컨테이너==================  */
+    .detail-container {
+        width: 700px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #f8f9fa;
+    }
+
+    .detail-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .detail-body {
+        text-align: center;
+    }
+
+    .look_rating {
+        display: flex;
+        justify-content: center;
+        margin: 10px 0;
+    }
+
+    .look_rating i {
+        font-size: 2rem;
+        color: #f5a623;
+    }
+
+    .look_rating i.empty {
+        color: #ddd;
+    }
+
+    .status-tag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 10px 0;
+        padding: 5px 10px;
+        border-radius: 20px;
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+
+    .status-tag i {
+        margin-right: 5px;
+    }
+   .memo-container {
+        display: flex;
+        flex-direction: column; /* 세로 정렬로 변경 */
+        justify-content: left;
+        margin: 10px 0;
+        align-items: flex-start;
+    }
+
+    .memo-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 1.2rem;
+    }
+
+    .memo-section {
+        padding: 10px;
+        border-radius: 10px;
+        background-color:#f0f8ff;
+        color: #333;
+        text-align: left;
+        width: 100%;
+        border: 2px solid #c8d0e0; /* 테두리 추가 */
+    }
+
+    .info-section {
+        margin: 20px 0;
+        text-align: left;
+    }
+
+    .info-section p {
+        margin: 10px 0;
+    }
+
+    .info-section strong {
+        display: block;
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+    }
+
+    .detail-footer {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .detail-footer a {
+        margin: 0 10px;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: white;
+        background-color: #007bff;
+    }
+
+    .detail-footer a.delete {
+        background-color: #dc3545;
+    }
+/*=====================메인정보 컨테이너 끝 ==================  */
+    @media (max-width: 1100px) {
+        .entire_article {
+            flex-direction: column;
+            /* 세로 정렬로 변경 */
+            align-items: center;
+            /* 중앙 정렬 */
+            width: 90%;
+        }
+
+        .poster_content,
+        .righter {
+            width: 100%;
+            /* 너비를 100%로 설정하여 화면을 꽉 채우게 함 */
+            margin-bottom: 20px;
+            /* 요소들 사이에 마진 추가 */
+        }
+
+        .righter {
+            order: 2;
+            /* righter를 poster_content 위로 올림 */
+            margin-left: 0px;
+        }
+
+        .poster_content {
+            order: 1;
+            /* poster_content를 righter 아래로 내림 */
+        }
+
+        .infomation {
+            margin-left: 0;
+        }
+
+        .place img {
+            width: 13rem;
+            height: 13rem;
+        }
+
+        .community {
+            padding: 20px;
+            /* 패딩 추가 */
+            margin-left: 0px;
+            /* 왼쪽 마진 추가 */
+        }
+    }
+
+    @media (max-width: 1700px) {
+        .card_artist {
+            flex: 0 0 45%;
+            /* flex-grow, flex-shrink, flex-basis */
+        }
+    }
+
+    @media (max-width: 1100px) {
+        .card_artist {
+            flex: 0 0 30%;
+            /* flex-grow, flex-shrink, flex-basis */
+        }
+    }
+
+    @media (max-width: 650px) {
+        .card_artist {
+            flex: 0 0 45%;
+            /* flex-grow, flex-shrink, flex-basis */
+        }
+    }
+
+    @media (max-width: 400px) {
+        .place img {
+            width: 11rem;
+            height: 11rem;
+        }
+
+        .card_artist {
+            flex: 0 0 45%;
+            /* flex-grow, flex-shrink, flex-basis */
+        }
+
+        .lineup {
+            gap: 10px;
+            /* 카드 사이의 간격 */
+        }
+    }
+</style>
+<div class="top-buttons">
+    <div class="top-buttons-left">
+        <a  href="{% url 'myshowapp:card_list' %}"><span class="material-icons">arrow_back</span></a>
+    </div>
+    <div class="top-buttons-right">
+        <a href="javascript:openDeleteModal()" class="delete">삭제</a>
+        <a href="{% url 'myshowapp:stamp_update' pk=stamp.pk %}">스탬프 관리</a>
+        <a href="javascript:openModal()">수정</a>
+    </div>
+</div>
+<div class="detail-container">
+    <div class="detail-header">
+        <h1>{{ performance.article.title }}</h1>
+    </div>
+    <div class="detail-body">
+        <div class="poster_content">
+            <img src="{{ performance.article.image.url }}" alt="" style="width: 100%; border-radius: 1rem;">
+        </div>
+        
+        <!-- 별점 표시 -->
+        <div class="look_rating">
+            {% for star in "12345" %}
+                {% if star|add:"0" <= performance.rating %}
+                    <i class="material-icons">star</i>
+                {% else %}
+                    <i class="material-icons empty">star_border</i>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- 상태 태그 표시 -->
+        <div class="status-tag">
+            <i class="material-icons">
+                {% if performance.status == "W" %}
+                    visibility
+                {% elif performance.status == "S" %}
+                    check_circle
+                {% elif performance.status == "L" %}
+                    favorite
+                {% endif %}
+            </i>
+            {% if performance.status == "W" %}
+                본 공연
+            {% elif performance.status == "S" %}
+                볼 공연
+            {% elif performance.status == "L" %}
+                보고싶은 공연
+            {% endif %}
+        </div>
+        <!-- 메모 표시 -->
+        <div class="memo-container">
+            <span class="memo-label">메모</span>
+            <div class="memo-section">
+                {{ performance.memo|safe|linebreaksbr }}
+            </div>
+        </div>
+        
+        <!-- 공연 정보 -->
+        <div class="info-section">
+            <p><strong>장소</strong> {% for project in performance.article.project.all %}{{ project }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+            <p><strong>날짜</strong> {% if performance.article.datetime %}{{ performance.article.datetime|date:"Y년 n월 j일 H시 i분" }}{% else %}{{ performance.article.date|date:"Y년 n월 j일" }}{% endif %}</p>
+            <p><strong>출연 아티스트</strong> {% for artist in performance.article.artist.all %}{{ artist }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+            <p><strong>러닝타임</strong> {{ performance.running_time }}분</p>
+        </div>
+    </div>
+    <div class="detail-footer">
+        <a href="{% url 'myshowapp:userperformance_detail' pk=performance.pk %}">수정</a>
+        <a href="{% url 'articleapp:detail' pk=performance.article.pk %}">자세히보기</a>
+    </div>
+</div>
+<!-- 삭제 모달 -->
+<!-- 삭제 모달 -->
+<div class="delete-overlay" id="delete-overlay" onclick="closeDeleteModal()"></div>
+<div class="delete-modal" id="delete-modal">
+    <h2>공연 삭제</h2>
+    <p>정말로 이 공연 기록을 삭제하시겠습니까?</p>
+    <form method="post" action="{% url 'myshowapp:userperformance_delete' pk=performance.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="delete-confirm-button">삭제</button>
+        <a href="javascript:closeDeleteModal()" class="delete-cancel-button">취소</a>
+    </form>
+</div>
+<!-- 수정모달 -->
+<div class="overlay" id="overlay" onclick="closeModal()"></div>
+<div class="modal" id="modal">
+    <h2>어떤공연인가요?</h2>
+    <div class="options">
+        <div onclick="selectOption(this, 'W')" id="option-w">
+            <i class="material-icons">check_circle</i>
+            본 공연
+        </div>
+        <div onclick="selectOption(this, 'S')" id="option-s">
+            <i class="material-icons">schedule</i>
+            볼 예정인 공연
+        </div>
+        <div onclick="selectOption(this, 'L')" id="option-l">
+            <i class="material-icons">favorite</i>
+            보고싶은 공연
+        </div>
+    </div>
+    <div class="rating">
+        <i class="material-icons" onclick="rate(this, 1)" id="star-1">star_border</i>
+        <i class="material-icons" onclick="rate(this, 2)" id="star-2">star_border</i>
+        <i class="material-icons" onclick="rate(this, 3)" id="star-3">star_border</i>
+        <i class="material-icons" onclick="rate(this, 4)" id="star-4">star_border</i>
+        <i class="material-icons" onclick="rate(this, 5)" id="star-5">star_border</i>
+    </div>
+    <textarea id="memo" name="memo" placeholder="메모를 입력하세요" style="width: 100%; height: 150px; border-radius: 5px; padding: 10px; margin-top: 10px; resize: none;"></textarea>
+    <button class="save-button" onclick="save()">수정하기</button>
+</div>
+
+<form method="post" style="display:none;" id="user-performance-form" action="{% url 'myshowapp:userperformance_detail' pk=performance.pk %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="status" id="status" value="{{ performance.status }}">
+    <input type="hidden" name="rating" id="rating" value="{{ performance.rating }}">
+    <input type="hidden" name="memo" id="memo-hidden" value="{{ performance.memo }}">
+</form>
+
+<script>
+function openDeleteModal() {
+    document.getElementById('delete-overlay').style.display = 'flex';
+    document.getElementById('delete-modal').style.display = 'block';
+}
+
+function closeDeleteModal() {
+    document.getElementById('delete-overlay').style.display = 'none';
+    document.getElementById('delete-modal').style.display = 'none';
+}
+function openModal() {
+    document.getElementById('overlay').style.display = 'flex';
+    document.getElementById('modal').style.display = 'block';
+    
+    // 기존 데이터로 모달 초기화
+    var status = "{{ performance.status }}";
+    var rating = "{{ performance.rating }}";
+    var memo = "{{ performance.memo|escapejs }}";
+
+    // 상태 선택 초기화
+    document.querySelectorAll('.modal .options div').forEach(option => option.classList.remove('selected'));
+    document.getElementById('option-' + status.toLowerCase()).classList.add('selected');
+
+    // 별점 초기화
+    document.querySelectorAll('.rating i').forEach(star => star.classList.remove('selected'));
+    for (let i = 1; i <= rating; i++) {
+        document.getElementById('star-' + i).classList.add('selected');
+    }
+
+    // 메모 초기화
+    document.getElementById('memo').value = memo;
+}
+
+function closeModal() {
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('modal').style.display = 'none';
+}
+
+function selectOption(element, status) {
+    const options = document.querySelectorAll('.modal .options div');
+    options.forEach(option => option.classList.remove('selected'));
+    element.classList.add('selected');
+    document.getElementById('status').value = status;
+}
+
+function rate(element, rating) {
+    const stars = document.querySelectorAll('.rating i');
+    stars.forEach(star => star.classList.remove('selected'));
+    for (let i = 0; i < rating; i++) {
+        stars[i].classList.add('selected');
+    }
+    document.getElementById('rating').value = rating;
+}
+
+function save() {
+    const status = document.getElementById('status').value;
+    const rating = document.getElementById('rating').value;
+    const memo = document.getElementById('memo').value;
+
+    if (!status || !rating) {
+        alert('상태와 별점을 모두 선택해주세요.');
+        return;
+    }
+
+    document.getElementById('memo-hidden').value = memo;
+    document.getElementById('user-performance-form').submit();
+}
+</script>
+{% endblock %}

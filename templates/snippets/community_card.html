@@ -1,0 +1,36 @@
+<style>
+    .card-container {
+        text-align: center; /* 컨테이너 내 내용을 중앙 정렬합니다 */
+        margin-bottom: 5px; /* 카드 하단의 마진을 추가합니다 */
+    }
+
+    .card-container img {
+        width: 100%; /* 이미지의 너비를 100%로 설정하여 컨테이너를 꽉 채우도록 합니다 */
+        border-radius: 1rem; /* 이미지의 모서리를 둥글게 처리합니다 */
+    }
+
+    .card-title {
+        margin-top: 5px; /* 이미지와 제목 사이의 여백을 설정합니다 */
+        font-weight: bold; /* 제목의 글꼴을 두껍게 합니다 */
+        color: #333; /* 제목의 색상을 설정합니다 */
+        font-size: 1rem; /* 제목의 글꼴 크기를 설정합니다 */
+        overflow: hidden; /* 너무 긴 텍스트를 숨김 처리합니다 */
+        text-overflow: ellipsis; /* 너무 긴 텍스트에 말줄임표(...) 적용합니다 */
+        white-space: nowrap; /* 텍스트가 한 줄로 표시되도록 설정합니다 */
+    }
+</style>
+
+<div class="card-container">
+    <img src="{{ community.image.url }}" alt="{{ community.title }}">
+</div>
+<div class="card-title">
+    {% if search_field == 'date' %}
+        {% if community.datetime %}
+            {{ community.datetime }}  <!-- DateTimeField가 존재하면 표시 -->
+        {% else %}
+            {{ community.date }}  <!-- 그렇지 않으면 DateField 표시 -->
+        {% endif %}  <!-- 여기서 'date_field'는 날짜가 저장된 필드 이름으로 변경해야 합니다 -->
+    {% else %}
+        {{ community.title }}
+    {% endif %}
+</div>

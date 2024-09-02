@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load bootstrap4 crispy_forms_tags %} <!-- crispy_forms_tags 추가 -->
+
+{% block content %}
+<style>
+.form-row {
+  display: flex; /* Flex 컨테이너 설정 */
+  justify-content: space-between; /* 자식 요소를 양 끝에 정렬 */
+  align-items: center; /* 세로 축에서 중앙 정렬 */
+}
+</style>
+<div class=" create_update_delete container mt-4">
+    <h4 class="mb-4 text-center">커뮤니티 수정</h4>
+    <form action="{% url 'communityapp:update' pk=target_community.pk %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                {{ form.board_type|as_crispy_field }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.image|as_crispy_field }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form.title|as_crispy_field }}
+        </div>
+        <div class="form-group">
+            {{ form.content|as_crispy_field }}
+        </div>
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                {{ form.article|as_crispy_field }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.artist|as_crispy_field }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                {{ form.project|as_crispy_field }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.person|as_crispy_field }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                {{ form.sing|as_crispy_field }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.album|as_crispy_field }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                {{ form.genre|as_crispy_field }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.instrument|as_crispy_field }}
+            </div>
+        </div>
+        <div class="text-center mb-3">
+            <button type="button" class="btn btn-info">숨기기</button>
+        </div>
+        <div class="text-center">
+            <input type="submit" class="btn btn-dark rounded-pill col-6 mt-3" value="제출">
+        </div>
+    </form>
+</div>
+<script>
+    tinymce.init({
+        selector: '.tinymce',
+        plugins: 'image',  // 이미지 플러그인 활성화
+        toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | image',  // 이미지 버튼 추가
+        images_upload_url: '{% url "communityapp:file_upload" %}',
+        image_class_list: [
+            {title: 'Responsive', value: 'responsive'}  // 이미지에 'responsive' 클래스 자동 적용
+        ],
+        init_instance_callback: function (editor) {
+            // 원래의 textarea 필드에서 'required' 속성을 제거합니다.
+            var textarea = document.getElementById(editor.id);
+            if (textarea) {
+                textarea.removeAttribute('required');
+            }
+        },
+        images_upload_handler: function (blobInfo, success, failure) {
+            var xhr, formData;
+            xhr = new XMLHttpRequest();
+            xhr.withCredentials = false;
+            xhr.open('POST', '{% url "communityapp:file_upload" %}');
+            xhr.onload = function() {
+                var json;
+                if (xhr.status != 200) {
+                    failure('HTTP Error: ' + xhr.status);
+                    return;
+                }
+                json = JSON.parse(xhr.responseText);
+                
+                if (!json || typeof json.location != 'string') {
+                    failure('Invalid JSON: ' + xhr.responseText);
+                    return;
+                }
+                // 이미지를 업로드하고 반응형 클래스를 이미지에 추가합니다.
+                success(json.location, { class: 'responsive' });
+            };
+            formData = new FormData();
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
+            xhr.send(formData);
+        },
+        content_style: "img { max-width: 100%; height: auto; }" // 모든 이미지에 대해 CSS 직접 적용
+    });
+</script>
+{% endblock %}

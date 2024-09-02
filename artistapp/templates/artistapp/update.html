@@ -1,0 +1,556 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+<style>
+    .input-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        width: 100%;
+    }
+    .input-group .form-control {
+        flex: 1 1 auto;
+        width: 1%;
+        margin-right: 10px;
+    }
+    .editable {
+        flex-grow: 2;
+        border: 2px solid #000000; /* 진한 테두리 적용 */
+        padding: 10px;
+        min-height: 100px;
+    }
+    .input-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        width: 100%;
+    }
+    .input-group .form-control {
+        flex: 1 1 auto;
+        width: 1%;
+        margin-right: 10px;
+    }
+    .editable {
+        flex-grow: 2;
+        border: 2px solid #000000; /* 진한 테두리 적용 */
+        padding: 10px;
+        min-height: 100px;
+    }
+    .form-group {
+        margin-bottom: 15px; /* 폼 필드 간격 조정 */
+        text-align: left; /* 왼쪽 정렬 */
+        display: flex; /* Flexbox를 사용하여 라벨과 입력 필드를 한 줄에 배열 */
+        align-items: center; /* 세로 중앙 정렬 */
+    }
+</style>
+<script src="//cdn.jsdelivr.net/npm/medium-editor@5.23.2/dist/js/medium-editor.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/medium-editor@5.23.2/dist/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
+
+<div class="create_update_delete" style="text-align: center; max-width:700px; margin: 4rem auto">
+    <div class="mb-4">
+        <h4>Artist Update</h4>
+    </div>
+    <form id="update_form" action="{% url 'artistapp:update' pk=target_artist.pk %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- content 필드를 수동으로 렌더링 -->
+
+        <div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.title }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.image }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="sub_titles_input">{{ form.sub_titles_input.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.sub_titles_input }}
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="hidden_default_persons" name="hidden_default_persons" value="">
+        <input type="hidden" id="hidden_default_text_persons" name="hidden_default_text_persons" value="">
+        <input type="hidden" id="hidden_persons_changed" name="hidden_persons_changed" value="">
+        <input type="hidden" id="hidden_text_persons_changed" name="hidden_text_persons_changed" value="">
+        <input type="hidden" id="hidden_persons_deleted" name="hidden_persons_deleted" value="">
+        <input type="hidden" id="hidden_text_persons_deleted" name="hidden_text_persons_deleted" value="">
+        <input type="hidden" id="hidden_current_persons" name="hidden_current_persons" value="">
+        <input type="hidden" id="hidden_current_text_persons" name="hidden_current_text_persons" value="">
+        <input type="hidden" id="final_persons" name="final_persons" value="">
+        <input type="hidden" id="final_text_persons" name="final_text_persons" value="">
+
+        <!-- 기존 멤버를 표시하는 부분 -->
+        <div id="bring_member_container">
+            <!-- 서버에서 전달된 persons_with_positions 데이터를 기반으로 멤버와 악기 정보 표시 -->
+            {% for person in persons_with_positions %}
+                <div class="member-entry mb-3 d-flex align-items-end" id="member_bring_{{ forloop.counter0 }}">
+                    <!-- 선택 방법, 악기, 멤버 선택 드롭다운 -->
+                    <div class="col">
+                        <select class="form-control selection-method" name="selection_method_{{ forloop.counter0 }}">
+                            <option value="">불러오기/직접 입력하기</option>
+                            <option value="load" selected>불러오기</option>
+                            <option value="manual_entry">직접 입력하기</option>
+                        </select>
+                    </div>
+                    <div class="col instrument-select">
+                        <select class="form-control instrument-selection" name="instrument_{{ forloop.counter0 }}">
+                            <option value="">악기 선택</option>
+                            {% for instrument in instruments %}
+                            <option value="{{ instrument.id }}" {% if instrument.id in person.instrument_ids %}selected{% endif %}>{{ instrument.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col person-select">
+                        <select class="form-control person-selection" name="person_id_{{ forloop.counter0 }}">
+                            <option value="">멤버 선택</option>
+                            {% for person_option in persons %}
+                            <option class="person-option" data-instrument="{{ person_option.instrument }}" value="{{ person_option.id }}" {% if person_option.id == person.person_id %}selected{% endif %}>{{ person_option.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- 직접 입력한 악기 필드 -->
+                    <div class="col manual-entry-fields" style="display: none;">
+                        <input type="text" class="form-control text-instrument-input" name="manual_instrument_{{ forloop.counter0 }}" placeholder="악기">
+                    </div>
+                    <!-- 직접 입력한 이름 필드 -->
+                    <div class="col manual-entry-fields" style="display: none;">
+                        <input type="text" class="form-control text-person-input" name="manual_name_{{ forloop.counter0 }}" placeholder="이름">
+                    </div>
+                    <!-- 삭제 버튼 -->
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-danger remove-member-btn" data-id="member_bring_{{ forloop.counter0 }}">삭제</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- 저장된 "직접 입력하기" 데이터를 불러오는 부분 -->
+        <div id="text_member_container">
+            {% for text_person in text_persons_data %}
+            <div class="member-entry mb-3 d-flex align-items-end" id="member_text_{{ forloop.counter0 }}">
+                <div class="col">
+                    <!-- 선택 방법 선택 -->
+                    <select class="form-control selection-method" name="selection_method_{{ forloop.counter0 }}">
+                        <option value="">불러오기/직접 입력하기</option>
+                        <option value="load">불러오기</option>
+                        <option value="manual_entry" selected>직접 입력하기</option>
+                    </select>
+                </div>
+                <!-- 악기 선택 -->
+                <div class="col instrument-select" style="display: none;">
+                    <select class="form-control instrument-selection" name="instrument_{{ forloop.counter0 }}">
+                        <option value="">악기 선택</option>
+                        {% for instrument in instruments %}
+                        <option value="{{ instrument.id }}">{{ instrument.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- 멤버 선택 -->
+                <div class="col person-select" style="display: none;">
+                    <select class="form-control person-selection" name="person_id_{{ forloop.counter0 }}">
+                        <option value="">멤버 선택</option>
+                        {% for person_option in persons %}
+                        <option class="person-option" value="{{ person_option.id }}">{{ person_option.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- 직접 입력한 악기 필드 -->
+                <div class="col manual-entry-fields" style="display: none;">
+                    <input type="text" class="form-control text-instrument-input" name="manual_instrument_{{ forloop.counter0 }}" placeholder="악기" value="{{ text_person.instrument }}">
+                </div>
+                <!-- 직접 입력한 이름 필드 -->
+                <div class="col manual-entry-fields" style="display: none;">
+                    <input type="text" class="form-control text-person-input" name="manual_name_{{ forloop.counter0 }}" placeholder="이름" value="{{ text_person.name }}">
+                </div>
+                <!-- 삭제 버튼 -->
+                <div class="col-auto">
+                    <button type="button" class="btn btn-danger remove-member-btn" data-id="member_text_{{ forloop.counter0 }}">삭제</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!--새로 생성하는 멤버를 추가하는 곳      -->
+        <div id="dynamic_member_container">
+        </div>
+        <!--  멤버추가버튼        -->
+        <button type="button" id="add_member_button" class="btn btn-info rounded-pill mt-2">+ 멤버 추가</button>
+
+            <!-- 기존 데이터를 표시하는 부분 -->
+        <div id="dynamic_fields_container">
+            {% for description in target_artist.detailed_descriptions.all %}
+            <div class="input-group mb-2" id="description_{{ description.id }}">
+                <input type="hidden" name="detailed_descriptions[{{ forloop.counter0 }}][id]" value="{{ description.id }}" />
+                <input type="text" name="detailed_descriptions[{{ forloop.counter0 }}][name]" class="form-control" placeholder="이름" required value="{{ description.name }}" />
+                <div class="editable" style="min-height: 100px;" data-placeholder="설명">{{ description.text }}</div>
+                <textarea name="detailed_descriptions[{{ forloop.counter0 }}][value]" style="display:none;"></textarea>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-danger" onclick="deleteDescription({{ description.id }})">삭제</button>
+                </div>
+            </div>
+            {% endfor %}              
+        </div><!-- 기존 데이터 표시 끝 -->
+        
+        <button type="button" id="add_field_button" class="btn btn-info rounded-pill mt-2">+ 추가 정보</button>
+        {% if target_artist.hide %}
+        <div class="button-row mt-3">
+            <button type="submit" name="save_draft" class="btn btn-secondary rounded-pill col-5 mr-1">Save as Draft</button>
+            <button type="submit" name="publish" class="btn btn-primary rounded-pill col-5 ml-1">Publish</button>
+        </div>
+        {% else %}
+        <div class="button-row mt-3">
+            <button type="submit" class="btn btn-primary rounded-pill col-12">Update</button>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+(function() {
+    // Private variables
+    var descriptionTexts = [
+        {% for description in target_artist.detailed_descriptions.all %}
+            "{{ description.text|escapejs }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    var counter = descriptionTexts.length;
+
+    // Private functions
+    function initMediumEditor(element, textArea) {
+        var editor = new MediumEditor(element);
+        editor.subscribe('editableInput', function(event, editable) {
+            textArea.val(editable.innerHTML);
+        });
+    }
+
+    function addDescriptionField() {
+        var newFieldHtml = `
+            <div class="input-group mb-2" id="description_${counter}">
+                <input type="text" name="detailed_descriptions[${counter}][name]" class="form-control" placeholder="정보의 이름" required />
+                <div class="editable" style="min-height: 100px;" data-placeholder="설명"></div>
+                <textarea name="detailed_descriptions[${counter}][value]" style="display:none;"></textarea>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-danger delete-description-btn" data-id="${counter}">삭제</button>
+                </div>
+            </div>
+        `;
+        $('#dynamic_fields_container').append(newFieldHtml);
+        // 새로 생성된 항목에 'new-description' 클래스 추가
+        $('#description_' + counter).addClass('new-description');
+        
+        var newEditable = $(`#description_${counter} .editable`);
+        var newTextarea = newEditable.next('textarea');
+        initMediumEditor(newEditable.get(0), newTextarea);
+        counter++;
+    }
+
+    // Public Exposure
+    window.addDescriptionField = addDescriptionField;
+
+    $(document).ready(function() {
+        $('.editable').each(function(index) {
+            var textArea = $(this).next('textarea');
+            textArea.val(descriptionTexts[index]);
+            initMediumEditor(this, textArea);
+            $(this).html(textArea.val());
+        });
+
+        $('#add_field_button').click(function(e) {
+            e.preventDefault();
+            window.addDescriptionField();
+        });
+        // 동적으로 생성된 '삭제' 버튼에 대한 이벤트 핸들링
+        $('#dynamic_fields_container').on('click', '.delete-description-btn', function() {
+            var descriptionId = $(this).data('id');
+            window.deleteDescription(descriptionId);
+        });
+
+        window.deleteDescription = function(descriptionId) {
+            // 새로 생성된 항목이 아직 서버에 저장되지 않았는지 확인
+            if ($('#description_' + descriptionId).hasClass('new-description')) {
+                $('#description_' + descriptionId).remove();
+                alert('새 설명이 아직 저장되지 않았습니다.');
+            } else {
+                // 서버에 저장된 항목을 삭제하는 AJAX 요청
+                $.ajax({
+                    url: '{% url "artistapp:delete_description" %}',
+                    type: 'POST',
+                    data: {
+                        'id': descriptionId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if(response.status === 'success') {
+                            $('#description_' + descriptionId).remove();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        var errorMsg = 'AJAX 요청 실패';
+                        alert(errorMsg);
+                    }
+                });
+            }
+        };
+     });
+})();
+</script>
+<script>
+$(document).ready(function() {
+    // 초기 상태 업데이트
+    let initialPersonIds = $('.person-selection').map(function() { return $(this).val(); }).get().filter(Boolean).join(',');
+    let initialTextPersons = $('.member-entry').map(function() {
+        var instrument = $(this).find('.text-instrument-input').val();
+        var name = $(this).find('.text-person-input').val();
+        return instrument && name ? instrument + ':' + name : '';
+    }).get().filter(Boolean).join(',');
+
+    $('#hidden_default_persons').val(initialPersonIds);
+    $('#hidden_default_text_persons').val(initialTextPersons);
+
+    let memberCounter = 0;
+
+    function initializeSelect2(selector) {
+        $(selector).select2({
+            width: '100%',
+            placeholder: "선택",
+            allowClear: true
+        });
+    }
+
+    $('#add_member_button').click(function(e) {
+        e.preventDefault();
+        let memberHtml = `
+            <div class="member-entry mb-3 d-flex align-items-end" id="member_${memberCounter}">
+                <div class="col">
+                    <select class="form-control selection-method" name="selection_method_${memberCounter}">
+                        <option value="">불러오기/직접 입력하기</option>
+                        <option value="load">불러오기</option>
+                        <option value="manual_entry">직접 입력하기</option>
+                    </select>
+                </div>
+                <div class="col instrument-select" style="display: none;">
+                    <select class="form-control instrument-selection" name="instrument_${memberCounter}">
+                        <option value="">악기 선택</option>
+                        {% for instrument in instruments %}
+                        <option value="{{ instrument.id }}">{{ instrument.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col person-select" style="display: none;">
+                    <select class="form-control person-selection" name="person_id_${memberCounter}">
+                        <option value="">멤버 선택</option>
+                    </select>
+                </div>
+                <div class="col manual-entry-fields" style="display: none;">
+                    <input type="text" class="form-control text-instrument-input" name="manual_instrument_${memberCounter}" placeholder="악기" />
+                </div>
+                <div class="col manual-entry-fields" style="display: none;">
+                    <input type="text" class="form-control text-person-input" name="manual_name_${memberCounter}" placeholder="이름" />
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-danger remove-member-btn" data-id="${memberCounter}">삭제</button>
+                </div>
+            </div>
+        `;
+
+        $('#dynamic_member_container').append(memberHtml);
+        initializeSelect2(`#member_${memberCounter} .instrument-selection`);
+        memberCounter++;
+    });
+
+    $(document).on('change', '.selection-method', function() {
+        let method = $(this).val();
+        let parentEntry = $(this).closest('.member-entry');
+        parentEntry.find('.instrument-select, .person-select, .manual-entry-fields').hide();
+
+        if (method === 'load') {
+            parentEntry.find('.instrument-select').show();
+        } else if (method === 'manual_entry') {
+            parentEntry.find('.manual-entry-fields').show();
+        }
+
+        // 선택 방법이 변경될 때 변경 감지
+        detectChanges(parentEntry, method);
+    });
+
+    $(document).on('change', '.instrument-selection', function() {
+        let instrumentId = $(this).val();
+        let parentDiv = $(this).closest('.member-entry');
+        let personSelect = parentDiv.find('.person-selection');
+
+        if (instrumentId) {
+            $.ajax({
+                url: `/artists/get-persons-by-instrument/${instrumentId}/`,
+                method: 'GET',
+                success: function(response) {
+                    personSelect.empty().append('<option value="">멤버 선택</option>');
+                    response.persons.forEach(function(person) {
+                        personSelect.append(`<option value="${person.id}">${person.title}</option>`);
+                    });
+                    personSelect.closest('.person-select').show();
+                    initializeSelect2(personSelect);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching persons: ", error);
+                }
+            });
+        } else {
+            personSelect.closest('.person-select').hide();
+        }
+    });
+
+    function detectChanges(parentEntry, method) {
+        let originalInstrument = parentEntry.find('.text-instrument-input').val();
+        let originalName = parentEntry.find('.text-person-input').val();
+        let originalTextPerson = originalInstrument && originalName ? originalInstrument + ':' + originalName : '';
+
+        if (method === 'load' && originalTextPerson) {
+            $('#hidden_text_persons_changed').val($('#hidden_text_persons_changed').val() + originalTextPerson + ',');
+            parentEntry.find('.manual-entry-fields').hide();
+            parentEntry.find('.instrument-select, .person-select').show();
+        } else if (method === 'manual_entry') {
+            let originalPersonId = parentEntry.find('.person-selection').val();
+            if (originalPersonId) {
+                $('#hidden_persons_changed').val($('#hidden_persons_changed').val() + originalPersonId + ',');
+                parentEntry.find('.instrument-select, .person-select').hide();
+                parentEntry.find('.manual-entry-fields').show();
+            }
+        }
+    }
+
+    // 초기 페이지 로드 시 각 멤버 엔트리 초기화
+    $('.member-entry').each(function() {
+        var $entry = $(this);
+        var selectionMethod = $entry.find('.selection-method').val();
+        toggleFields($entry, selectionMethod);
+    });
+
+    function toggleFields($entry, method) {
+        $entry.find('.instrument-select, .person-select, .manual-entry-fields').hide();
+
+        if (method === 'load') {
+            $entry.find('.instrument-select').show();
+            var instrument = $entry.find('.instrument-selection').val();
+            if (instrument) {
+                $entry.find('.person-select').show();
+            }
+        } else if (method === 'manual_entry') {
+            $entry.find('.manual-entry-fields').show();
+        }
+    }
+
+    // 선택 방법 변경 이벤트
+    $(document).on('change', '.selection-method', function() {
+        var $entry = $(this).closest('.member-entry');
+        var selectionMethod = $(this).val();
+        toggleFields($entry, selectionMethod);
+    });
+
+    // person 변경 감지
+    $('.person-selection').each(function() {
+        let originalValue = $(this).val();
+        $(this).on('change', function() {
+            let currentValue = $(this).val();
+            if (originalValue !== currentValue) {
+                $('#hidden_persons_changed').val($('#hidden_persons_changed').val() + originalValue + ',');
+            }
+        });
+    });
+
+    // text_person 변경 감지
+    $('.member-entry').each(function() {
+        let $entry = $(this);
+        let originalInstrument = $entry.find('.text-instrument-input').val();
+        let originalName = $entry.find('.text-person-input').val();
+        let originalTextPerson = originalInstrument && originalName ? originalInstrument + ':' + originalName : '';
+
+        $entry.find('.text-instrument-input, .text-person-input').on('change', function() {
+            let currentInstrument = $entry.find('.text-instrument-input').val();
+            let currentName = $entry.find('.text-person-input').val();
+            let currentTextPerson = currentInstrument && currentName ? currentInstrument + ':' + currentName : '';
+
+            if (originalTextPerson !== currentTextPerson) {
+                $('#hidden_text_persons_changed').val($('#hidden_text_persons_changed').val() + originalTextPerson + ',');
+            }
+        });
+    });
+
+    // 멤버 삭제 감지
+    $(document).on('click', '.remove-member-btn', function() {
+        var memberId = $(this).data('id');
+        var originalPersonId = $('#' + memberId + ' .person-selection').val();
+
+        if (originalPersonId) {
+            $('#hidden_persons_deleted').val($('#hidden_persons_deleted').val() + originalPersonId + ',');
+        }
+
+        var $textEntry = $('#' + memberId + ' .manual-entry-fields');
+        var originalInstrument = $textEntry.find('.text-instrument-input').val();
+        var originalName = $textEntry.find('.text-person-input').val();
+        var originalTextPerson = originalInstrument && originalName ? originalInstrument + ':' + originalName : '';
+
+        if (originalTextPerson) {
+            $('#hidden_text_persons_deleted').val($('#hidden_text_persons_deleted').val() + originalTextPerson + ',');
+        }
+
+        $('#' + memberId).remove();
+    });
+
+    $('#update_form').on('submit', function(e) {
+        e.preventDefault();
+        let currentPersons = $('.person-selection').map(function() { return $(this).val(); }).get().filter(Boolean);
+        let currentTextPersons = $('.member-entry').map(function() {
+            let instrumentInput = $(this).find('.text-instrument-input');
+            let nameInput = $(this).find('.text-person-input');
+            let instrument = instrumentInput.val();
+            let name = nameInput.val();
+            if (instrument && name) {
+                return instrument + ':' + name;
+            } else {
+                return '';
+            }
+        }).get().filter(Boolean);
+
+        $('#hidden_current_persons').val(currentPersons.join(','));
+        $('#hidden_current_text_persons').val(currentTextPersons.join(','));
+
+        let initialPersons = $('#hidden_default_persons').val().split(',').filter(Boolean);
+        let initialTextPersons = $('#hidden_default_text_persons').val().split(',').filter(Boolean);
+        let deletedPersons = $('#hidden_persons_deleted').val().split(',').filter(Boolean);
+        let deletedTextPersons = $('#hidden_text_persons_deleted').val().split(',').filter(Boolean);
+        let changedPersons = $('#hidden_persons_changed').val().split(',').filter(Boolean);
+        let changedTextPersons = $('#hidden_text_persons_changed').val().split(',').filter(Boolean);
+
+        let remainingInitialPersons = initialPersons.filter(pid => !deletedPersons.includes(pid) && !changedPersons.includes(pid));
+        let remainingInitialTextPersons = initialTextPersons.filter(tp => !deletedTextPersons.includes(tp) && !changedTextPersons.includes(tp));
+
+        let addedPersons = currentPersons.filter(pid => !initialPersons.includes(pid));
+        let addedTextPersons = currentTextPersons.filter(tp => !initialTextPersons.includes(tp));
+
+        let finalPersons = [...new Set([...remainingInitialPersons, ...addedPersons])];
+        let finalTextPersons = [...new Set([...remainingInitialTextPersons, ...addedTextPersons])];
+
+        $('#final_persons').val(JSON.stringify(finalPersons));
+        $('#final_text_persons').val(JSON.stringify(finalTextPersons));
+
+        this.submit();
+    });
+
+    initializeSelect2($('.person-selection'));
+    initializeSelect2($('.instrument-selection'));
+});
+</script>
+
+
+
+{% endblock %}
+

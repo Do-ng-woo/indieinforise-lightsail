@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+.container {
+    padding: 0;
+    margin: 0 auto;
+}
+
+.container div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 1rem;
+}
+
+.container img {
+    width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+    height: 14rem; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+    object-fit: cover; /* 이미지 비율 유지 */
+    border-radius: 1rem; /* 이미지 모서리 둥글기 */
+}
+
+a {
+    color: black;
+    text-decoration-line: none;
+}
+
+.container a {
+    flex: 0 0 100%; /* flex-grow, flex-shrink, flex-basis */
+    box-sizing: border-box; /* 패딩과 보더를 너비에 포함 */
+    margin: 1%; /* 각 요소 사이의 마진 */
+    text-align: center; /* 내용을 중앙 정렬 */
+    border-radius: 1rem;
+    padding: 15px; /* 내부 패딩 */
+    background-color: #FFFFFF; /* 배경색 */
+    height: 300px; /* 카드의 높이, 필요에 따라 조정 */
+    width: 250px;
+    flex-wrap: wrap; /* 요소들이 컨테이너를 벗어나지 않도록 줄바꿈 설정 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* X축, Y축, 흐림 반경, 색상 */
+}
+
+.project_search {
+    background-color: #4CAF50;
+    color: white;
+    padding: 7px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.sort_button {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 7px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.sort_button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+@media (max-width: 600px) {
+    .container {
+        margin-top: 20px;
+    }
+
+    .project-container-card-link {
+        width: 45%;
+        max-width: 200px;
+        margin: 10px; /* 상하좌우 마진 추가 */
+    }
+
+    .container img {
+        width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+        height: 10rem; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+        object-fit: cover; /* 이미지 비율 유지 */
+        border-radius: 1rem; /* 이미지 모서리 둥글기 */
+    }
+
+    .container a {
+        height: 250px; /* 카드의 높이, 필요에 따라 조정 */
+        width: 250px;
+    }
+}
+@media (max-width: 510px) {
+    .sort_button {
+        padding: 7px 13px;
+    }
+}
+@media (max-width: 500px) {
+    .container img {
+        width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+        height: 160px; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+    }
+
+    .container a {
+        height: 240px; /* 카드의 높이, 필요에 따라 조정 */
+    }
+}
+@media (max-width: 440px) {
+    .sort_button {
+        padding: 5px 12px;
+        margin-left: 3px;
+    }
+    .search_input{
+        width:130px;
+        height:29.5px;
+        margin-left:3px;
+    }
+    .project_search{
+        padding: 5px 12px; 
+    }
+}
+@media (max-width: 420px) {
+    .container img {
+        width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+        height: 130px; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+    }
+
+    .container a {
+        height: 210px; /* 카드의 높이, 필요에 따라 조정 */
+    }
+}
+@media (max-width: 400px) {
+    .sort_button {
+        padding: 5px 10px;
+        margin-left: 3px;
+    }
+    .search_input{
+        width:120px;
+        height:29.5px;
+    }
+    .project_search{
+        padding: 5px 10px; 
+    }
+}
+@media (max-width: 370px) {
+    .sort_button {
+        padding: 5px 8px;
+        margin-left: 3px;
+    }
+    .search_input{
+        width:110px;
+        height:29.5px;
+    }
+    .project_search{
+        padding: 5px 10px; 
+    }
+}
+</style>
+
+<div style="display: flex; justify-content: flex-end; margin-bottom: 10px; margin-top:10px;">
+    <form method="get" action="{% url 'projectapp:list' %}" style="margin-right: 10px; display: flex; align-items: center;">
+        <button type="submit" name="order_by" value="newest" class="sort_button {% if request.GET.order_by == 'newest' %}active{% endif %}">최신순</button>
+        <button type="submit" name="order_by" value="popularity" class="sort_button {% if request.GET.order_by == 'popularity' %}active{% endif %}">인기순</button>
+        <button type="submit" name="order_by" value="title" class="sort_button {% if request.GET.order_by == 'title' %}active{% endif %}">제목순</button>
+        <input type="text" name="search_keyword" class="search_input" placeholder="검색어를 입력하세요" value="{{ request.GET.search_keyword }}">
+        <button type="submit" class="project_search">검색</button>
+    </form>
+</div>
+
+{% if project_list %}
+<div class="container">
+    {% for project in project_list %}
+    <div class="project-container-card-link">
+        <a href="{% url 'projectapp:detail' pk=project.pk %}">
+            {% include 'snippets/card_project.html' with project=project %}
+        </a>
+    </div>
+    {% endfor %}
+</div>
+<script src="{% static 'js/magicgrid.js' %}"></script>
+{% else %}
+<div style="text-align:center">
+    <h1>
+        No Articles Yet!!!!!
+    </h1>
+</div>
+{% endif %}
+
+{% include 'snippets/pagination.html' with pageobj=page_obj %}
+<div style="text-align: center">
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'projectapp:create' %}" class="btn btn-dark rounded-pill col-6 mt-3 mb-3 px-3">
+        공연장 추가하기
+    </a>
+    {% else %}
+    <a class="loginButton btn btn-dark rounded-pill col-6 mt-3 mb-3 px-3" href="#">
+        공연장 추가하기
+    </a>
+    {% endif %}
+</div>
+
+{% endblock %}

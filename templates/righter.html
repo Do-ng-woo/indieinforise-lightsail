@@ -1,0 +1,83 @@
+
+<style>
+.lefter {
+    position: fixed;
+    left: 50%; /* 중앙 정렬을 위한 설정 */
+    top: 50%; /* 중앙 정렬을 위한 설정 */
+    transform: translate(-50%, -50%); /* 정확한 중앙 위치로 이동 */
+    width: 23vw; /* 화면 너비의 20% */
+    height: 33vh; /* 화면 높이의 30% */
+    background-color: #FFFFFF;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    color: #333;
+    display: none; /* 페이지 로드 시 로그인 창 숨김 */
+    min-width:300px;
+}
+
+.profile-info button:hover {
+    background-color: #0056b3; /* 버튼 호버 색상 변경 */
+}
+.login-form input[type="submit"] {
+    width: 90%; /* 버튼의 가로 폭을 창의 80%로 설정 */
+    margin: 0 auto; /* 상하 마진 0, 좌우 마진 자동으로 버튼을 가운데 정렬 */
+    display: block; /* 블록 레벨 요소로 설정하여 width 적용 가능하게 함 */
+}
+.close-button {
+    color: #000000; /* 호버 시 색상 변경 */
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: none;
+    background: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: #f44336; /* 호버 시 색상 변경 */
+}
+@media (max-width: 768px) {
+    .lefter {
+        transform: translate(-50%, -50%); /* 정확한 중앙 위치로 이동 */
+        width: 80vw; /* 화면 너비의 20% */
+        height: 300px;; /* 화면 높이의 30% */
+        min-width:200px;
+    } 
+}
+</style>
+{% load bootstrap4 %}
+<div class="lefter">
+    <button class="close-button">&times;</button> <!-- 창닫기 버튼 추가 -->
+    {% if user.is_authenticated %}
+        <div class="profile-card">
+            <img src="{{ user_profile.image.url }}" alt="Profile Image" class="profile-image"/>
+            <div class="profile-info">
+                <h2>{{ user_profile.user.username }}</h2>
+                <button onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+    {% else %}
+        <div class="login-form">
+            <h4>IndieInfoRise</h4>
+            <form action="{% url 'accountapp:login' %}" method="post">
+                {% csrf_token %}
+                {% bootstrap_form login_form %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <input type="submit" class="btn btn-dark rounded-pill col-6 mt-3" value="Login">
+                <br>
+                <a href="{% url 'accountapp:create' %}" class="signup-button" >회원가입</a>
+                |<a>아이디 찾기</a>|<a>비밀번호 찾기</a>
+                
+            </form>
+        </div>
+    {% endif %}
+</div>
+ 
+
+

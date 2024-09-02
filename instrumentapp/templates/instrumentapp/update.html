@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+<style>
+    .input-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        width: 100%;
+    }
+    .input-group .form-control {
+        flex: 1 1 auto;
+        width: 1%;
+        margin-right: 10px;
+    }
+    .editable {
+        flex-grow: 2;
+        border: 2px solid #000000; /* 진한 테두리 적용 */
+        padding: 10px;
+        min-height: 100px;
+    }
+    .form-group {
+        margin-bottom: 15px; /* 폼 필드 간격 조정 */
+        text-align: left; /* 왼쪽 정렬 */
+        display: flex; /* Flexbox를 사용하여 라벨과 입력 필드를 한 줄에 배열 */
+        align-items: center; /* 세로 중앙 정렬 */
+    }
+    .text_instrument{
+        height: 35rem; 
+        overflow-y: auto;
+    }
+</style>
+
+<script src="//cdn.jsdelivr.net/npm/medium-editor@5.23.2/dist/js/medium-editor.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/medium-editor@5.23.2/dist/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
+
+<div class="create_update_delete" style="text-align: center; max-width:700px; margin: 4rem auto">
+    <div class="mb-4">
+        <h4>Instrument Update</h4>
+    </div>
+    <form id="update_form" action="{% url 'instrumentapp:update' pk=target_instrument.pk %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>
+            <!-- content 필드를 수동으로 렌더링 -->
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="{{ form.title.id_for_label }}">이름</label>
+                <div class="col-sm-12">
+                    {{ form.title }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="content-editor">설명</label>
+                <div class="col-sm-12">
+                    <textarea id="content-editor" name="content" class="form-control text_instrument" placeholder="가사를 입력해주세요">{{ form.content.value|default_if_none:"" }}</textarea>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="{{ form.image.id_for_label }}">이미지</label>
+                <div class="col-sm-12">
+                    {{ form.image }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="{{ form.hide.id_for_label }}">{{ form.hide.label }}</label>
+                <div class="col-sm-12">
+                    {{ form.hide }}
+                </div>
+            </div>
+        </div>
+        
+        <div id="dynamic_fields_container">
+            <!-- 기존 데이터를 표시하는 부분 -->
+            {% for description in target_instrument.detailed_descriptions.all %}
+            <div class="input-group mb-2" id="description_{{ description.id }}">
+                <input type="hidden" name="detailed_descriptions[{{ forloop.counter0 }}][id]" value="{{ description.id }}" />
+                <input type="text" name="detailed_descriptions[{{ forloop.counter0 }}][name]" class="form-control" placeholder="이름" required value="{{ description.name }}" />
+                <div class="editable" style="min-height: 100px;" data-placeholder="설명">{{ description.text }}</div>
+                <textarea name="detailed_descriptions[{{ forloop.counter0 }}][value]" style="display:none;"></textarea>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-danger" onclick="deleteDescription({{ description.id }})">삭제</button>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- 기존 데이터 표시 끝 -->
+        </div>
+        <button type="button" id="add_field_button" class="btn btn-info rounded-pill mt-2">+ 추가 정보</button>
+        {% if target_instrument.hide %}
+        <div class="button-row mt-3">
+            <button type="submit" name="save_draft" class="btn btn-secondary rounded-pill col-5 mr-1">Save as Draft</button>
+            <button type="submit" name="publish" class="btn btn-primary rounded-pill col-5 ml-1">Publish</button>
+        </div>
+        {% else %}
+        <div class="button-row mt-3">
+            <button type="submit" class="btn btn-primary rounded-pill col-12">Update</button>
+        </div>
+        {% endif %}
+    </form>
+</div>
+<script>
+    var descriptionTexts = [
+        {% for description in target_instrument.detailed_descriptions.all %}
+            "{{ description.text|escapejs }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+</script>
+<script>
+   $(document).ready(function() {
+        // 기존 detailed_descriptions 항목의 수를 기반으로 counter 초기화
+        var counter = $('#dynamic_fields_container .input-group').length;
+
+        // 'content-editor' ID를 가진 요소에 대해 MediumEditor 적용
+        var contentEditor = new MediumEditor('#content-editor', {
+            // MediumEditor 옵션 설정
+        });
+
+        $('.editable').each(function(index) {
+            var textArea = $(this).next('textarea');
+            textArea.val(descriptionTexts[index]);
+
+            var detailedEditor = new MediumEditor(this);
+            detailedEditor.subscribe('editableInput', function(event, editable) {
+                textArea.val(editable.innerHTML);
+            });
+
+            $(this).html(textArea.val());
+        });
+
+        $('#add_field_button').click(function(e) {
+            e.preventDefault();
+            var newFieldHtml = `
+                <div class="input-group mb-2" id="description_${counter}">
+                    <input type="text" name="detailed_descriptions[${counter}][name]" class="form-control" placeholder="정보의 이름" required />
+                    <div class="editable" style="min-height: 100px;" data-placeholder="설명"></div>
+                    <textarea name="detailed_descriptions[${counter}][value]" style="display:none;"></textarea>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-danger delete-description-btn" data-id="${counter}" onclick="deleteDescription(${counter})">삭제</button>
+                    </div>
+                </div>
+            `;
+            $('#dynamic_fields_container').append(newFieldHtml);
+
+            var newEditable = $(`#description_${counter} .editable`);
+            var newTextarea = newEditable.next('textarea');
+            new MediumEditor(newEditable.get(0)).subscribe('editableInput', function(event, editable) {
+                newTextarea.val(editable.innerHTML);
+            });
+
+            counter++;
+        });
+
+        // 삭제 함수 정의
+        window.deleteDescription = function(descriptionId) {
+            $.ajax({
+                url: '{% url "instrumentapp:delete_description" %}',
+                type: 'POST',
+                data: {
+                    'id': descriptionId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if(response.status === 'success') {
+                        // DOM에서 삭제
+                        $('#description_' + descriptionId).remove();
+                    } else {
+                        // 서버에서 반환한 에러 메시지를 표시
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr) {
+                    // 서버에서 반환한 에러 메시지를 표시
+                    var errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'AJAX 요청 실패';
+                    alert(errorMsg);
+                }
+            });
+        };
+    });
+</script> 
+
+
+
+
+{% endblock %}

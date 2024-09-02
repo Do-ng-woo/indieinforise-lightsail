@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+<script src="//cdn.jsdelivr.net/npm/medium-editor@5.23.2/dist/js/medium-editor.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/medium-editor@5.23.2/dist/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
+<style>
+.input-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        width: 100%;
+    }
+    .input-group .form-control {
+        flex: 1 1 auto;
+        width: 1%;
+        margin-right: 10px;
+    }
+    .editable {
+        flex-grow: 2;
+        border: 2px solid #000000; /* 진한 테두리 적용 */
+        padding: 10px;
+        min-height: 100px;
+    }
+    .form-group {
+        margin-bottom: 15px; /* 폼 필드 간격 조정 */
+        text-align: left; /* 왼쪽 정렬 */
+        display: flex; /* Flexbox를 사용하여 라벨과 입력 필드를 한 줄에 배열 */
+        align-items: center; /* 세로 중앙 정렬 */
+    }
+    .text_instrument{
+        height: 35rem; 
+        overflow-y: auto;
+    }
+</style>
+<div class="create_update_delete" style="text-align: center; max-width:700px; margin: 4rem auto">
+    <div class="mb-4">
+        <h4>
+            Instrument Create
+        </h4>
+    </div>
+    <form action="{%url 'instrumentapp:create' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>
+            <!-- content 필드를 수동으로 렌더링 -->
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="{{ form.title.id_for_label }}">이름</label>
+                <div class="col-sm-12">
+                    {{ form.title }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="{{ form.image.id_for_label }}">이미지</label>
+                <div class="col-sm-12">
+                    {{ form.image }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="content-editor">설명</label>
+                <div class="col-sm-12">
+                    <textarea id="content-editor" name="content" class="form-control text_instrument" placeholder="가사를 입력해주세요">{{ form.content.value|default_if_none:"" }}</textarea>
+                </div>
+            </div>
+        </div>
+        <div id="dynamic_fields_container">
+            <!-- 동적 필드가 추가될 컨테이너 -->
+        </div>
+        <button type="button" id="add_field_button" class="btn btn-info rounded-pill mt-2">+ 추가 정보</button>
+        <div class="button-row mt-3">
+            <button type="submit" name="save_draft" class="btn btn-secondary rounded-pill col-5 mr-1">Save as Draft</button>
+            <button type="submit" name="publish" class="btn btn-primary rounded-pill col-5 ml-1">Publish</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        let counter = 0;
+        
+        // 'content-editor' ID를 가진 요소에 대해 MediumEditor 적용
+        var contentEditor = new MediumEditor('#content-editor', {
+            // MediumEditor 옵션 설정
+        });
+        
+        // 추가 정보 버튼 클릭 이벤트
+        $('#add_field_button').click(function(e) {
+            e.preventDefault();
+            if(counter < 20) {
+                let newFieldHtml = `
+                    <div class="input-group mb-2" id="description_${counter}">
+                        <input type="text" name="detailed_descriptions[${counter}][name]" class="form-control" placeholder="정보의 이름" required />
+                        <div class="editable" style="min-height: 100px;" data-placeholder="정보"></div>
+                        <textarea name="detailed_descriptions[${counter}][value]" style="display:none;"></textarea>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-danger remove-field-btn" data-id="${counter}">삭제</button>
+                        </div>
+                    </div>
+                `;
+                $('#dynamic_fields_container').append(newFieldHtml);
+                
+                // 새로운 editable 요소에 대한 Medium Editor 초기화 및 동기화
+                var newEditable = $(`#description_${counter} .editable`);
+                var newTextarea = newEditable.next('textarea');
+                new MediumEditor(newEditable.get(0)).subscribe('editableInput', function(event, editable) {
+                    newTextarea.val(editable.innerHTML);
+                });
+
+                counter++;
+            }
+        });
+
+        // 동적으로 생성된 삭제 버튼에 대한 이벤트 핸들러를 설정합니다.
+        $('#dynamic_fields_container').on('click', '.remove-field-btn', function() {
+            let fieldId = $(this).data('id');
+            $('#description_' + fieldId).remove();
+        });
+    });
+</script>
+
+
+{% endblock %}

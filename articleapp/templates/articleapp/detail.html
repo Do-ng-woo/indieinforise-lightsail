@@ -1,0 +1,623 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+.title{
+        background-color: #f8f9fa; /* 배경색 설정 */
+        padding: 20px;
+        border-radius: 10px; /* 모서리 둥글게 */
+        font-weight: bold; /* 글씨 굵게 */
+        margin: 20px auto 40px; /* 자동 마진으로 중앙 정렬, 위 아래 마진 조정 */
+        width: 80%; /* 내용에 맞게 너비 조정 */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 그림자 효과 추가 */
+    }
+
+    .entire_article {
+        display: flex; /* Flex 컨테이너 설정 */
+        justify-content: space-between; /* 자식 요소를 가운데 정렬 */
+        align-items: flex-start; /* 세로 축에서 상단 정렬 */
+        width: 80%; /* 전체 너비 */
+        margin: auto; /* 자동 마진으로 중앙 정렬 */
+    }
+    .poster_content {
+        width: 65%;
+        background-color: #f8f9fa; /* 배경색 회색으로 설정 */
+        padding: 20px; /* 패딩 추가 */
+        margin-bottom: 20px; /* 아래쪽 마진 추가 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+    }
+    /* 공연 정보 박스 내부 패딩 및 마진 조정 */
+    .infomation {
+        padding: 20px; /* 패딩 추가 */
+        background-color: #f8f9fa; /* 배경색 변경 */
+        margin-left: 20px; /* 왼쪽 마진 추가 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+    }
+    .lineup, .date, .place {
+        background-color: #e9ecef; /* 배경색 회색으로 설정 */
+        padding: 20px; /* 패딩 추가 */
+        margin-left: 20px; /* 왼쪽 마진 추가 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+        
+    }
+    /* 아티스트 카드를 포함하는 컨테이너 스타일 수정 */
+    .lineup {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px; /* 카드 사이의 간격 */
+        margin-bottom: 20px; /* 섹션 아래쪽 마진 */
+        padding: 20px;
+        background-color: #e9ecef; /* 배경색 회색으로 설정 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+    }
+    
+    /* 카드 스타일 */
+    .lineup a {
+        text-decoration: none; /* 링크 밑줄 제거 */
+        color: black; /* 텍스트 색상 */
+    }
+    
+    /* 개별 아티스트 카드 스타일 */
+    .card_artist{    
+        flex: 0 0 30%; /* flex-grow, flex-shrink, flex-basis */
+    }
+    .card_project{    
+        flex: 0 0 45%; /* flex-grow, flex-shrink, flex-basis */
+    }
+    
+    .card_artist,.card_project h5 {
+        margin-top: 10px; /* 이미지와 텍스트 사이 마진 */
+    }
+    
+    .lineup div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 1rem;
+    }
+    
+    .lineup img {
+        width: 5rem;
+        height: 5rem;
+        object-fit: cover;
+        border-radius: 1rem;
+    }
+     .place {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; /* 카드를 왼쪽 정렬 */
+        gap: 20px; /* 카드 사이의 간격 */
+        margin-bottom: 20px; /* 섹션 아래쪽 마진 */
+        padding: 20px;
+        background-color: #e9ecef; /* 배경색 회색으로 설정 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+    }
+    
+    .place div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 1rem;
+    }
+    
+    .place img {
+        width: 11rem;
+        height: 11rem;
+        object-fit: cover;
+        border-radius: 1rem;
+    }
+    /* 정보 섹션 내부 텍스트 정렬 수정 */
+    .date, .place, .lineup {
+        text-align: left; /* 텍스트 왼쪽 정렬 */
+    }
+    
+    .date p, .place p, .lineup p {
+        margin: 10px 0; /* 위 아래 마진 추가 */
+    }
+
+    /* 아티스트 및 프로젝트 카드 내부 스타일 조정 */
+    .card_artist, .card_project {
+        text-align: center; /* 텍스트 중앙 정렬 */
+        display: block; /* 블록 요소로 표시 */
+    }
+
+    .card_artist img, .card_project img {
+        margin-bottom: 10px; /* 이미지 아래쪽 마진 추가 */
+    }
+    
+    /* 공연 정보 세부 항목 스타일 */
+    .infomation h2 {
+        color: #333; /* 글자색 변경 */
+        margin-top: 20px; /* 위쪽 마진 추가 */
+    }
+    .righter{
+        width: 35%;   
+    }
+     .table th, .table td {
+        text-align: center;
+    }
+
+     .table th.title, .table td.title {
+        width: 50%; /* 제목 열의 너비 설정 */
+        text-align: left; /* 제목 텍스트를 왼쪽으로 정렬 */
+        padding-left: 3rem; /* 텍스트와 셀 경계 사이에 약간의 여백을 추가 */
+    }
+
+    .table th.short, .table td.short {
+        width: 20%; /* 다른 열의 너비를 짧게 설정 */
+    }
+    .community{
+        padding: 20px; /* 패딩 추가 */
+        margin-left: 20px; /* 왼쪽 마진 추가 */
+        border-radius: 1rem; /* 모서리 둥글게 */
+        background-color: #f8f9fa; /* 배경색 변경 */
+        margin-top: 20px;
+        height: 650px; /* 고정 높이 설정 */
+        overflow-y: auto; /* 세로 스크롤바 설정 */
+        margin-right:0px;
+    }
+    .modify{
+     text-align: center;
+    }
+    /* 커뮤니티 글 모두보기 스타일 */
+/* 관련 커뮤니티 글 모두 보기 버튼 스타일 */
+.view-all-community-btn {
+    display: inline-block; /* 인라인 블록 요소로 설정 */
+    padding: 10px 20px; /* 패딩 조정 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    border: none; /* 테두리 없앰 */
+    border-radius: 5px; /* 둥근 모서리 */
+    background-color: #8c9191; /* 배경색 */
+    color: black; /* 글자색 */
+    text-decoration: none; /* 밑줄 제거 */
+    font-weight: bold; /* 글자 굵게 */
+    transition: background-color 0.3s ease; /* 배경색 변경 애니메이션 */
+}
+
+.view-all-community-btn:hover {
+    background-color: #555959; /* 호버 시 배경색 변경 */
+    color: white; /* 글자색 */
+}
+
+/* 공연 관련 글 헤더 스타일 */
+.community-header {
+    display: flex; /* Flex 컨테이너로 설정 */
+    justify-content: space-between; /* 내용을 양쪽 끝으로 정렬 */
+    align-items: center; /* 세로 축 중앙 정렬 */
+    margin-bottom: 20px; /* 하단 여백 추가 */
+}
+/* ========================================댓글섹션 스타일링====================================== */
+    /* 전체 댓글 섹션 스타일링 */
+.comment-section {
+    font-family: 'Arial', sans-serif;
+    max-width: 800px;
+    width:90%;
+    margin: auto;
+    
+}
+/* 정렬 버튼 스타일링 */
+.sorting-buttons {
+    text-align: right;
+    margin: 20px 0;
+}
+
+.sorting-buttons a {
+    text-decoration: none;
+    color: #1a0dab;
+    font-size: 0.9em;
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: 1px solid #dfe1e5;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.sorting-buttons a:hover {
+    background-color: #f8f9fa;
+}
+
+/* 댓글 목록 스타일링 */
+.comment {
+    background-color: #f1f3f4;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* 페이지네이션 스타일링 */
+.pagination {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: #1a0dab;
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #dfe1e5;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #f8f9fa;
+}
+
+.pagination .current-page {
+    padding: 5px 10px;
+    margin: 0 5px;
+    background-color: #e8f0fe;
+    border-radius: 4px;
+}
+/*----------------커뮤니티-----------  */
+.community-item {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+     /* 커서 모양 변경 */
+    cursor: pointer;
+}
+
+.top-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+}
+
+.top-line h2 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.top-line{
+    font-size: 24px;
+    color: #666;
+}
+.likes{
+    display: flex;
+    color: #666;
+    align-items: center;
+}
+.like_count{
+    font-size: 20px;
+    margin-left:10px;
+}
+
+.bottom-line {
+    display: flex;
+    justify-content: start;
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.bottom-line span {
+    margin-right: 10px;
+}
+@media (max-width: 1450px) {
+     .bottom-line {
+        font-size: 11px;
+    }
+}
+@media (max-width: 1400px) {
+    .bottom-line {
+        font-size: 12px;
+    }
+}
+@media (max-width: 1200px) {
+    .bottom-line {
+        font-size: 11px;
+    }
+}
+@media (max-width: 1100px) {
+    .bottom-line {
+        font-size: 12px;
+    }
+}
+@media (max-width: 390px) {
+    .bottom-line {
+        font-size: 11px;
+    }
+}
+@media (max-width: 360px) {
+    .bottom-line {
+        font-size: 10.5px;
+    }
+}
+/*----------------커뮤니티 끝-----------  */
+@media (max-width: 1400px) {
+    /* 그 외 캘린더 요소들의 스타일을 조정하고 싶은 경우 여기에 추가합니다. */
+    .poster_content{
+        width: 60%;
+    }
+    .righter{
+        width: 40%;   
+    }
+}
+@media (max-width: 1100px) {
+.entire_article {
+        flex-direction: column; /* 세로 정렬로 변경 */
+        align-items: center; /* 중앙 정렬 */
+        width:90%;
+    }
+
+    .poster_content, .righter {
+        width: 100%; /* 너비를 100%로 설정하여 화면을 꽉 채우게 함 */
+        margin-bottom: 20px; /* 요소들 사이에 마진 추가 */
+    }
+
+    .righter {
+        order: 2; /* righter를 poster_content 위로 올림 */
+        margin-left:0px;
+    }
+
+    .poster_content {
+        order: 1; /* poster_content를 righter 아래로 내림 */
+    }
+    .infomation{
+        margin-left:0;
+        
+    }
+    .place img {
+        width: 13rem;
+        height: 13rem;
+    }
+    .community{
+        padding: 20px; /* 패딩 추가 */
+        margin-left: 0px; /* 왼쪽 마진 추가 */
+
+    }
+
+}
+@media (max-width: 1700px) {
+    .card_artist{    
+        flex: 0 0 45%; /* flex-grow, flex-shrink, flex-basis */
+    }
+}
+@media (max-width: 1100px) {
+    .card_artist{    
+        flex: 0 0 30%; /* flex-grow, flex-shrink, flex-basis */
+    }
+}
+@media (max-width: 650px) {
+    .card_artist{    
+        flex: 0 0 45%; /* flex-grow, flex-shrink, flex-basis */
+    }
+}
+@media (max-width: 400px) {
+    .place img {
+        width: 11rem;
+        height: 11rem;
+    }
+    .card_artist{    
+        flex: 0 0 45%; /* flex-grow, flex-shrink, flex-basis */
+    }
+    .lineup {
+        gap: 10px; /* 카드 사이의 간격 */
+    }
+}
+</style>
+
+<div>
+    <h1 class="title" >{{ target_article.title }}</h1> 
+    <div class="entire_article">
+        <div class="poster_content">
+            <img src="{{ target_article.image.url }}" alt="" style="width: 100%; border-radius: 1rem;">
+            <div style='text-align: start; background-color: #e9ecef; padding: 20px; border-radius: 1rem;'>
+                {{ target_article.content|safe|linebreaksbr }}
+            </div>
+        </div>
+        <div class="righter">
+             <div class="infomation">
+                <h2>   공연 날짜</h2>
+                <div class="date">
+                    {% if target_article.datetime %}
+                        <p> {{ target_article.datetime|date:"Y년 n월 j일 H시 i분" }}</p>
+                    {% else %}
+                        <p>{{ target_article.date|date:"Y년 n월 j일" }}</p>
+                    {% endif %}
+                </div>
+                <div class="place_and_lineup">
+                    <div class="place_container">
+                        <h2>공연 장소</h2>
+                        <div class="place">
+                            {% for project in target_article.project.all %}
+                                <a href="{% url 'projectapp:detail' pk=project.pk %}">
+                                    {% include 'snippets/card_project.html' with project=project %}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="lineup_container">
+                        <h2>출연 아티스트</h2>
+                        <div class="lineup">
+                            {% for artist in target_article.artist.all %}
+                                <a href="{% url 'artistapp:detail' pk=artist.pk %}" class="card_artist">
+                                    {% include 'snippets/card_artist.html' with artist=artist %}
+                                </a>
+                            {% endfor %}
+                        </div>                
+                    </div>
+                 </div>
+            </div>
+            
+            <div class="community">
+                <div class="community-header">
+                    <h2>공연 관련 글</h2>
+                    <a href="{% url 'communityapp:list' %}?search_field=article&search_keyword={{ target_article.title|urlencode }}" class="view-all-community-btn">더보기</a>
+                </div>
+                {% if community_articles %}
+                    <div class="table-responsive">
+                        {% for object in community_articles %}
+                        <div data-href="{% url 'communityapp:detail' pk=object.pk %}" onclick="window.location=this.getAttribute('data-href');" class="community-item">
+                            <div class="top-line">
+                                <h2>{{ object.title }}</h2>
+                                <div class="likes">
+                                    <span class="material-icons">favorite</span>
+                                    <span class="like_count">{{ object.like }}</span>  
+                                </div>
+                            </div>
+                            <div class="bottom-line">
+                                <span class="author">작성자: {{ object.writer.username }}</span>
+                                <span class="created-at"> 
+                                    {% if object.created_at|date:"Y-m-d" == today %}
+                                        {{ object.created_at|date:"g:i A" }} <!-- 오늘이면 시간만 표시 -->
+                                    {% else %}
+                                        {{ object.created_at|date:"y.m.d" }} <!-- 오늘이 아니면 날짜와 시간 표시 -->
+                                    {% endif %}
+                                </span>
+                                <span class="views">조회수: {{ object.views }}</span>
+                                <span class="comments">댓글: {{ object.comment_count }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <!-- 페이지네이션 컨트롤 -->
+                    <div style="text-align:center; margin-top:20px;">
+                        {% if community_articles.has_previous %}
+                            <a href="?community_page={{ community_articles.previous_page_number }}&current_section=community" class="btn btn-primary">&laquo; 이전</a>
+                        {% endif %}
+
+                        <span class="current-page">페이지 {{ community_articles.number }} / {{ community_articles.paginator.num_pages }}</span>
+
+                        {% if community_articles.has_next %}
+                            <a href="?community_page={{ community_articles.next_page_number }}&current_section=community" class="btn btn-primary">다음 &raquo;</a>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p>이 Article을 태그한 Community 글이 없습니다.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        
+    </div>
+    
+    <div class="modify">
+    <a href="{% url 'articleapp:article-update-logs' pk=target_article.pk %}"
+       class= "btn btn-primary rounded-pill col-3">
+    UpdateLOG 
+    </a>
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'articleapp:update' pk=target_article.pk %}"
+       class= "btn btn-primary rounded-pill col-3">
+    Update 
+    </a>
+    {% else %}
+    <a class="loginButton btn btn-primary rounded-pill col-3" href="#">
+    Update 
+    </a>
+    {% endif %}
+    {% if target_article.writer == user %}
+    <a href="{% url 'articleapp:delete' pk=target_article.pk %}"
+        class= "btn btn-danger rounded-pill col-3">
+    Delete
+    </a>
+    
+    {% endif %}
+    </div>
+    <div class="text-center" style="height: 2rem; margin: 4rem auto;">
+        <a href="{% url 'likeapp:article_like' pk=target_article.pk %}">
+            <i style="vertical-align: middle; font-size: 3rem; color: #f77" class="material-icons">
+                favorite
+            </i>
+        </a>
+        <span style="vertical-align: middle; font-size: 1.2rem;">
+            {{ target_article.like }}
+        </span>
+    </div>
+    <div class="comment-section">
+        <span>댓글 수: {{ target_article.comment_count }}</span>
+        <span>조회 수: {{ target_article.views }}</span>
+        <div class="make">
+        {% include 'commentapp/create.html' with content_type_id=content_type_id object_id=object_id %}
+        </div>
+        <div class="sorting-buttons">
+            <a href="{{ request.path }}?sort=recent{% if comment_page_obj.number %}&page={{ comment_page_obj.number }}{% endif %}">최신순</a>
+            <a href="{{ request.path }}?sort=likes{% if comment_page_obj.number %}&page={{ comment_page_obj.number }}{% endif %}">좋아요순</a>
+        </div>
+
+        <!-- 페이지네이션된 댓글 목록 -->
+        <div class="comment">
+            {% for comment in comments %}
+                {% include 'commentapp/detail.html' with comment=comment %}
+            {% empty %}
+                <p>댓글이 없습니다.</p>
+            {% endfor %}
+        </div>
+
+        <!-- 페이지네이션 링크 -->
+        <div class="pagination">
+            {% if comment_page_obj.has_previous %}
+                <a href="?sort={{ sort }}&page=1">&laquo; 처음</a>
+                <a href="?sort={{ sort }}&page={{ comment_page_obj.previous_page_number }}">이전</a>
+            {% endif %}
+            <span class="current-page">{{ comment_page_obj.number }}/{{ comment_page_obj.paginator.num_pages }}</span>
+            {% if comment_page_obj.has_next %}
+                <a href="?sort={{ sort }}&page={{ comment_page_obj.next_page_number }}">다음</a>
+                <a href="?sort={{ sort }}&page={{ comment_page_obj.paginator.num_pages }}">마지막 &raquo;</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function(){
+    // 댓글 컨테이너에 대한 클릭 이벤트 위임
+    $('.comment').on('click', 'button.like-button', function(e){
+        e.preventDefault();
+        var commentId = $(this).data('id');
+        var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '/comments/like_comment/' + commentId + '/',
+            data: {
+                csrfmiddlewaretoken: csrftoken,
+            },
+            success: function(response){
+                $('#like-count-' + commentId).text(response.total_likes);
+                if(response.liked){
+                    $('#like-icon-' + commentId).css('color', 'red');
+                } else {
+                    $('#like-icon-' + commentId).css('color', 'grey');
+                }
+            },
+            error: function(xhr, status, error){
+                alert('Something went wrong: ' + error);
+            }
+        });
+    });
+
+    // 싫어요 버튼 이벤트 위임
+    $('.comment').on('click', 'button.dislike-button', function(e){
+        e.preventDefault();
+        var commentId = $(this).data('id');
+        var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '/comments/dislike_comment/' + commentId + '/',
+            data: {
+                csrfmiddlewaretoken: csrftoken,
+            },
+            success: function(response){
+                $('#dislike-count-' + commentId).text(response.total_dislikes); // 싫어요 개수 업데이트
+                if(response.disliked){
+                    $('#dislike-icon-' + commentId).css('color', 'blue'); // 싫어요 눌린 상태로 스타일 변경
+                } else {
+                    $('#dislike-icon-' + commentId).css('color', 'grey'); // 싫어요 눌리지 않은 상태로 스타일 변경
+                }
+            },
+            error: function(xhr, status, error){
+                alert('Something went wrong: ' + error);
+            }
+        });
+    });
+});
+
+</script>
+
+{% endblock %}

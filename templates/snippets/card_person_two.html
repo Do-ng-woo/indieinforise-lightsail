@@ -1,0 +1,10 @@
+<div style="display: block; text-align:center;">
+    <!-- 포지션 표시, person 객체에 position 필드가 있을 경우 사용 -->
+    <div style="font-weight: bold;"> 
+    {% for instrument in person.instruments.all %}
+        {{ instrument.title }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+    </div>
+    <img src="{{ person.image.url }}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
+    <h5 class="mt-2" style="font-family: 'NanumSquareB';">{{ person.title | truncatechars:8 }}</h5>
+</div>

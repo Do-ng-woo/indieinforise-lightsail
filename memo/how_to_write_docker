@@ -1,0 +1,21 @@
+일단 처음 난 오류는 
+# 환경 변수 설정 (UTF-8 인코딩 강제)
+ENV PYTHONUTF8=1
+
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir -r requirements.txt
+
+을 통해 해결할 수 있을듯 
+
+pip pip install -r requirements.txt 할떄 한번 konlpy부분에서 한번 오류가 났었음
+근데 이 오류는 window 개발환경에서 나는 오류이고 리눅스에서는 안난다고 함 
+
+마이그레이션 할때 한번에 마이그레이션 하면 안됨 makemigration을 생성이라 한번에 해도 되는데
+migrate는 오류가 나니까 
+python manage.py migrate accountapp
+python manage.py migrate profileapp
+python manage.py migrate articleapp
+python manage.py migrate genreapp
+python manage.py migrate
+
+이 순서로 마이그레이션 할거임

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .top-buttons {
+        margin: auto;
+        width: 700px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        align-items: center;
+    }
+
+    .top-buttons-left,
+    .top-buttons-right {
+        display: flex;
+        gap: 10px;
+    }
+    .top-buttons-left a .material-icons {
+        vertical-align: middle;
+    }
+    .btn-submit {
+        text-decoration: none;
+        color: black;
+        background-color: #e0e0e0;
+        padding: 10px 20px 10px 20px;
+        border-radius: 5px;
+        font-size: 1rem;
+        border: 1px solid #ccc; /* 테두리 색상 추가 */
+    }
+    .btn-submit:hover {
+        background-color: #b0b0b0;
+    }
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        font-family: 'Arial', sans-serif;
+    }
+    .stamp-preview {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .stamp-preview img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+    }
+    .fixed-details, .stamp-details {
+        margin-bottom: 20px;
+    }
+    .fixed-details h3, .stamp-details h3 {
+        margin-bottom: 10px;
+        font-size: 1.5em;
+        color: #333;
+    }
+    .stamp-details label {
+        display: block;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .form-control:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+</style>
+<div class="top-buttons">
+    <div class="top-buttons-left">
+        <a href="{% url 'myshowapp:userperformance_detail' pk=user_performance.pk %}" class="btn-submit"><span class="material-icons">arrow_back</span></a>
+    </div>
+    <div class="top-buttons-right">
+        <button type="button" onclick="submitForm('randomize')" class="btn-submit">랜덤 재설정</button>
+        <button type="button" onclick="submitForm('save')" class="btn-submit">업데이트</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="stamp-preview">
+        <h3>현재 스템프</h3>
+        <img src="{{ user_performance.stamp_image.url }}" alt="Current Stamp Image">
+    </div>
+
+    <div class="fixed-details">
+        <h3>내 스템프 정보</h3>
+        <p><strong>Article:</strong> {{ article.title }}</p>
+        <p><strong>Date:</strong> {{ date|date:"Y-m-d" }}</p>
+    </div>
+
+    <div class="stamp-details">
+        <h3>스템프 커스터마이징</h3>
+        <form id="stampForm" method="post">
+            {% csrf_token %}
+            <p><strong>전체 텍스트:</strong> {{ full_text }}</p>
+            
+            <label for="first_line">First Line</label>
+            <input type="text" name="first_line" id="first_line" value="{{ stamp.first_line }}" class="form-control">
+            
+            <label for="second_line">Second Line</label>
+            <input type="text" name="second_line" id="second_line" value="{{ stamp.second_line|default_if_none:'' }}" class="form-control" placeholder="입력시 두번째줄이 추가됩니다">
+            
+            <label for="third_line">Third Line</label>
+            <input type="text" name="third_line" id="third_line" value="{{ stamp.third_line|default_if_none:'' }}" class="form-control" placeholder="입력시 세번째줄이 추가됩니다">
+            
+            <label for="font_choice">폰트 선택</label>
+            <select name="font_choice" id="font_choice" class="form-control">
+                {% for value, display in form.font_choice.field.choices %}
+                    <option value="{{ value }}" {% if value == stamp.font_choice %}selected{% endif %}>{{ display }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="background_choice">프레임 선택</label>
+            <select name="background_choice" id="background_choice" class="form-control">
+                {% for value, display in form.background_choice.field.choices %}
+                    <option value="{{ value }}" {% if value == stamp.background_choice %}selected{% endif %}>{{ display }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="center_image_choice">중앙 라벨 선택</label>
+            <select name="center_image_choice" id="center_image_choice" class="form-control">
+                {% for value, display in form.center_image_choice.field.choices %}
+                    <option value="{{ value }}" {% if value == stamp.center_image_choice %}selected{% endif %}>{{ display }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="color_choice">색상 선택</label>
+            <select name="color_choice" id="color_choice" class="form-control">
+                {% for value, display in form.color_choice.field.choices %}
+                    <option value="{{ value }}" {% if value == stamp.color_choice %}selected{% endif %}>{{ display }}</option>
+                {% endfor %}
+            </select>
+            <input type="hidden" name="action" id="action" value="save">
+        </form>
+    </div>
+</div>
+
+<script>
+function submitForm(action) {
+    document.getElementById('action').value = action;
+    document.getElementById('stampForm').submit();
+}
+</script>
+{% endblock %}

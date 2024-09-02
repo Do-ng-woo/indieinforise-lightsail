@@ -1,0 +1,62 @@
+{% load static %}
+
+<style>
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        background: white;
+        transition: transform 0.3s ease-in-out;
+        height: 750px; /* 카드의 높이를 컨테이너보다 약간 작게 설정 */
+        width: auto; /* 카드의 너비를 이미지와 내용에 따라 자동으로 설정 */
+    }
+    
+    .card:hover {
+        transform: translateY(-5px); /* 호버 시 위로 조금 움직임 */
+    }
+
+     .card img {
+        width: 100%;
+        max-height: 600px; /* 이미지의 최대 높이를 설정 */
+        object-fit: cover;
+    }
+
+     .card-content {
+        padding: 20px;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .card-date {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="card">
+    <a href="{% url 'articleapp:detail' pk=article.pk %}">
+        <img src="{{ article.image.url }}" alt="{{ article.title }}">
+    </a>
+    <div class="card-content">
+        <h3 class="card-title">{{ article.title }}</h3>
+        {% if article.datetime %}
+            <p class="card-date">{{ article.datetime|date:"Y-m-d" }}</p>
+        {% else %}
+            <p class="card-date">{{ article.date|date:"Y-m-d" }}</p>
+        {% endif %}
+        <!-- 모든 프로젝트 제목과 링크를 표시 -->
+        {% for project in article.project.all %}
+            <p class="card-project">
+                <a href="{% url 'projectapp:detail' pk=project.pk %}">
+                    {{ project.title }}
+                </a>
+            </p>
+        {% endfor %}
+    </div>
+</div>

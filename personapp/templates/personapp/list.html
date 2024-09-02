@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+.container {
+    padding: 0;
+    margin: 0 auto;
+}
+    
+.container div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 1rem;
+}
+
+.container img {
+    width: 7rem;
+    height: 7rem;
+    object-fit: cover;
+    border-radius: 1rem;
+}
+
+a {
+    color: black;
+    text-decoration-line: none;
+}
+
+.position_and_search {
+    width: 75%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    margin: 0 auto;
+}
+
+.position_button a:hover {
+    background-color: #0056b3;
+}
+
+.search-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.search-item {
+    margin-right: 10px;
+}
+
+/* select2-container의 기본 너비 설정 */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    width: 200px;  /* 고정 너비 설정 */
+    height: 46px;  /* 고정 높이 설정 */
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    white-space: nowrap;  /* 텍스트 줄바꿈 방지 */
+    overflow: auto;  /* 내용이 넘칠 경우 숨김 처리 */
+}
+    
+.position_and_search .search-container .search-item select, 
+.position_and_search .search-container .search-item input[type="text"] {
+    width: 200px;
+    height: 46px;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+    overflow: hidden; /* 내용이 넘칠 경우 숨김 처리 */
+}
+
+/* select2 선택 항목 스타일링 */
+/* select2 선택 항목 스타일링 */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    height: 32px;  /* 기존 높이에서 2px 증가 */
+    margin-top: 0px;  /* 위쪽으로 2px 확장 */
+    padding: 6px 8px;
+    font-size: 16px;
+    line-height: 1.0;
+    border-radius: 4px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* 검색 버튼 스타일 */
+.position_and_search .search-container .search-item button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.entire_person {
+    display: flex;
+    width: 90%;
+    margin: 50px auto;
+}
+
+.main_person_list {
+    width: 100%;
+    margin: 0 auto;
+}
+/* -----------------포지션 버튼 ------------------------- */
+    /* 포지션 버튼 스타일 */
+.position-buttons-container {
+    display: none;
+    width: 70%;
+    margin: 1rem auto;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1rem;
+    justify-items: center;
+    align-items: center;
+}
+
+.position-buttons-container button {
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #000;
+    cursor: pointer;
+}
+
+.position-buttons-container button:hover {
+    background-color: #f0f0f0;
+}
+
+/* 펼치기/닫기 버튼 스타일 */
+.toggle-button {
+    display: block;
+    margin-right: 10px;
+    padding: 10px 6px 10px 10px;
+    height:44px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+.toggle-button:hover {
+    background-color: #45a049;
+}
+
+@media (max-width: 1150px) {
+    .main_person_list {
+        width: 90%;
+    }
+    .position_and_search {
+        width: 90%;
+    }
+}
+@media (max-width: 950px) {
+    .position-buttons-container {
+        width: 80%;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+    }
+}
+@media (max-width: 810px) {
+    .position-buttons-container {
+        width: 90%;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+    }
+}
+@media (max-width: 768px) {
+    .position_and_search {
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+        width: 100%;
+    }
+    .search-container {
+        margin: 0 auto;
+        justify-content: center;
+    }
+    .position_and_search .search-container .search-item input[type="text"] {
+        width: 200px;
+        font-size: 16px;
+    }
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple {
+        width: 200px;
+        font-size: 16px;
+    }
+}
+@media (max-width: 710px) {
+    .position-buttons-container {
+        width: 90%;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+    }
+}
+@media (max-width: 630px) {
+    .position-buttons-container {
+        width: 90%;
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+    }
+}
+@media (max-width: 580px) {
+    .position_and_search .search-container .search-item input[type="text"] {
+        width: 170px;
+        font-size: 16px;
+    }
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple {
+        width: 170px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 525px) {
+    .position_and_search .search-container .search-item input[type="text"] {
+        width: 150px;
+        font-size: 16px;
+    }
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple {
+        width: 150px;
+        font-size: 16px;
+    }
+}
+@media (max-width: 500px) {
+    .position_and_search .search-container .search-item input[type="text"] {
+        width: 150px;
+        font-size: 16px;
+    }
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple {
+        width: 150px;
+        font-size: 16px;
+    }
+    /* 검색 버튼 스타일 */
+    .position_and_search .search-container .search-item button[type="submit"] {
+        padding: 10px 15px;
+        font-size:16px;
+    }
+}
+    
+@media (max-width: 440px) {
+    .position-buttons-container {
+        width: 90%;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+    }
+}
+@media (max-width: 475px) {
+    .position_and_search .search-container .search-item input[type="text"] {
+        width: 130px;
+        font-size: 13px;
+        height:39.5px;
+    }
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple {
+        width: 120px;
+        font-size: 13px;
+        height:39.5px;
+    }
+    /* 검색 버튼 스타일 */
+    .position_and_search .search-container .search-item button[type="submit"] {
+        padding: 10px 15px;
+        font-size:13px;
+    }
+    .toggle-button {
+        margin-right: 5px;
+        padding: 9px 6px 5px 8px;
+        height:39.5px;
+        width:38px;
+    }
+}
+
+
+@media (max-width: 410px) {
+    .main_person_list {
+        width: 95%;
+    }
+    .position_and_search {
+        width: 100%;
+    }
+    .position_and_search .search-container .search-item input[type="text"] {
+        width: 100px;
+        height: 36px;
+        font-size: 11px;
+    }
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple {
+        width: 100px;
+        font-size: 13px;
+        height:36px;
+    }
+    .position_and_search .search-container .search-item button[type="submit"] {
+        padding: 8px 13px;
+    }
+    .container img {
+        width: 6.3rem;
+        height: 6.3rem;
+    }
+    .toggle-button {
+        margin-right: 5px;
+        padding: 6px 6px 6px 6px;
+        height:36px;
+        width:34px;
+    }
+}
+</style>
+
+
+<div class="position_and_search">
+    <button class="toggle-button" onclick="togglePositionButtons()"><span class="material-icons">menu_open</span></button>
+    <div class="search-container">
+        <form id="search-form" method="get" action="{% url 'personapp:list' %}" class="search-item">
+            <!-- 악기 선택 드롭다운 -->
+            <select id="instrument-select" class="person_search_select django-select2" name="instruments" multiple="multiple">
+                <option></option> <!-- Placeholder option -->
+                {% for instrument in instrument_choices %}
+                <option value="{{ instrument.id }}" {% if instrument.id|stringformat:"s" in selected_instruments %}selected{% endif %}>
+                    {{ instrument.title }}
+                </option>
+                {% endfor %}
+            </select>
+            <!-- 검색 필드 -->
+            <input type="text" class="person_search_input" name="search_keyword" placeholder="검색어를 입력하세요" value="{{ search_keyword }}">
+            <!-- 검색 버튼 -->
+            <button class="person_search_button"type="submit">검색</button>
+        </form>
+    </div>
+</div>
+
+<div class="position-buttons-container" id="position-buttons">
+    {% for instrument in instrument_choices %}
+    <button onclick="selectInstrumentAndSearch('{{ instrument.id }}')">{{ instrument.title }}</button>
+    {% endfor %}
+</div>
+
+<div class="entire_person">
+    <div class="main_person_list">
+        {% if person_list %}
+        <div class="container">
+            {% for person in person_list %}
+            <a href="{% url 'personapp:detail' pk=person.pk %}">
+                {% include 'snippets/card_person.html' with person=person %}
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align:center">
+            <h1>
+                No Articles Yet!!!!!
+            </h1>
+        </div>
+        {% endif %}
+        {% include 'snippets/pagination.html' with pageobj=page_obj %}
+    </div>
+</div>
+
+<div style="text-align: center">
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'personapp:create' %}" class="btn btn-dark rounded-pill col-6 mt-3 mb-3 px-3">
+        인물추가하기
+    </a>
+    {% else %}
+    <a class="loginButton btn btn-dark rounded-pill col-6 mt-3 mb-3 px-3" href="#">
+        인물추가하기
+    </a>
+    {% endif %}
+</div>
+
+<script src="{% static 'js/magicgrid.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.django-select2').select2({
+            width: 'style',
+            dropdownAutoWidth: true,
+            placeholder: '포지션 선택',  // Placeholder 설정
+        });
+    });
+
+    function togglePositionButtons() {
+        var container = document.getElementById('position-buttons');
+        var buttons = container.querySelectorAll('button');
+        if (container.style.display === 'none' || container.style.display === '') {
+            container.style.display = 'grid';
+            buttons.forEach(button => {
+                button.style.display = 'flex';
+            });
+        } else {
+            container.style.display = 'none';
+            buttons.forEach(button => {
+                button.style.display = 'none';
+            });
+        }
+    }
+
+    function selectInstrumentAndSearch(instrumentId) {
+        var selectElement = $('#instrument-select');
+        selectElement.val([instrumentId]).trigger('change'); // 선택된 값을 변경하고 이벤트 트리거
+        clearSearchField(); // 검색 필드를 비웁니다
+        $('#search-form').submit(); // 폼 제출
+    }
+
+    function clearSearchField() {
+        $('input[name="search_keyword"]').val('');
+    }
+</script>
+
+
+{% endblock %}

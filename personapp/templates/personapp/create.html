@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+<script src="//cdn.jsdelivr.net/npm/medium-editor@5.23.2/dist/js/medium-editor.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/medium-editor@5.23.2/dist/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
+<style>
+.input-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
+}
+.input-group .form-control {
+    flex: 1 1 auto;
+    width: 1%;
+    margin-right: 10px;
+}
+.editable {
+    flex-grow: 2;
+    border: 2px solid #000000; /* 진한 테두리 적용 */
+    padding: 10px;
+    min-height: 100px;
+}
+</style>
+<div class="create_update_delete" style="text-align: center; max-width:700px; margin: 4rem auto">
+    <div class="mb-4">
+        <h4>
+            Person Create
+        </h4>
+    </div>
+    <form action="{%url 'personapp:create' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <div id="dynamic_fields_container">
+            <!-- 동적 필드가 추가될 컨테이너 -->
+        </div>
+        <button type="button" id="add_field_button" class="btn btn-info rounded-pill mt-2">+ 추가 정보</button>
+        <div class="button-row mt-3">
+            <button type="submit" name="save_draft" class="btn btn-secondary rounded-pill col-5 mr-1">Save as Draft</button>
+            <button type="submit" name="publish" class="btn btn-primary rounded-pill col-5 ml-1">Publish</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        let counter = 0;
+        
+        // 추가 정보 버튼 클릭 이벤트
+        $('#add_field_button').click(function(e) {
+            e.preventDefault();
+            if(counter < 20) {
+                let newFieldHtml = `
+                    <div class="input-group mb-2" id="description_${counter}">
+                        <input type="text" name="detailed_descriptions[${counter}][name]" class="form-control" placeholder="정보의 이름" required />
+                        <div class="editable" style="min-height: 100px;" data-placeholder="정보"></div>
+                        <textarea name="detailed_descriptions[${counter}][value]" style="display:none;"></textarea>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-danger remove-field-btn" data-id="${counter}">삭제</button>
+                        </div>
+                    </div>
+                `;
+                $('#dynamic_fields_container').append(newFieldHtml);
+                
+                // 새로운 editable 요소에 대한 Medium Editor 초기화 및 동기화
+                var newEditable = $(`#description_${counter} .editable`);
+                var newTextarea = newEditable.next('textarea');
+                new MediumEditor(newEditable.get(0)).subscribe('editableInput', function(event, editable) {
+                    newTextarea.val(editable.innerHTML);
+                });
+
+                counter++;
+            }
+        });
+
+        // 동적으로 생성된 삭제 버튼에 대한 이벤트 핸들러를 설정합니다.
+        $('#dynamic_fields_container').on('click', '.remove-field-btn', function() {
+            let fieldId = $(this).data('id');
+            $('#description_' + fieldId).remove();
+        });
+    });
+</script>
+
+
+
+{% endblock %}

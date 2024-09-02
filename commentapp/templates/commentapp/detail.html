@@ -1,0 +1,123 @@
+<style>
+.comment-detail-container {
+    width:100%;
+    border: 1px solid #bbb;
+    border-radius: 1rem;
+    padding: 1%;
+    margin: auto;
+    text-align: left;
+    
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.comment-header-left {
+    display: flex;
+    align-items: center;
+}
+
+.profile-image {
+    width: 50px; /* Adjust based on your preference */
+    height: 50px; /* Adjust to maintain aspect ratio */
+    border-radius: 50%;
+    object-fit: cover; /* Ensure the image covers the area without distortion */
+    margin-right: 10px;
+}
+
+.comment-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.comment-content {
+    margin: 1rem 0;
+}
+
+.comment-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px; /* Adjust the gap between buttons */
+}
+
+.material-icons {
+    vertical-align: middle;
+}
+</style>
+<div class="comment-detail-container">
+    <div class="comment-header">
+        <div class="comment-header-left">
+            <a href="{% url 'accountapp:detail' pk=comment.writer.pk %}">
+                <img src="{{ comment.writer.image.url }}" alt="Profile Image" class="profile-image">
+            </a>
+            <div class="comment-info">
+                <div class="nickname"><a href="{% url 'accountapp:detail' pk=comment.writer.pk %}">{{ comment.writer.nickname }}</a></div>
+                <div class="created-at">{{ comment.created_at }}</div>
+            </div>
+        </div>
+        {% if comment.writer == user %}
+        <div class="comment-header-right">
+            <a href="{% url 'commentapp:delete' pk=comment.pk %}">
+                <span class="material-icons" style="vertical-align: middle;">
+                    delete
+                </span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="comment-content">
+        {{ comment.content }}
+    </div>
+    <div class="comment-actions">
+        <!-- 좋아요 버튼 -->
+        <div style="text-align: left; margin-bottom: 1rem;">
+            {% if request.user.is_authenticated %}
+                <button type="button" class="like-button" data-id="{{ comment.id }}" style="border: none; background: none; cursor: pointer;">
+                    <span class="material-icons" style="vertical-align: middle;" id="like-icon-{{ comment.id }}">
+                        thumb_up
+                    </span>
+                    <span style="vertical-align: middle;" id="like-count-{{ comment.id }}">
+                        {{ comment.likes.count }}
+                    </span>
+                </button>
+            {% else %}
+                <!-- 로그인하지 않은 사용자에게 보여질 로그인 버튼 -->
+                <a class="loginButton" href="#" >
+                    <span class="material-icons" style="vertical-align: middle;">
+                        thumb_up
+                    </span>
+                    <span style="vertical-align: middle;" id="like-count-{{ comment.id }}">
+                        {{ comment.likes.count }}
+                    </span>
+                </a>
+            {% endif %}
+        </div>
+        <!-- 싫어요 버튼 -->
+        <div style="text-align: left; margin-bottom: 1rem;">
+            {% if request.user.is_authenticated %}
+                <button type="button" class="dislike-button" data-id="{{ comment.id }}" style="border: none; background: none; cursor: pointer;">
+                    <span class="material-icons" style="vertical-align: middle;" id="dislike-icon-{{ comment.id }}">
+                        thumb_down
+                    </span>
+                    <span style="vertical-align: middle;" id="dislike-count-{{ comment.id }}">
+                        {{ comment.dislikes.count }}
+                    </span>
+                </button>
+            {% else %}
+                <!-- 로그인하지 않은 사용자에게 보여질 로그인 버튼 -->
+                <a class="loginButton" href="#" >
+                    <span class="material-icons" style="vertical-align: middle;">
+                        thumb_down
+                    </span>
+                    <span style="vertical-align: middle;" id="dislike-count-{{ comment.id }}">
+                        {{ comment.dislikes.count }}
+                    </span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+

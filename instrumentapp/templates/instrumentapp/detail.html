@@ -1,0 +1,933 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+/* Global Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Container for the artist section */
+.artist-container {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Clear floats */
+}
+
+/* Title of the artist section */
+.artist-title {
+    font-size: 2rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* Subtitles within the artist section */
+.artist-subtitles h5 {
+    font-size: 1.2rem;
+    color: #555;
+    text-align: center;
+    margin: 0.5rem 0;
+}
+/* The image of the artist */
+.artist-image {
+    text-align: center;
+    padding: 1rem;
+}
+
+.artist-image img {
+    width: 100%; /* Make image responsive */
+    height: auto;
+    border-radius: 8px;
+}
+
+/*----------------------여기까지 arstit  css  */
+.entire_artist {
+    display: flex; /* Flex 컨테이너 설정 */
+    justify-content: space-between; /* 자식 요소를 가운데 정렬 */
+    align-items: flex-start; /* 세로 축에서 상단 정렬 */
+    width: 80%; /* 전체 너비 */
+    margin: auto; /* 자동 마진으로 중앙 정렬 */
+} 
+.artist_container{
+    width: 50%;
+    background-color: #f8f9fa; /* 배경색 회색으로 설정 */
+    padding: 20px; /* 패딩 추가 */
+    margin-bottom: 20px; /* 아래쪽 마진 추가 */
+    border-radius: 1rem; /* 모서리 둥글게 */
+    margin-right: 2rem; /* 오른쪽 마진 추가 */
+}
+.artist-descriptions {
+    min-height: 500px; /* 최소 높이 설정 */
+    max-height: 500px; /* 최대 높이 설정 */
+    overflow-y: auto; /* 세로 방향으로 내용이 넘칠 경우 스크롤바 표시 */
+    padding: 20px; /* 패딩 추가 */
+    background-color: #f8f9fa; /* 배경색 회색으로 설정 */
+    border-radius: 1rem; /* 모서리 둥글게 처리 */
+    margin-bottom: 20px; /* 아래쪽 마진 추가 */
+}
+.description-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.description-table td {
+    padding: 8px; /* 셀 패딩 조정 */
+    border-bottom: 1px solid #ddd; /* 하단 테두리 추가 */
+}
+.description-table tr:nth-child(even) {
+    background-color: #f2f2f2; /* 짝수 행 배경색 변경 */
+}
+.description-table tr:hover {
+    background-color: #ddd; /* 행에 마우스 오버시 배경색 변경 */
+}
+.open-descriptions button {
+    display: block; /* 블록 레벨 요소로 설정하여 가운데 정렬 가능하게 함 */
+    margin: 20px auto; /* 상하 마진 20px, 좌우 마진 auto로 설정하여 가운데 정렬 */
+    padding: 10px 15px; /* 패딩 설정 */
+    background-color: #9CA3AF; /* 회색톤 배경색 */
+    color: white; /* 텍스트 색상 */
+    border: none; /* 테두리 제거 */
+    border-radius: 5px; /* 모서리 둥글게 처리 */
+    cursor: pointer; /* 마우스 오버 시 커서 변경 */
+    transition: background-color 0.3s; /* 배경색 변경 애니메이션 */
+}
+
+.open-descriptions button:hover {
+    background-color: #6B7280; /* 호버 시 배경색 변경 */
+}
+/* 공연 정보 박스 내부 패딩 및 마진 조정 */
+.information {
+    padding: 20px; /* 패딩 추가 */
+    background-color: #f8f9fa; /* 배경색 변경 */
+    border-radius: 1rem; /* 모서리 둥글게 */
+    margin-left: 20px;
+    min-height:300px;
+}
+
+/* 공연 정보 세부 항목 스타일 */
+.information h2 {
+    color: #333; /* 글자색 변경 */
+    margin-bottom: 20px; /* 위쪽 마진 추가 */
+}
+/* 아티스트 카드를 포함하는 컨테이너 스타일 수정 */
+.detailed_lineup {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* 카드를 왼쪽 정렬 */
+    gap: 20px; /* 카드 사이의 간격 */
+    margin-bottom: 20px; /* 섹션 아래쪽 마진 */
+    padding: 20px;
+    background-color: #e9ecef; /* 배경색 회색으로 설정 */
+    border-radius: 1rem; /* 모서리 둥글게 */
+    min-height: 350px; /* 최소 높이 설정 - 필요에 따라 조정 */
+}
+
+/* 카드 스타일 */
+.detailed_lineup a {
+    text-decoration: none; /* 링크 밑줄 제거 */
+    color: black; /* 텍스트 색상 */
+}
+.righter{
+    width: 45%;   
+}
+.select_button{ 
+    display: flex;
+    justify-content: center;
+    width: 96.8%;
+    background-color: #f8f9fa;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    margin-left:20px;
+    margin-top:10px;
+}
+.select_button button {
+    flex: 1;
+    background-color: #f8f9fa; /* 어두운 회색 배경 */
+    color: #000000; /* 흰색 글자 */
+    padding: 10px 0;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center;
+    border-top: 1px solid #ddd; /* 위쪽 테두리 추가 */
+}
+.select_button button:first-child {
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.select_button button.active {
+    background-color: #8c9191; /* 활성화된 배경색 */
+    color: #FFFFFF; /* 활성화된 글자색 */
+}
+
+.select_button button:hover {
+    background-color: #8c9191; /* 활성화된 배경색 */
+}
+.community{
+    padding: 20px; /* 패딩 추가 */
+    margin-left: 20px; /* 왼쪽 마진 추가 */
+    border-bottom-left-radius: 1rem; /* 왼쪽 아래 모서리 둥글게 */
+    border-bottom-right-radius: 1rem; /* 오른쪽 아래 모서리 둥글게 */
+    padding: 20px; /* 패딩 추가 */
+    background-color: #f8f9fa; /* 배경색 변경 */
+    height: 650px; /* 고정 높이 설정 */
+    overflow-y: auto; /* 세로 스크롤바 설정 */
+}
+ .modify{
+ text-align: center;
+ margin-top:25px
+}
+.name-cell {
+    font-size: 2em; /* 이름의 글꼴 크기를 키웁니다. */
+    text-align: center;
+    /* 추가적으로 원하는 스타일 속성을 정의할 수 있습니다. */
+}
+/* 커뮤니티 글 모두보기 스타일 */
+/* 관련 커뮤니티 글 모두 보기 버튼 스타일 */
+.view-all-community-btn {
+    display: inline-block; /* 인라인 블록 요소로 설정 */
+    padding: 10px 20px; /* 패딩 조정 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    border: none; /* 테두리 없앰 */
+    border-radius: 5px; /* 둥근 모서리 */
+    background-color: #8c9191; /* 배경색 */
+    color: black; /* 글자색 */
+    text-decoration: none; /* 밑줄 제거 */
+    font-weight: bold; /* 글자 굵게 */
+    transition: background-color 0.3s ease; /* 배경색 변경 애니메이션 */
+}
+
+.view-all-community-btn:hover {
+    background-color: #555959; /* 호버 시 배경색 변경 */
+    color: white; /* 글자색 */
+}
+
+/* 공연 관련 글 헤더 스타일 */
+.community-header {
+    display: flex; /* Flex 컨테이너로 설정 */
+    justify-content: space-between; /* 내용을 양쪽 끝으로 정렬 */
+    align-items: center; /* 세로 축 중앙 정렬 */
+    margin-bottom: 20px; /* 하단 여백 추가 */
+}
+/*----------------커뮤니티-----------  */
+.community-item {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 5px;
+     /* 커서 모양 변경 */
+    cursor: pointer;
+}
+
+.top-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+}
+
+.top-line h2 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.top-line{
+    font-size: 24px;
+    color: #666;
+}
+.likes{
+    display: flex;
+    color: #666;
+    align-items: center;
+}
+.like_count{
+    font-size: 20px;
+    margin-left:10px;
+}
+
+.bottom-line {
+    display: flex;
+    justify-content: start;
+    font-size: 12px;
+    color: #888;
+    margin-top: 3px;
+}
+
+.bottom-line span {
+    margin-right: 10px;
+}
+@media (max-width: 1450px) {
+     .bottom-line {
+        font-size: 11px;
+    }
+}
+@media (max-width: 1400px) {
+    .bottom-line {
+        font-size: 12px;
+    }
+}
+@media (max-width: 1200px) {
+    .bottom-line {
+        font-size: 11px;
+    }
+}
+@media (max-width: 1100px) {
+    .bottom-line {
+        font-size: 12px;
+    }
+}
+@media (max-width: 900px) {
+    .bottom-line {
+        font-size: 11px;
+    }
+}
+@media (max-width: 850px) {
+    .bottom-line {
+        font-size: 10px;
+    }
+}
+@media (max-width: 799px) {
+    .bottom-line {
+        font-size: 12px;
+    }
+}
+@media (max-width: 390px) {
+    .bottom-line {
+        font-size: 11px;
+    }
+}
+@media (max-width: 370px) {
+    .bottom-line {
+        font-size: 10px;
+    }
+}
+/*----------------커뮤니티 끝-----------  */
+.article_info{
+    margin:auto;
+    border-radius: 1rem; /* 모서리 둥글게 */
+    background-color: #f8f9fa; /* 배경색 변경 */
+    margin-top: 20px;
+    height: 650px; /* 고정 높이 설정 */
+    width: 98%;
+    margin-left:20px;
+}
+    
+.swiper-container{
+    padding: 20px; /* 패딩 추가 */
+    margin: auto;
+    border-radius: 1rem; /* 모서리 둥글게 */
+    background-color: #f8f9fa; /* 배경색 변경 */
+    height: 650px; /* 고정 높이 설정 */
+    width: 70%;
+    position: relative; /* Swiper 컨테이너에 대한 상대 위치 설정 */
+    overflow: hidden;
+}
+.swiper-slide {
+    text-align: center; /* 슬라이드 내용 중앙 정렬 */
+    font-size: 18px; /* 폰트 크기 */
+    background: #fff; /* 배경 색상 */
+
+}
+.swiper-wrapper{
+    margin-top: 15px;
+    height:30%;
+
+}
+/* Swiper 버튼 보이게 하는 스타일 */
+.swiper-button-prev, .swiper-button-next {
+    visibility: visible; /* 버튼을 보이게 함 */
+    z-index: 10; /* 다른 요소들 위에 오도록 z-index 조정 */
+    background-color: #FFF; /* 배경색 추가, 필요에 따라 조정 가능 */
+    border-radius: 50%; /* 버튼 모양을 원형으로 */
+    width: 40px; /* 너비 조정 */
+    height: 40px; /* 높이 조정 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.8; /* 버튼 투명도 조정, 필요에 따라 변경 가능 */
+    position: absolute; /* 절대 위치 설정으로 컨테이너 내에서 위치 조정 */
+    top: 96%; /* 버튼을 컨테이너의 수직 중앙에 위치시킴 */
+    transform: translateY(-50%); /* Y축 기준으로 자신의 크기의 반만큼 이동하여 정확히 중앙에 위치 */
+    z-index: 10; /* 다른 요소 위에 표시되도록 z-index 설정 */
+    /* 기타 스타일 */
+}
+.swiper-button-prev {
+    left: 10px; /* 컨테이너 왼쪽 가장자리로부터의 거리 */
+}
+
+.swiper-button-next {
+    right: 10px; /* 컨테이너 오른쪽 가장자리로부터의 거리 */
+}
+.swiper-button-prev:hover, .swiper-button-next:hover {
+    opacity: 1; /* 마우스 호버시 투명도 변경 */
+}
+/* 페이지네이션 스타일 */
+.swiper-pagination {
+    position: absolute;
+    bottom: 10px; /* 하단에서 10px 위로 올림 */
+    left: 0;
+    width: 100%;
+    text-align: center; /* 페이지네이션 버튼을 중앙에 배치 */
+    z-index: 10;
+}
+/* ========================================댓글섹션 스타일링====================================== */
+    /* 전체 댓글 섹션 스타일링 */
+.comment-section {
+    font-family: 'Arial', sans-serif;
+    max-width: 800px;
+    margin: auto;
+    width:90%;
+}
+
+/* 정렬 버튼 스타일링 */
+.sorting-buttons {
+    text-align: right;
+    margin: 20px 0;
+}
+
+.sorting-buttons a {
+    text-decoration: none;
+    color: #1a0dab;
+    font-size: 0.9em;
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: 1px solid #dfe1e5;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.sorting-buttons a:hover {
+    background-color: #f8f9fa;
+}
+
+/* 댓글 목록 스타일링 */
+.comment {
+    background-color: #f1f3f4;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* 페이지네이션 스타일링 */
+.pagination {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: #1a0dab;
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #dfe1e5;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #f8f9fa;
+}
+
+.pagination .current-page {
+    padding: 5px 10px;
+    margin: 0 5px;
+    background-color: #e8f0fe;
+    border-radius: 4px;
+}
+.instrument-content {
+    margin: 20px 0; /* 상하 여백 추가 */
+    padding: 15px; /* 내부 패딩 */
+    background-color: #ffffff; /* 배경색 설정 */
+    border-radius: 10px; /* 모서리 둥글게 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    font-size: 1rem; /* 글자 크기 */
+    line-height: 1.6; /* 줄 간격 */
+}
+/* ------------------------ */
+.image_and_info {
+    display: flex;
+    align-items: center; /* 세로 중앙 정렬 */
+    margin-bottom: 15px; /* 원하는 대로 조절 가능 */
+}
+
+
+.instrument_info {
+    display: flex;
+    flex-direction: column;
+    margin-left: 15px; /* artist-image와의 간격 */
+}
+
+.m2m-name {
+    display: inline-block;
+    background-color: #f0f0f0; /* 배경색 */
+    margin: 2px; /* 상하 좌우 마진 */
+    padding: 5px; /* 내부 여백 */
+    border: 1px solid #dcdcdc; /* 테두리 */
+    border-radius: 5px; /* 둥근 모서리 */
+}
+.info_row {
+    display: flex;
+    align-items: center; /* 항목들을 세로 중앙에 정렬합니다. */
+    margin-bottom: 5px; /* 각 항목 사이의 마진 */
+}
+
+.info_label {
+    margin-right: 10px; /* 라벨과 내용 사이의 간격 */
+    font-weight: bold; /* 라벨을 두껍게 표시 */
+}
+
+.info_content {
+    display: flex;
+    align-items: center; /* 내용을 세로 중앙에 정렬합니다. */
+    flex-wrap: wrap; /* 내용이 여러 아티스트를 포함할 경우 줄바꿈 */
+}
+/* ========================설명==================== */
+.descriptions-container {
+    margin-top: 20px;
+}
+
+.description-block {
+    margin-bottom: 20px;
+}
+
+.description-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.description-text {
+    margin: 20px 0; /* 상하 여백 추가 */
+    padding: 15px; /* 내부 패딩 */
+    background-color: #ffffff; /* 배경색 설정 */
+    border-radius: 10px; /* 모서리 둥글게 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    font-size: 1rem; /* 글자 크기 */
+    line-height: 1.6; /* 줄 간격 */
+}
+@media (max-width: 1600px) {
+    .community-header h2{
+        font-size:30px;
+    }
+}
+@media (max-width: 1400px) {
+    /* 그 외 캘린더 요소들의 스타일을 조정하고 싶은 경우 여기에 추가합니다. */
+    .artist_container{
+        width: 60%;
+    }
+    .righter{
+        width: 40%;   
+    }
+    .community-header h2{
+        font-size:28px;
+    }
+   .swiper-container{
+        width: 90%;
+    }
+}
+@media (max-width: 1200px) {
+    .community-header h2{
+        font-size:24px;
+    }
+    .swiper-container{
+        width: 100%;
+    }
+
+}
+    
+@media (max-width: 1100px) {
+    .entire_artist {
+        flex-direction: column; /* 세로 정렬로 변경 */
+        align-items: center; /* 중앙 정렬 */
+        width:90%;
+    }
+    .artist_container {
+        width: 100%; /* 너비를 100%로 설정하여 화면을 꽉 채우게 함 */
+        margin-bottom: 20px; /* 요소들 사이에 마진 추가 */
+        order: 1; /* poster_content를 righter 아래로 내림 */
+        margin-right: 0; /* 오른쪽 마진 추가 */
+    }
+    .righter {
+        width: 100%; /* 너비를 100%로 설정하여 화면을 꽉 채우게 함 */
+        margin-bottom: 20px; /* 요소들 사이에 마진 추가 */
+        order: 2; /* righter를 poster_content 위로 올림 */
+    }
+    .information, .select_button, .community, .swiper-container{
+        margin-left:0px;
+    }    
+    .select_button{
+        width:100%;
+    }
+}
+@media (max-width: 800px) {
+    .select_button{
+        width:100%;
+    }
+}
+@media (max-width: 600px) {
+    .image_and_info{
+        flex-direction: column; /* 세로 정렬로 변경 */
+        align-items: start; /* 중앙 정렬 */
+        width:90%;
+    }
+    .album_info {
+        margin-top:30px;
+        margin-left: 20px; /* artist-image와의 간격 */
+        width:100%;
+        padding: 15px; /* 내부 패딩 */
+        background-color: #ffffff; /* 배경색 설정 */
+        border-radius: 10px; /* 모서리 둥글게 */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+        font-size: 1rem; /* 글자 크기 */
+        line-height: 1.6; /* 줄 간격 */
+    }
+    .community-header h2{
+        font-size:26px;
+    }
+}
+
+</style>
+
+
+<div class="entire_artist">
+    <div class="artist_container">
+        <h1 class="artist-title">{{ target_instrument.title }}</h1>
+        <div class="artist-image">
+            <img src="{{ target_instrument.image.url }}" alt="{{ target_instrument.title }}">
+        </div>
+        <div class="artist-descriptions">
+            <div class="instrument-content">
+                {{ target_instrument.content | safe }}
+            </div>
+            <div class="detailed_descriptions">
+                {% if target_instrument.detailed_descriptions.all %}
+                <div class="descriptions-container">
+                    {% for description in target_instrument.detailed_descriptions.all %}
+                        <div class="description-block">
+                            <div class="description-name">{{ description.name }}</div>
+                            <div class="description-text">{{ description.text|safe|linebreaksbr }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    <p style='margin-top:50px; text-align:center;'>알고있는 정보가 있다면 추가해주세요</p>
+                    <p style='text-align:center'>Tmi도 환영합니다</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="open-descriptions">
+             <button onclick="toggleDescriptions()">펼치기</button>
+        </div>
+    </div>
+    
+    <div class="righter">
+        <div class="information">
+            <h2>인기 음악인</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">포지션</th>
+                        <th scope="col">이름</th>
+                        <th scope="col">이미지</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if popular_persons %}
+                        {% for person in popular_persons %}
+                            <tr>
+                                <td>
+                                    {% for instrument in person.instruments.all %}
+                                        {{ instrument.title }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'personapp:detail' pk=person.pk %}">
+                                        {{ person.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <img src="{{ person.image.url }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No popular members available.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <div class="select_button">
+            <button id="show_community">태그한 글 보기</button>
+        </div>
+        <div class="community_and_swiper">
+            <div class="community">
+                <div class="community-header">
+                    <h2>악기 관련 글</h2>
+                    <a href="{% url 'communityapp:list' %}?search_field=instrument&search_keyword={{ target_instrument.title|urlencode }}" class="view-all-community-btn">더보기</a>
+                </div>
+                {% if community_articles %}
+                    <div class="table-responsive">
+                        {% for object in community_articles %}
+                        <div data-href="{% url 'communityapp:detail' pk=object.pk %}" onclick="window.location=this.getAttribute('data-href');" class="community-item">
+                            <div class="top-line">
+                                <h2>{{ object.title }}</h2>
+                                <div class="likes">
+                                    <span class="material-icons">favorite</span>
+                                    <span class="like_count">{{ object.like }}</span>  
+                                </div>
+                            </div>
+                            <div class="bottom-line">
+                                <span class="author">작성자: {{ object.writer.username }}</span>
+                                <span class="created-at"> 
+                                    {% if object.created_at|date:"Y-m-d" == today %}
+                                        {{ object.created_at|date:"g:i A" }} <!-- 오늘이면 시간만 표시 -->
+                                    {% else %}
+                                        {{ object.created_at|date:"y.m.d" }} <!-- 오늘이 아니면 날짜와 시간 표시 -->
+                                    {% endif %}
+                                </span>
+                                <span class="views">조회수: {{ object.views }}</span>
+                                <span class="comments">댓글: {{ object.comment_count }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <!-- 페이지네이션 컨트롤 -->
+                    <div style="text-align:center; margin-top:20px;">
+                        {% if community_articles.has_previous %}
+                            <a href="?community_page={{ community_articles.previous_page_number }}&current_section=community" class="btn btn-primary">&laquo; 이전</a>
+                        {% endif %}
+
+                        <span class="current-page">페이지 {{ community_articles.number }} / {{ community_articles.paginator.num_pages }}</span>
+
+                        {% if community_articles.has_next %}
+                            <a href="?community_page={{ community_articles.next_page_number }}&current_section=community" class="btn btn-primary">다음 &raquo;</a>
+                        {% endif %}
+                    </div>
+
+                {% else %}
+                    <p>이 Instrument를 태그한 Community 글이 없습니다.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div>
+    <div class="modify">
+         <a href="{% url 'instrumentapp:instrument-update-logs' pk=target_instrument.pk %}"
+           class= "btn btn-primary rounded-pill col-3">
+        UpdateLOG 
+        </a>
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'instrumentapp:update' pk=target_instrument.pk %}"
+           class= "btn btn-primary rounded-pill col-3">
+        Update 
+        </a>
+        {% else %}
+        <a class="loginButton btn btn-primary rounded-pill col-3" href="#">
+        Update 
+        </a>
+        {% endif %}
+        {% if target_instrument.writer == user %}
+         <a href="{% url 'instrumentapp:delete' pk=target_instrument.pk %}"
+            class= "btn btn-danger rounded-pill col-3">
+        Delete
+        </a>
+        {% endif %}
+    </div>
+</div>
+<div class="text-center" style="height: 2rem; margin: 4rem auto;">
+    <a href="{% url 'likeapp:instrument_like' pk=target_instrument.pk %}">
+        <i style="vertical-align: middle; font-size: 3rem; color: #f77" class="material-icons">
+            favorite
+        </i>
+    </a>
+    <span style="vertical-align: middle; font-size: 1.2rem;">
+        {{ target_instrument.like }}
+    </span>
+</div>
+<div class="comment-section">
+    <span>댓글 수: {{ target_instrument.comment_count }}</span>
+    <span>조회 수: {{ target_instrument.views }}</span>
+    <div class="make">
+    {% include 'commentapp/create.html' with content_type_id=content_type_id object_id=object_id %}
+    </div>
+    <div class="sorting-buttons">
+        <a href="{{ request.path }}?sort=recent{% if comment_page_obj.number %}&page={{ comment_page_obj.number }}{% endif %}">최신순</a>
+        <a href="{{ request.path }}?sort=likes{% if comment_page_obj.number %}&page={{ comment_page_obj.number }}{% endif %}">좋아요순</a>
+    </div>
+
+    <!-- 페이지네이션된 댓글 목록 -->
+    <div class="comment">
+        {% for comment in comments %}
+            {% include 'commentapp/detail.html' with comment=comment %}
+        {% empty %}
+            <p>댓글이 없습니다.</p>
+        {% endfor %}
+    </div>
+
+    <!-- 페이지네이션 링크 -->
+    <div class="pagination">
+        {% if comment_page_obj.has_previous %}
+            <a href="?sort={{ sort }}&page=1">&laquo; 처음</a>
+            <a href="?sort={{ sort }}&page={{ comment_page_obj.previous_page_number }}">이전</a>
+        {% endif %}
+        <span class="current-page">{{ comment_page_obj.number }}/{{ comment_page_obj.paginator.num_pages }}</span>
+        {% if comment_page_obj.has_next %}
+            <a href="?sort={{ sort }}&page={{ comment_page_obj.next_page_number }}">다음</a>
+            <a href="?sort={{ sort }}&page={{ comment_page_obj.paginator.num_pages }}">마지막 &raquo;</a>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+     var initialSlideIndex = {{ initial_slide_index }}; // Django 템플릿에서 변수 전달
+    // Swiper 인스턴스 생성 및 구성
+    var swiper = new Swiper('.swiper-container', {
+        direction: 'horizontal',
+        loop: false,
+        centeredSlides: true,
+        slidesPerView: 1,
+        spaceBetween: 30,
+        initialSlide: initialSlideIndex, // 초기 슬라이드 인덱스 설정
+        // Navigation arrows
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var projectContainer = document.querySelector('.artist_container');
+    var projectDescriptions = document.querySelector('.artist-descriptions');
+    var projectImage = projectContainer.querySelector('img'); // 이미지 요소 접근
+    var righter = document.querySelector('.righter');
+    var openDescriptionsBtn = document.querySelector('.open-descriptions button');
+
+    function adjustHeight() {
+        var projectImageHeight = projectImage.offsetHeight; // 이미지의 동적 높이 가져오기
+
+        if (window.matchMedia('(max-width: 1100px)').matches) {
+            // 1100px 이하일 때 설정
+            projectDescriptions.style.minHeight = '300px';
+            projectDescriptions.style.maxHeight = '300px';
+            projectContainer.style.minHeight = (projectImageHeight + 500) + 'px'; // 이미지 높이 + 700px
+        } else {
+            // 그 외의 화면 크기에 대한 설정
+            var righterHeight = righter.offsetHeight;
+            var descriptionsHeight = righterHeight - projectImageHeight - 210;
+            
+            projectContainer.style.minHeight = righterHeight + 'px';
+            projectDescriptions.style.minHeight = descriptionsHeight + 'px';
+            projectDescriptions.style.maxHeight = descriptionsHeight + 'px';
+        }
+        
+        checkContentOverflow();
+    }
+
+    function toggleDescriptions() {
+        if (projectDescriptions.style.maxHeight !== "none") {
+            projectDescriptions.style.maxHeight = "none";
+            projectDescriptions.style.overflowY = "visible";
+            openDescriptionsBtn.textContent = "접기";
+        } else {
+            adjustHeight();
+            projectDescriptions.style.overflowY = "auto";
+            openDescriptionsBtn.textContent = "펼치기";
+        }
+    }
+
+    function checkContentOverflow() {
+        if (projectDescriptions.scrollHeight > projectDescriptions.offsetHeight) {
+            openDescriptionsBtn.style.display = "block";
+        } else {
+            openDescriptionsBtn.style.display = "none";
+        }
+    }
+
+    // openDescriptionsBtn이 존재할 경우에만 이벤트 리스너를 추가
+    if (openDescriptionsBtn) {
+        openDescriptionsBtn.addEventListener('click', toggleDescriptions);
+    }
+
+    window.addEventListener('load', adjustHeight); // 이미지 로드 완료 후 높이 조정
+    window.addEventListener('resize', adjustHeight); // 창 크기 변경 시 높이 재조정
+});
+</script>
+<script>
+$(document).ready(function(){
+    // 댓글 컨테이너에 대한 클릭 이벤트 위임
+    $('.comment').on('click', 'button.like-button', function(e){
+        e.preventDefault();
+        var commentId = $(this).data('id');
+        var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '/comments/like_comment/' + commentId + '/',
+            data: {
+                csrfmiddlewaretoken: csrftoken,
+            },
+            success: function(response){
+                $('#like-count-' + commentId).text(response.total_likes);
+                if(response.liked){
+                    $('#like-icon-' + commentId).css('color', 'red');
+                } else {
+                    $('#like-icon-' + commentId).css('color', 'grey');
+                }
+            },
+            error: function(xhr, status, error){
+                alert('Something went wrong: ' + error);
+            }
+        });
+    });
+
+    // 싫어요 버튼 이벤트 위임
+    $('.comment').on('click', 'button.dislike-button', function(e){
+        e.preventDefault();
+        var commentId = $(this).data('id');
+        var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '/comments/dislike_comment/' + commentId + '/',
+            data: {
+                csrfmiddlewaretoken: csrftoken,
+            },
+            success: function(response){
+                $('#dislike-count-' + commentId).text(response.total_dislikes); // 싫어요 개수 업데이트
+                if(response.disliked){
+                    $('#dislike-icon-' + commentId).css('color', 'blue'); // 싫어요 눌린 상태로 스타일 변경
+                } else {
+                    $('#dislike-icon-' + commentId).css('color', 'grey'); // 싫어요 눌리지 않은 상태로 스타일 변경
+                }
+            },
+            error: function(xhr, status, error){
+                alert('Something went wrong: ' + error);
+            }
+        });
+    });
+});
+
+</script>
+
+
+{% endblock %}
