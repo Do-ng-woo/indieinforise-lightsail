@@ -1,6 +1,6 @@
 
 from articleapp.models import Article
-from sentence_transformers import SentenceTransformer, util
+# from sentence_transformers import SentenceTransformer, util
 import numpy as np
 from django.core.paginator import Paginator
 
@@ -158,78 +158,78 @@ class StampUpdateView(UpdateView):
 
 
 # 임베딩 모델 로드
-model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
+# model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
 
-def search_performances(request):
-    query = request.GET.get('q')
-    page_number = int(request.GET.get('page', 1))
-    results_per_page = 10
-    results = []
-    page_obj = None
+# def search_performances(request):
+#     query = request.GET.get('q')
+#     page_number = int(request.GET.get('page', 1))
+#     results_per_page = 10
+#     results = []
+#     page_obj = None
 
-    if query:
-        # 검색어 임베딩
-        query_embedding = model.encode(query)
+#     if query:
+#         # 검색어 임베딩
+#         query_embedding = model.encode(query)
         
-        # 모든 임베딩 데이터 로드
-        articles = Article.objects.filter(title_embedding__isnull=False, content_embedding__isnull=False, combined_text_embedding__isnull=False)
-        title_embeddings = []
-        content_embeddings = []
-        combined_text_embeddings = []
-        article_list = []
+#         # 모든 임베딩 데이터 로드
+#         articles = Article.objects.filter(title_embedding__isnull=False, content_embedding__isnull=False, combined_text_embedding__isnull=False)
+#         title_embeddings = []
+#         content_embeddings = []
+#         combined_text_embeddings = []
+#         article_list = []
 
-        for article in articles:
-            title_embedding = np.frombuffer(article.title_embedding, dtype=np.float32)
-            content_embedding = np.frombuffer(article.content_embedding, dtype=np.float32)
-            combined_text_embedding = np.frombuffer(article.combined_text_embedding, dtype=np.float32)
+#         for article in articles:
+#             title_embedding = np.frombuffer(article.title_embedding, dtype=np.float32)
+#             content_embedding = np.frombuffer(article.content_embedding, dtype=np.float32)
+#             combined_text_embedding = np.frombuffer(article.combined_text_embedding, dtype=np.float32)
             
-            title_embeddings.append(title_embedding)
-            content_embeddings.append(content_embedding)
-            combined_text_embeddings.append(combined_text_embedding)
-            article_list.append(article)
+#             title_embeddings.append(title_embedding)
+#             content_embeddings.append(content_embedding)
+#             combined_text_embeddings.append(combined_text_embedding)
+#             article_list.append(article)
         
-        title_embeddings = np.array(title_embeddings)
-        content_embeddings = np.array(content_embeddings)
-        combined_text_embeddings = np.array(combined_text_embeddings)
+#         title_embeddings = np.array(title_embeddings)
+#         content_embeddings = np.array(content_embeddings)
+#         combined_text_embeddings = np.array(combined_text_embeddings)
         
-        # 유사도 계산
-        title_scores = util.pytorch_cos_sim(query_embedding, title_embeddings).cpu().numpy().flatten()
-        content_scores = util.pytorch_cos_sim(query_embedding, content_embeddings).cpu().numpy().flatten()
-        combined_text_scores = util.pytorch_cos_sim(query_embedding, combined_text_embeddings).cpu().numpy().flatten()
+#         # 유사도 계산
+#         title_scores = util.pytorch_cos_sim(query_embedding, title_embeddings).cpu().numpy().flatten()
+#         content_scores = util.pytorch_cos_sim(query_embedding, content_embeddings).cpu().numpy().flatten()
+#         combined_text_scores = util.pytorch_cos_sim(query_embedding, combined_text_embeddings).cpu().numpy().flatten()
 
-        # 상위 결과 선택
-        top_n = 5
-        top_title_indices = np.argsort(-title_scores)[:top_n]
-        top_combined_text_indices = np.argsort(-combined_text_scores)[:top_n]
-        top_content_indices = np.argsort(-content_scores)[:top_n]
+#         # 상위 결과 선택
+#         top_n = 5
+#         top_title_indices = np.argsort(-title_scores)[:top_n]
+#         top_combined_text_indices = np.argsort(-combined_text_scores)[:top_n]
+#         top_content_indices = np.argsort(-content_scores)[:top_n]
 
-        # 필터링된 기사 리스트
-        filtered_indices = set(top_title_indices.tolist() + top_combined_text_indices.tolist() + top_content_indices.tolist())
-        filtered_article_list = [article_list[idx] for idx in filtered_indices]
-        filtered_title_scores = title_scores[list(filtered_indices)]
-        filtered_combined_text_scores = combined_text_scores[list(filtered_indices)]
-        filtered_content_scores = content_scores[list(filtered_indices)]
+#         # 필터링된 기사 리스트
+#         filtered_indices = set(top_title_indices.tolist() + top_combined_text_indices.tolist() + top_content_indices.tolist())
+#         filtered_article_list = [article_list[idx] for idx in filtered_indices]
+#         filtered_title_scores = title_scores[list(filtered_indices)]
+#         filtered_combined_text_scores = combined_text_scores[list(filtered_indices)]
+#         filtered_content_scores = content_scores[list(filtered_indices)]
 
-        # 가중치 적용
-        final_scores = (
-            filtered_title_scores * 1.2 +
-            filtered_combined_text_scores * 1.1 +
-            filtered_content_scores * 1
-        )
+#         # 가중치 적용
+#         final_scores = (
+#             filtered_title_scores * 1.2 +
+#             filtered_combined_text_scores * 1.1 +
+#             filtered_content_scores * 1
+#         )
 
-        # 최종 정렬
-        sorted_articles_with_scores = sorted(
-            zip(filtered_article_list, final_scores),
-            key=lambda x: -x[1]
-        )
-        sorted_articles = [article for article, score in sorted_articles_with_scores]
+#         # 최종 정렬
+#         sorted_articles_with_scores = sorted(
+#             zip(filtered_article_list, final_scores),
+#             key=lambda x: -x[1]
+#         )
+#         sorted_articles = [article for article, score in sorted_articles_with_scores]
 
-        # 페이지네이션 적용
-        paginator = Paginator(sorted_articles, results_per_page)  # 페이지당 10개씩
-        page_obj = paginator.get_page(page_number)
-        results = page_obj.object_list
+#         # 페이지네이션 적용
+#         paginator = Paginator(sorted_articles, results_per_page)  # 페이지당 10개씩
+#         page_obj = paginator.get_page(page_number)
+#         results = page_obj.object_list
 
-    return render(request, 'myshowapp/search_result.html', {'results': results, 'query': query, 'page_obj': page_obj})
+#     return render(request, 'myshowapp/search_result.html', {'results': results, 'query': query, 'page_obj': page_obj})
 
 
 

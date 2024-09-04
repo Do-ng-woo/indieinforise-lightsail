@@ -130,6 +130,13 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',  # SQLite 엔진 사용
+#         'NAME': BASE_DIR / 'db.sqlite3',  # 데이터베이스 파일 경로
+#     }
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators

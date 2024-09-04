@@ -29,20 +29,20 @@ class Article(models.Model):
     like = models.IntegerField(default=0)
     hide = models.BooleanField(default=True)  # 임시저장 여부를 나타내는 필드
     #임베딩 저장 테스트
-    title_embedding = models.BinaryField(null=True, blank=True)  # 임베딩 저장 필드
-    content_embedding = models.BinaryField(null=True, blank=True)  # 임베딩 저장 필드
-    combined_text_embedding = models.BinaryField(null=True, blank=True)  # 출연, 장소, 날짜정보 포함 필드
+    # title_embedding = models.BinaryField(null=True, blank=True)  # 임베딩 저장 필드
+    # content_embedding = models.BinaryField(null=True, blank=True)  # 임베딩 저장 필드
+    # combined_text_embedding = models.BinaryField(null=True, blank=True)  # 출연, 장소, 날짜정보 포함 필드
     
     def __str__(self):
         return f'{self.title}'
     
-    def get_combined_text(self):
-        project_names = ", ".join([project.title for project in self.project.all()])
-        artist_names = ", ".join([artist.title for artist in self.artist.all()])
-        date_str = self.datetime.strftime('%Y-%m-%d %H:%M') if self.datetime else self.date.strftime('%Y-%m-%d')
+    # def get_combined_text(self):
+    #     project_names = ", ".join([project.title for project in self.project.all()])
+    #     artist_names = ", ".join([artist.title for artist in self.artist.all()])
+    #     date_str = self.datetime.strftime('%Y-%m-%d %H:%M') if self.datetime else self.date.strftime('%Y-%m-%d')
         
-        combined_text = f"{project_names} {artist_names} {date_str}"
-        return combined_text
+    #     combined_text = f"{project_names} {artist_names} {date_str}"
+    #     return combined_text
     
 class ArticleUpdateLog(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='update_logs')

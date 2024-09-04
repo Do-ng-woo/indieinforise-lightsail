@@ -56,8 +56,8 @@ from collections import Counter
 
 from django.db.models import Prefetch
 
-from django.db import transaction
-from sentence_transformers import SentenceTransformer
+# from django.db import transaction
+# from sentence_transformers import SentenceTransformer
 
 # Create your views here.
 @method_decorator(login_required, 'get')
@@ -90,7 +90,7 @@ class ArticleCreateView(CreateView):
         form.save_m2m()  # ManyToMany 필드를 저장
 
         # ManyToMany 필드가 저장된 후에 임베딩을 생성
-        transaction.on_commit(lambda: generate_and_save_embeddings(temp_article))
+        # transaction.on_commit(lambda: generate_and_save_embeddings(temp_article))
         
 
         # 수정된 전체 내용을 문자열로 저장합니다.
@@ -252,7 +252,7 @@ class ArticleUpdateView(UpdateView):
         form.save_m2m()  # ManyToMany 필드를 저장
 
         # ManyToMany 필드가 저장된 후에 임베딩을 생성
-        transaction.on_commit(lambda: generate_and_save_embeddings(temp_article))
+        # transaction.on_commit(lambda: generate_and_save_embeddings(temp_article))
 
         # 수정된 전체 내용을 문자열로 저장합니다.
         update_description = []
@@ -418,26 +418,26 @@ def article_update_log_view(request, pk):
 
 
 # 임베딩 모델 로드 (캐시된 모델 사용)
-model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS', cache_folder='./embading/models')
+# model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS', cache_folder='./embading/models')
 
-def generate_and_save_embeddings(article):
-    """
-    Given an Article instance, generate embeddings for the title, content, and combined text,
-    and save them to the instance.
-    """
-    combined_text = article.get_combined_text()
-    print("Combined Text:", combined_text)  # combined_text 출력
+# def generate_and_save_embeddings(article):
+#     """
+#     Given an Article instance, generate embeddings for the title, content, and combined text,
+#     and save them to the instance.
+#     """
+#     combined_text = article.get_combined_text()
+#     print("Combined Text:", combined_text)  # combined_text 출력
 
-    title_embedding = model.encode(article.title).tobytes()
-    content_embedding = model.encode(article.content).tobytes()
-    combined_text_embedding = model.encode(combined_text).tobytes()
+#     title_embedding = model.encode(article.title).tobytes()
+#     content_embedding = model.encode(article.content).tobytes()
+#     combined_text_embedding = model.encode(combined_text).tobytes()
     
-    article.title_embedding = title_embedding
-    article.content_embedding = content_embedding
-    article.combined_text_embedding = combined_text_embedding
+#     article.title_embedding = title_embedding
+#     article.content_embedding = content_embedding
+#     article.combined_text_embedding = combined_text_embedding
 
-    print("Title Embedding:완료")
-    print("Content Embedding:완료")
-    print("Combined Text Embedding:완료")
+#     print("Title Embedding:완료")
+#     print("Content Embedding:완료")
+#     print("Combined Text Embedding:완료")
     
-    article.save(update_fields=['title_embedding', 'content_embedding', 'combined_text_embedding'])
+#     article.save(update_fields=['title_embedding', 'content_embedding', 'combined_text_embedding'])
