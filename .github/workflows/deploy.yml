@@ -1,0 +1,52 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Set up known hosts
+        run: |
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        env:
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_PUBLIC_IP: ${{ secrets.SSH_PUBLIC_IP }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_PUBLIC_IP << 'EOF'
+            # 서버에서 실행할 명령어를 여기에 추가
+            cd ~/your_project_directory
+            
+            # Git 리포지토리에서 최신 코드 가져오기
+            git pull origin main
+
+            # 가상환경 활성화 및 패키지 설치
+            source venv/bin/activate
+
+            # Django 마이그레이션 적용 및 정적 파일 모음
+            python manage.py makemigrations
+            python manage.py migrate
+            python manage.py collectstatic --noinput
+
+            # Gunicorn 재시작
+            sudo systemctl restart gunicorn
+
+            # Nginx 재시작 (필요시)
+            sudo systemctl restart nginx
+          EOF
