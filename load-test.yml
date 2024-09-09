@@ -1,0 +1,10 @@
+config:
+  target: http://43.203.16.157
+  phases:
+    - duration: 5
+      arrivalRate: 30  # 'arrtivalRate' 오타 수정
+
+scenarios:
+  - flow:
+      - get:
+          url: "/articles/list/"
