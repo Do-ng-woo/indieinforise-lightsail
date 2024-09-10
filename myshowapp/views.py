@@ -1,5 +1,6 @@
 
 from articleapp.models import Article
+from artistapp.models import Artist
 # from sentence_transformers import SentenceTransformer, util
 import numpy as np
 from django.core.paginator import Paginator
