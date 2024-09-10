@@ -36,9 +36,10 @@ from accountapp.models import CustomUser
 
 from django.http import Http404
 
-from django.db.models import Q, Case, When, IntegerField
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import Q, Case, When, IntegerField, Value
+from django.db.models.functions import Replace
 
 class UserPerformanceCreateView(CreateView):
     model = UserPerformance
@@ -160,11 +161,16 @@ class StampUpdateView(UpdateView):
         return reverse_lazy('myshowapp:stamp_update', kwargs={'pk': self.object.pk})
 
 def search_performances(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '').replace(' ', '')  # 입력된 검색어의 공백 제거
     page_number = int(request.GET.get('page', 1))
     results_per_page = 10
     results = []
     page_obj = None
+
+    # 검색어가 한 글자일 경우 메시지를 표시하고 검색하지 않음
+    if len(query) < 2:
+        context = {'message': '두 글자 이상부터 검색 가능합니다.'}
+        return render(request, 'myshowapp/search_result.html', context)
 
     if query:
         # 현재 날짜 기준 1년 전과 1년 후의 날짜 계산
@@ -172,12 +178,26 @@ def search_performances(request):
         one_year_before = current_time - timedelta(days=365)
         one_year_after = current_time + timedelta(days=365)
 
-        # 검색 조건 설정
+        # 서브타이틀에서 검색어와 일치하는 Artist 검색
+        matching_artists = Artist.objects.filter(
+            Q(title__icontains=query) |
+            Q(Replace('title', Value(' '), Value(''))__icontains=query) |
+            Q(sub_titles__title__icontains=query) |
+            Q(Replace('sub_titles__title', Value(' '), Value(''))__icontains=query)
+        ).distinct()
+
+        # Artist에 관련된 Article을 필터링하기 위한 ID 목록 생성
+        artist_ids = matching_artists.values_list('id', flat=True)
+
+        # 검색 조건 설정 (person 필드 제외)
         search_conditions = (
             Q(title__icontains=query) |
+            Q(Replace('title', Value(' '), Value(''))__icontains=query) |
             Q(artist__title__icontains=query) |
+            Q(Replace('artist__title', Value(' '), Value(''))__icontains=query) |
             Q(project__title__icontains=query) |
-            Q(person__title__icontains=query)
+            Q(Replace('project__title', Value(' '), Value(''))__icontains=query) |
+            Q(artist__id__in=artist_ids)  # Artist ID를 기반으로 Article 검색
         )
 
         # 1년 전후의 공연 필터링
@@ -189,13 +209,15 @@ def search_performances(request):
             sort_date=Coalesce('datetime', 'date'),
             relevance=Case(
                 When(title__icontains=query, then=4),
+                When(Replace('title', Value(' '), Value(''))__icontains=query, then=4),
                 When(artist__title__icontains=query, then=3),
+                When(Replace('artist__title', Value(' '), Value(''))__icontains=query, then=3),
                 When(project__title__icontains=query, then=2),
-                When(person__title__icontains=query, then=1),
+                When(Replace('project__title', Value(' '), Value(''))__icontains=query, then=2),
                 default=0,
                 output_field=IntegerField()
             )
-        ).order_by('-relevance', '-created_at')
+        ).distinct().order_by('-relevance', '-created_at')
 
         # 1년을 초과하는 공연 필터링
         beyond_one_year = Article.objects.filter(
@@ -207,13 +229,15 @@ def search_performances(request):
             sort_date=Coalesce('datetime', 'date'),
             relevance=Case(
                 When(title__icontains=query, then=4),
+                When(Replace('title', Value(' '), Value(''))__icontains=query, then=4),
                 When(artist__title__icontains=query, then=3),
+                When(Replace('artist__title', Value(' '), Value(''))__icontains=query, then=3),
                 When(project__title__icontains=query, then=2),
-                When(person__title__icontains=query, then=1),
+                When(Replace('project__title', Value(' '), Value(''))__icontains=query, then=2),
                 default=0,
                 output_field=IntegerField()
             )
-        ).order_by('-relevance', '-created_at')
+        ).distinct().order_by('-relevance', '-created_at')
 
         # 두 개의 쿼리셋을 합쳐서 전체 결과 생성
         combined_results = list(within_one_year) + list(beyond_one_year)
