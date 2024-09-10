@@ -40,6 +40,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q, Case, When, IntegerField, Value
 from django.db.models.functions import Replace
+from collections import OrderedDict  # OrderedDict 임포트
 
 class UserPerformanceCreateView(CreateView):
     model = UserPerformance
@@ -168,13 +169,12 @@ def search_performances(request):
     page_obj = None
 
     if query == '':
-        # 기본 검색어를 설정하여 검색을 수행 (예: '모든 공연')
-        query = '관심 있는 공연을 검색해 보세요 '
+        # 기본 검색어를 설정하여 검색을 수행 (예: '검색..')
+        query = '검색..'
     
     # 검색어가 한 글자일 경우 메시지를 표시하고 검색하지 않음
     if len(query) < 2:
         messages.warning(request, "두 글자 이상부터 검색이 가능합니다.")
-        # 이전 페이지로 리다이렉트 (검색한 페이지로 돌아가기)
         return redirect(request.META.get('HTTP_REFERER', 'myshowapp:search_performances'))
 
     if query:
@@ -202,9 +202,7 @@ def search_performances(request):
             title_no_space=Replace('title', Value(' '), Value('')),
             artist_title_no_space=Replace('artist__title', Value(' '), Value('')),
             project_title_no_space=Replace('project__title', Value(' '), Value(''))
-        )
-
-        search_conditions = (
+        ).filter(
             Q(title__icontains=query) |
             Q(title_no_space__icontains=query) |
             Q(artist__title__icontains=query) |
@@ -212,11 +210,10 @@ def search_performances(request):
             Q(project__title__icontains=query) |
             Q(project_title_no_space__icontains=query) |
             Q(artist__id__in=artist_ids)  # Artist ID를 기반으로 Article 검색
-        )
+        ).distinct()
 
         # 1년 전후의 공연 필터링
         within_one_year = articles.filter(
-            search_conditions,
             Q(datetime__range=(one_year_before, one_year_after)) |
             Q(date__range=(one_year_before.date(), one_year_after.date()))
         ).annotate(
@@ -231,12 +228,10 @@ def search_performances(request):
                 default=0,
                 output_field=IntegerField()
             )
-        ).distinct().order_by('-relevance', '-created_at')
+        ).order_by('-relevance', '-created_at')
 
         # 1년을 초과하는 공연 필터링
-        beyond_one_year = articles.filter(
-            search_conditions
-        ).exclude(
+        beyond_one_year = articles.exclude(
             Q(datetime__range=(one_year_before, one_year_after)) |
             Q(date__range=(one_year_before.date(), one_year_after.date()))
         ).annotate(
@@ -251,13 +246,16 @@ def search_performances(request):
                 default=0,
                 output_field=IntegerField()
             )
-        ).distinct().order_by('-relevance', '-created_at')
+        ).order_by('-relevance', '-created_at')
 
         # 두 개의 쿼리셋을 합쳐서 전체 결과 생성
         combined_results = list(within_one_year) + list(beyond_one_year)
 
+        # 중복 제거: 'id'를 기준으로 첫 번째 객체를 유지
+        unique_results = list(OrderedDict((article.id, article) for article in combined_results).values())
+
         # 페이지네이션 적용
-        paginator = Paginator(combined_results, results_per_page)  # 페이지당 10개씩
+        paginator = Paginator(unique_results, results_per_page)  # 페이지당 10개씩
         page_obj = paginator.get_page(page_number)
         results = page_obj.object_list
 
