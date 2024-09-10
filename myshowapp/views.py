@@ -36,6 +36,9 @@ from accountapp.models import CustomUser
 
 from django.http import Http404
 
+from django.db.models import Q, Case, When, IntegerField
+from django.utils import timezone
+from datetime import timedelta
 
 class UserPerformanceCreateView(CreateView):
     model = UserPerformance
@@ -155,6 +158,72 @@ class StampUpdateView(UpdateView):
     
     def get_success_url(self):
         return reverse_lazy('myshowapp:stamp_update', kwargs={'pk': self.object.pk})
+
+def search_performances(request):
+    query = request.GET.get('q')
+    page_number = int(request.GET.get('page', 1))
+    results_per_page = 10
+    results = []
+    page_obj = None
+
+    if query:
+        # 현재 날짜 기준 1년 전과 1년 후의 날짜 계산
+        current_time = timezone.now()
+        one_year_before = current_time - timedelta(days=365)
+        one_year_after = current_time + timedelta(days=365)
+
+        # 검색 조건 설정
+        search_conditions = (
+            Q(title__icontains=query) |
+            Q(artist__title__icontains=query) |
+            Q(project__title__icontains=query) |
+            Q(person__title__icontains=query)
+        )
+
+        # 1년 전후의 공연 필터링
+        within_one_year = Article.objects.filter(
+            search_conditions,
+            Q(datetime__range=(one_year_before, one_year_after)) |
+            Q(date__range=(one_year_before.date(), one_year_after.date()))
+        ).annotate(
+            sort_date=Coalesce('datetime', 'date'),
+            relevance=Case(
+                When(title__icontains=query, then=4),
+                When(artist__title__icontains=query, then=3),
+                When(project__title__icontains=query, then=2),
+                When(person__title__icontains=query, then=1),
+                default=0,
+                output_field=IntegerField()
+            )
+        ).order_by('-relevance', '-created_at')
+
+        # 1년을 초과하는 공연 필터링
+        beyond_one_year = Article.objects.filter(
+            search_conditions
+        ).exclude(
+            Q(datetime__range=(one_year_before, one_year_after)) |
+            Q(date__range=(one_year_before.date(), one_year_after.date()))
+        ).annotate(
+            sort_date=Coalesce('datetime', 'date'),
+            relevance=Case(
+                When(title__icontains=query, then=4),
+                When(artist__title__icontains=query, then=3),
+                When(project__title__icontains=query, then=2),
+                When(person__title__icontains=query, then=1),
+                default=0,
+                output_field=IntegerField()
+            )
+        ).order_by('-relevance', '-created_at')
+
+        # 두 개의 쿼리셋을 합쳐서 전체 결과 생성
+        combined_results = list(within_one_year) + list(beyond_one_year)
+
+        # 페이지네이션 적용
+        paginator = Paginator(combined_results, results_per_page)  # 페이지당 10개씩
+        page_obj = paginator.get_page(page_number)
+        results = page_obj.object_list
+
+    return render(request, 'myshowapp/search_result.html', {'results': results, 'query': query, 'page_obj': page_obj})
 
 
 # 임베딩 모델 로드

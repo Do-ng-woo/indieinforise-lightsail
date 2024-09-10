@@ -7,7 +7,7 @@ from myshowapp.views import StampUpdateView, MyShowIllustCreateView, MyShowIllus
 app_name = "myshowapp"
 
 urlpatterns = [
-    # path('search/', views.search_performances, name='search_performances'),
+    path('search/', views.search_performances, name='search_performances'),
     path('userperformance/create/<int:pk>/', UserPerformanceCreateView.as_view(), name='userperformance_create'),
     path('card_list/', UserPerformanceListView.as_view(), name='card_list'),
     path('stamp_list/', UserPerformanceStampListView.as_view(), name='stamp_list'),
