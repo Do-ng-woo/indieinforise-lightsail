@@ -28,13 +28,15 @@ class Article(models.Model):
     comment_count = models.IntegerField(default=0)  # 댓글 수 필드 추가
     like = models.IntegerField(default=0)
     hide = models.BooleanField(default=True)  # 임시저장 여부를 나타내는 필드
-    #임베딩 저장 테스트
+
+
+    def __str__(self):
+        return f'{self.title}'
+
+    #임베딩 저장 필드들
     # title_embedding = models.BinaryField(null=True, blank=True)  # 임베딩 저장 필드
     # content_embedding = models.BinaryField(null=True, blank=True)  # 임베딩 저장 필드
     # combined_text_embedding = models.BinaryField(null=True, blank=True)  # 출연, 장소, 날짜정보 포함 필드
-    
-    def __str__(self):
-        return f'{self.title}'
     
     # def get_combined_text(self):
     #     project_names = ", ".join([project.title for project in self.project.all()])
