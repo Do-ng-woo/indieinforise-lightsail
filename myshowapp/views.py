@@ -21,7 +21,6 @@ from django.shortcuts import redirect
 from django.views import View
 
 from django.db.models import F, Value
-from django.db.models.functions import Coalesce
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -36,7 +35,7 @@ from django.views.generic.edit import FormView
 from accountapp.models import CustomUser
 
 from django.http import Http404
-
+from django.db.models.functions import Coalesce, Replace
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q, Case, When, IntegerField, Value
@@ -168,10 +167,15 @@ def search_performances(request):
     results = []
     page_obj = None
 
+    if query == '':
+        # 기본 검색어를 설정하여 검색을 수행 (예: '모든 공연')
+        query = '관심 있는 공연을 검색해 보세요 '
+    
     # 검색어가 한 글자일 경우 메시지를 표시하고 검색하지 않음
     if len(query) < 2:
-        context = {'message': '두 글자 이상부터 검색 가능합니다.'}
-        return render(request, 'myshowapp/search_result.html', context)
+        messages.warning(request, "두 글자 이상부터 검색이 가능합니다.")
+        # 이전 페이지로 리다이렉트 (검색한 페이지로 돌아가기)
+        return redirect(request.META.get('HTTP_REFERER', 'myshowapp:search_performances'))
 
     if query:
         # 현재 날짜 기준 1년 전과 1년 후의 날짜 계산
@@ -180,29 +184,38 @@ def search_performances(request):
         one_year_after = current_time + timedelta(days=365)
 
         # 서브타이틀에서 검색어와 일치하는 Artist 검색
-        matching_artists = Artist.objects.filter(
+        matching_artists = Artist.objects.annotate(
+            title_no_space=Replace('title', Value(' '), Value('')),
+            sub_title_no_space=Replace('sub_titles__name', Value(' '), Value(''))
+        ).filter(
             Q(title__icontains=query) |
-            Q(Replace('title', Value(' '), Value(''))__icontains=query) |
-            Q(sub_titles__title__icontains=query) |
-            Q(Replace('sub_titles__title', Value(' '), Value(''))__icontains=query)
+            Q(title_no_space__icontains=query) |
+            Q(sub_titles__name__icontains=query) |
+            Q(sub_title_no_space__icontains=query)
         ).distinct()
 
         # Artist에 관련된 Article을 필터링하기 위한 ID 목록 생성
         artist_ids = matching_artists.values_list('id', flat=True)
 
         # 검색 조건 설정 (person 필드 제외)
+        articles = Article.objects.annotate(
+            title_no_space=Replace('title', Value(' '), Value('')),
+            artist_title_no_space=Replace('artist__title', Value(' '), Value('')),
+            project_title_no_space=Replace('project__title', Value(' '), Value(''))
+        )
+
         search_conditions = (
             Q(title__icontains=query) |
-            Q(Replace('title', Value(' '), Value(''))__icontains=query) |
+            Q(title_no_space__icontains=query) |
             Q(artist__title__icontains=query) |
-            Q(Replace('artist__title', Value(' '), Value(''))__icontains=query) |
+            Q(artist_title_no_space__icontains=query) |
             Q(project__title__icontains=query) |
-            Q(Replace('project__title', Value(' '), Value(''))__icontains=query) |
+            Q(project_title_no_space__icontains=query) |
             Q(artist__id__in=artist_ids)  # Artist ID를 기반으로 Article 검색
         )
 
         # 1년 전후의 공연 필터링
-        within_one_year = Article.objects.filter(
+        within_one_year = articles.filter(
             search_conditions,
             Q(datetime__range=(one_year_before, one_year_after)) |
             Q(date__range=(one_year_before.date(), one_year_after.date()))
@@ -210,18 +223,18 @@ def search_performances(request):
             sort_date=Coalesce('datetime', 'date'),
             relevance=Case(
                 When(title__icontains=query, then=4),
-                When(Replace('title', Value(' '), Value(''))__icontains=query, then=4),
+                When(title_no_space__icontains=query, then=4),
                 When(artist__title__icontains=query, then=3),
-                When(Replace('artist__title', Value(' '), Value(''))__icontains=query, then=3),
+                When(artist_title_no_space__icontains=query, then=3),
                 When(project__title__icontains=query, then=2),
-                When(Replace('project__title', Value(' '), Value(''))__icontains=query, then=2),
+                When(project_title_no_space__icontains=query, then=2),
                 default=0,
                 output_field=IntegerField()
             )
         ).distinct().order_by('-relevance', '-created_at')
 
         # 1년을 초과하는 공연 필터링
-        beyond_one_year = Article.objects.filter(
+        beyond_one_year = articles.filter(
             search_conditions
         ).exclude(
             Q(datetime__range=(one_year_before, one_year_after)) |
@@ -230,11 +243,11 @@ def search_performances(request):
             sort_date=Coalesce('datetime', 'date'),
             relevance=Case(
                 When(title__icontains=query, then=4),
-                When(Replace('title', Value(' '), Value(''))__icontains=query, then=4),
+                When(title_no_space__icontains=query, then=4),
                 When(artist__title__icontains=query, then=3),
-                When(Replace('artist__title', Value(' '), Value(''))__icontains=query, then=3),
+                When(artist_title_no_space__icontains=query, then=3),
                 When(project__title__icontains=query, then=2),
-                When(Replace('project__title', Value(' '), Value(''))__icontains=query, then=2),
+                When(project_title_no_space__icontains=query, then=2),
                 default=0,
                 output_field=IntegerField()
             )
