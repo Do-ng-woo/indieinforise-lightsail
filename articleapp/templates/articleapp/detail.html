@@ -535,8 +535,8 @@
         {% include 'commentapp/create.html' with content_type_id=content_type_id object_id=object_id %}
         </div>
         <div class="sorting-buttons">
-            <a href="{{ request.path }}?sort=recent{% if comment_page_obj.number %}&page={{ comment_page_obj.number }}{% endif %}">최신순</a>
-            <a href="{{ request.path }}?sort=likes{% if comment_page_obj.number %}&page={{ comment_page_obj.number }}{% endif %}">좋아요순</a>
+            <a href="{{ request.path }}?sort=recent&page=1">최신순</a>
+            <a href="{{ request.path }}?sort=likes&page=1">좋아요순</a>
         </div>
 
         <!-- 페이지네이션된 댓글 목록 -->
