@@ -1,20 +1,69 @@
-<div class="page_button"style="text-align:center; margin: 3rem 0;">
+<div class="page_button" style="text-align:center; margin: 3rem 0;">
     {% if page_obj.has_previous %}
-    <a href="?page={{ page_obj.previous_page_number }}"
-       class="btn btn-secondary rounded-pill active">
-        {{ page_obj.previous_page_number }}
-    </a>
+        <!-- 처음 페이지로 이동 -->
+        <a href="?page=1" class="btn btn-secondary rounded-pill">&laquo;</a>
+
+        <!-- 이전 페이지로 이동 -->
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary rounded-pill">&lt;</a>
     {% endif %}
-    <a href="?page={{ page_obj.number }}"
-       class="btn btn-secondary rounded-pill active">
-        {{ page_obj.number }}
-    </a>
+
+    <!-- 페이지 번호 범위 계산 -->
+    {% for page_num in page_obj.paginator.page_range %}
+        {% if page_obj.number <= 3 %}
+            <!-- 첫 페이지 근처 -->
+            {% if page_num <= 5 %}
+                {% if page_num == page_obj.number %}
+                    <span class="btn btn-primary rounded-pill active">{{ page_num }}</span>
+                {% else %}
+                    <a href="?page={{ page_num }}" class="btn btn-secondary rounded-pill">{{ page_num }}</a>
+                {% endif %}
+            {% endif %}
+        {% elif page_obj.number > page_obj.paginator.num_pages|add:'-3' %}
+            <!-- 마지막 페이지 근처 -->
+            {% if page_num > page_obj.paginator.num_pages|add:'-5' %}
+                {% if page_num == page_obj.number %}
+                    <span class="btn btn-primary rounded-pill active">{{ page_num }}</span>
+                {% else %}
+                    <a href="?page={{ page_num }}" class="btn btn-secondary rounded-pill">{{ page_num }}</a>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <!-- 현재 페이지 중심으로 5개 범위 표시 -->
+            {% if page_num >= page_obj.number|add:'-2' and page_num <= page_obj.number|add:'2' %}
+                {% if page_num == page_obj.number %}
+                    <span class="btn btn-primary rounded-pill active">{{ page_num }}</span>
+                {% else %}
+                    <a href="?page={{ page_num }}" class="btn btn-secondary rounded-pill">{{ page_num }}</a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
     {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}"
-       class="btn btn-secondary rounded-pill active">
-        {{ page_obj.next_page_number }}
-    </a>
+        <!-- 다음 페이지로 이동 -->
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary rounded-pill">&gt;</a>
+
+        <!-- 마지막 페이지로 이동 -->
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary rounded-pill">&raquo;</a>
     {% endif %}
-    
-    
 </div>
+<script>
+    // 스크롤 위치를 저장하는 함수
+    function saveScrollPosition() {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+    }
+    
+    // 페이지 로드 시 저장된 스크롤 위치로 이동하는 함수
+    function loadScrollPosition() {
+        const scrollPosition = sessionStorage.getItem('scrollPosition');
+        if (scrollPosition) {
+            window.scrollTo(0, scrollPosition);
+        }
+    }
+    
+    // 페이지 로드 시 스크롤 위치 복원
+    window.onload = loadScrollPosition;
+    
+    // 페이지를 벗어날 때 스크롤 위치 저장
+    window.onbeforeunload = saveScrollPosition;
+    </script>

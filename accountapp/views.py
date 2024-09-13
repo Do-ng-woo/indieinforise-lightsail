@@ -65,6 +65,14 @@ class AccountCreateView(CreateView):
     success_url = reverse_lazy('articleapp:list')
     template_name = 'accountapp/create.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        # 사용자가 로그인 상태인지 확인
+        if request.user.is_authenticated:
+            # 로그인되어 있으면 메인 페이지로 리다이렉트
+            return redirect('homepageapp:main')  # 원하는 URL로 리다이렉트
+        # 로그인되어 있지 않으면 원래대로 dispatch 진행
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         return super().form_valid(form)
     
@@ -238,6 +246,14 @@ class AccountDeleteView(DeleteView):
 class CustomLoginView(LoginView):
     form_class = CustomLoginForm
     template_name = 'accountapp/login.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # 사용자가 로그인 상태인지 확인
+        if request.user.is_authenticated:
+            # 로그인되어 있으면 메인 페이지로 리다이렉트
+            return redirect('homepageapp:main')  # 원하는 URL로 리다이렉트
+        # 로그인되어 있지 않으면 원래대로 dispatch 진행
+        return super().dispatch(request, *args, **kwargs)
     
     
 # ======================================================================================

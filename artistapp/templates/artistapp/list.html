@@ -499,6 +499,9 @@ a {
             </div>
             {% endfor %}   
         </div>
+        <div style="margin:0 auto;">
+        {% include 'snippets/pagination.html' with pageobj=page_obj %}
+        </div>
         {% else %}
         <div style="text-align:center" >
             <h1>
@@ -506,8 +509,6 @@ a {
             </h1>
         </div>
         {% endif %}
-
-        {% include 'snippets/pagination.html' with pageobj=page_obj %}
     </div>
     <div class="right_artist_info">
          <!-- 광고 영역 추가 -->

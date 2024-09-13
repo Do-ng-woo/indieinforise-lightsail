@@ -181,7 +181,7 @@ class GenreDetailView(DetailView, FormMixin):
             comments = comments.order_by('-created_at')
 
         # 페이징 처리
-        paginator = Paginator(comments, 2)  # 페이지 당 보여줄 댓글 수
+        paginator = Paginator(comments, 10)  # 페이지 당 보여줄 댓글 수
         page_number = self.request.GET.get('page')
         comment_page_obj = paginator.get_page(page_number)
 
