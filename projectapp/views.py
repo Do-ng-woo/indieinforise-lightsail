@@ -424,7 +424,7 @@ def events_api(request):
     
     if project_id:
         # 특정 프로젝트에 속하는 Article만 필터링
-        events = Article.objects.filter(project__id=project_id)
+        events = Article.objects.filter(hide=False, project__id=project_id)
     else:
         # 프로젝트 ID가 제공되지 않은 경우, 모든 Article을 반환합니다.
         # 이 부분은 필요에 따라 제거하거나 다르게 처리할 수 있습니다.

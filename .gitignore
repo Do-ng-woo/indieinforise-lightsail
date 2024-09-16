@@ -103,3 +103,9 @@ db.sqlite3
 media/article
 media/album
 media/artist 
+media/instrument
+media/person
+media/sing 
+media/project
+meida/genre 
+meida/community 

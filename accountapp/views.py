@@ -161,7 +161,7 @@ class AccountDetailView(DetailView):
         model = model_map.get(content_type, Community)
         
         if view_type == 'posts':
-            return model.objects.filter(writer=user)
+            return model.objects.filter(writer=user, hide=False)
         elif view_type == 'drafts':
             return model.objects.filter(writer=user, hide=True)
         elif view_type == 'comments':
@@ -294,21 +294,22 @@ def delete_favorite_keyword(request, keyword_id):
 def get_field_data(request):
     field = request.GET.get('field')
     data = []
+    
     if field == 'artist':
-        data = list(Artist.objects.values('id', 'title'))
+        data = list(Artist.objects.filter(hide=False).values('id', 'title'))
     elif field == 'project':
-        data = list(Project.objects.values('id', 'title'))
+        data = list(Project.objects.filter(hide=False).values('id', 'title'))
     elif field == 'person':
-        data = list(Person.objects.values('id', 'title'))
+        data = list(Person.objects.filter(hide=False).values('id', 'title'))
     elif field == 'article':
-        data = list(Article.objects.values('id', 'title'))
+        data = list(Article.objects.filter(hide=False).values('id', 'title'))
     elif field == 'sing':
-        data = list(Sing.objects.values('id', 'title'))
+        data = list(Sing.objects.filter(hide=False).values('id', 'title'))
     elif field == 'album':
-        data = list(Album.objects.values('id', 'title'))
+        data = list(Album.objects.filter(hide=False).values('id', 'title'))
     elif field == 'genre':
-        data = list(Genre.objects.values('id', 'title'))
+        data = list(Genre.objects.filter(hide=False).values('id', 'title'))
     elif field == 'instrument':
-        data = list(Instrument.objects.values('id', 'title'))
+        data = list(Instrument.objects.filter(hide=False).values('id', 'title'))
 
     return JsonResponse(data, safe=False)

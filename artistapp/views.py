@@ -172,8 +172,9 @@ class ArtistCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['instruments'] = Instrument.objects.all()
-        context['persons'] = Person.objects.all()
+        # Instrument와 Person 쿼리셋에 hide=False 조건 추가
+        context['instruments'] = Instrument.objects.filter(hide=False)
+        context['persons'] = Person.objects.filter(hide=False)
         return context
 
     def get_success_url(self):
@@ -206,7 +207,7 @@ class ArtistDetailView(DetailView, FormMixin):
         
         #article 넘기기
         # Article 쿼리셋에 sort_date 주석 추가
-        articles = Article.objects.filter(artist=artist).annotate(
+        articles = Article.objects.filter(artist=artist, hide=False).annotate(
             sort_date=Coalesce('datetime', 'date')
         )
         # 오늘 날짜를 기준으로 과거와 미래 게시글 분리 및 정렬
@@ -623,10 +624,10 @@ class ArtistUpdateView(UpdateView):
         persons_with_positions = [
             {
                 'person_id': person.id,
-                'instrument_ids': [instr.id for instr in person.instruments.all()],
+                'instrument_ids': [instr.id for instr in person.instruments.filter(hide=False)],
                 'name': person.title,
             }
-            for person in self.object.person.all()
+            for person in self.object.person.filter(hide=False)
         ]
         context['persons_with_positions'] = persons_with_positions
 
@@ -640,8 +641,8 @@ class ArtistUpdateView(UpdateView):
 
         context['text_persons_data'] = text_persons_data
 
-        context['persons'] = Person.objects.all()
-        context['instruments'] = Instrument.objects.all()
+        context['persons'] = Person.objects.filter(hide=False)
+        context['instruments'] = Instrument.objects.filter(hide=False)
 
         return context
 
@@ -675,7 +676,7 @@ def artist_update_log_view(request, pk):
 def get_persons_by_instrument(request, instrument_id):
     try:
         instrument = Instrument.objects.get(id=instrument_id)
-        persons = Person.objects.filter(instruments=instrument)  # instrument에 연결된 person을 가져옴
+        persons = Person.objects.filter(hide=False,instruments=instrument)  # instrument에 연결된 person을 가져옴
         person_list = [{'id': person.id, 'title': person.title} for person in persons]
         return JsonResponse({'persons': person_list})
     except Instrument.DoesNotExist:

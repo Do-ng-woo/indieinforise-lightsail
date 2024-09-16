@@ -185,7 +185,7 @@ class SingDetailView(DetailView, FormMixin):
             for artist in related_artists:
                 articles_query |= Q(artist=artist)
             
-            articles = Article.objects.filter(articles_query).annotate(
+            articles = Article.objects.filter(articles_query, hide=False).annotate(
                 sort_date=Coalesce('datetime', 'date')
             )
             # 오늘 날짜를 기준으로 과거와 미래 게시글 분리 및 정렬

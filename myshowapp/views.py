@@ -191,7 +191,8 @@ def search_performances(request):
             Q(title__icontains=query) |
             Q(title_no_space__icontains=query) |
             Q(sub_titles__name__icontains=query) |
-            Q(sub_title_no_space__icontains=query)
+            Q(sub_title_no_space__icontains=query),
+            hide=False  # hide가 False인 Artist만 검색
         ).distinct()
 
         # Artist에 관련된 Article을 필터링하기 위한 ID 목록 생성
@@ -209,7 +210,8 @@ def search_performances(request):
             Q(artist_title_no_space__icontains=query) |
             Q(project__title__icontains=query) |
             Q(project_title_no_space__icontains=query) |
-            Q(artist__id__in=artist_ids)  # Artist ID를 기반으로 Article 검색
+            Q(artist__id__in=artist_ids),  # Artist ID를 기반으로 Article 검색
+            hide=False  # hide가 False인 Article만 검색
         ).distinct()
 
         # 1년 전후의 공연 필터링

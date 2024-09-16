@@ -27,39 +27,60 @@ class TinyMCEWidget(forms.Textarea):
 
 class CommunityCreationForm(ModelForm):
     content = forms.CharField(widget=TinyMCEWidget())
-    project = forms.ModelMultipleChoiceField(queryset=Project.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}),required=False)
-    artist = forms.ModelMultipleChoiceField(queryset=Artist.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}),required=False)
-    person = forms.ModelMultipleChoiceField(queryset=Person.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}),required=False)
-    article = forms.ModelMultipleChoiceField(queryset=Article.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}),required=False)
-    sing = forms.ModelMultipleChoiceField(queryset=Sing.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}),required=False)
-    album = forms.ModelMultipleChoiceField(queryset=Album.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}),required=False)
-    genre = forms.ModelMultipleChoiceField(queryset=Genre.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}),required=False)
-    instrument = forms.ModelMultipleChoiceField(queryset=Instrument.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}),required=False)
+    
+    project = forms.ModelMultipleChoiceField(
+        queryset=Project.objects.filter(hide=False), 
+        widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), 
+        required=False
+    )
+    artist = forms.ModelMultipleChoiceField(
+        queryset=Artist.objects.filter(hide=False), 
+        widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), 
+        required=False
+    )
+    person = forms.ModelMultipleChoiceField(
+        queryset=Person.objects.filter(hide=False), 
+        widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), 
+        required=False
+    )
+    article = forms.ModelMultipleChoiceField(
+        queryset=Article.objects.filter(hide=False), 
+        widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), 
+        required=False
+    )
+    sing = forms.ModelMultipleChoiceField(
+        queryset=Sing.objects.filter(hide=False), 
+        widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), 
+        required=False
+    )
+    album = forms.ModelMultipleChoiceField(
+        queryset=Album.objects.filter(hide=False), 
+        widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), 
+        required=False
+    )
+    genre = forms.ModelMultipleChoiceField(
+        queryset=Genre.objects.filter(hide=False), 
+        widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), 
+        required=False
+    )
+    instrument = forms.ModelMultipleChoiceField(
+        queryset=Instrument.objects.filter(hide=False), 
+        widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), 
+        required=False
+    )
 
     def clean(self):
         cleaned_data = super().clean()
-        # project, artist, person 필드가 선택되지 않았다면 빈 리스트를 할당
-        if 'project' not in cleaned_data or not cleaned_data['project']:
-            cleaned_data['project'] = []
-        if 'artist' not in cleaned_data or not cleaned_data['artist']:
-            cleaned_data['artist'] = []
-        if 'person' not in cleaned_data or not cleaned_data['person']:
-            cleaned_data['person'] = []
-        if 'article' not in cleaned_data or not cleaned_data['article']:
-            cleaned_data['article'] = []
-        if 'sing' not in cleaned_data or not cleaned_data['sing']:
-            cleaned_data['sing'] = []
-        if 'album' not in cleaned_data or not cleaned_data['album']:
-            cleaned_data['album'] = []
-        if 'genre' not in cleaned_data or not cleaned_data['genre']:
-            cleaned_data['genre'] = []
-        if 'instrument' not in cleaned_data or not cleaned_data['instrument']:
-            cleaned_data['instrument'] = []
-        return cleaned_data 
+        # 각 필드가 선택되지 않았다면 빈 리스트를 할당
+        for field in ['project', 'artist', 'person', 'article', 'sing', 'album', 'genre', 'instrument']:
+            if field not in cleaned_data or not cleaned_data[field]:
+                cleaned_data[field] = []
+        return cleaned_data
     
     class Meta:
         model = Community
-        fields = ['board_type','image','title','content','article','person','sing','genre','album', 'project', 'artist','instrument','hide']
+        fields = ['board_type', 'image', 'title', 'content', 'article', 'person', 'sing', 'genre', 
+                  'album', 'project', 'artist', 'instrument', 'hide']
         
         
 class CommunitySearchForm(forms.Form):

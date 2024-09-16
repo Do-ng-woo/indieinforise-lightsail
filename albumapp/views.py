@@ -166,7 +166,7 @@ class AlbumCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # 모든 아티스트를 컨텍스트에 추가
-        context['artists'] = Artist.objects.all()
+        context['artists'] = Artist.objects.filter(hide=False)
         return context
     
     def get_success_url(self):
@@ -236,7 +236,7 @@ class AlbumDetailView(DetailView, FormMixin):
             for artist in related_artists:
                 articles_query |= Q(artist=artist)
             
-            articles = Article.objects.filter(articles_query).annotate(
+            articles = Article.objects.filter(articles_query,hide=False).annotate(
                 sort_date=Coalesce('datetime', 'date')
             )
             # 오늘 날짜를 기준으로 과거와 미래 게시글 분리 및 정렬
@@ -506,7 +506,7 @@ class AlbumUpdateView(UpdateView):
             
     def get_context_data(self, **kwargs):
         context = super(AlbumUpdateView, self).get_context_data(**kwargs)
-        context['artists'] = Artist.objects.all()
+        context['artists'] = Artist.objects.filter(hide=False)
 
         # 기존 context 설정 코드 유지
         if self.request.POST:
@@ -516,7 +516,7 @@ class AlbumUpdateView(UpdateView):
         
         # 이미 입력한 불러오기를 통한 멤버와 포지션 정보 불러오기
         sings_with_artists = []
-        for sing in self.object.sing.all():
+        for sing in self.object.sing.filter(hide=False):
             artist_info = sing.artist.first()
             if artist_info:
                 sings_with_artists.append({
@@ -540,7 +540,7 @@ class AlbumUpdateView(UpdateView):
             text_sings_data.append({'artist': artist, 'title': title})
         context['text_sings_data'] = text_sings_data
 
-        context['albums'] = Album.objects.all()  # 사용하는 모델과 필드명에 따라 조정 필요
+        context['albums'] = Album.objects.filter(hide=False)  # 사용하는 모델과 필드명에 따라 조정 필요
 
         return context
 
@@ -573,7 +573,7 @@ def album_update_log_view(request, pk):
 
 
 def get_songs_by_artist(request, artist_id):
-    songs = Sing.objects.filter(artist__id=artist_id).values('id', 'title')
+    songs = Sing.objects.filter(hide=False,artist__id=artist_id).values('id', 'title')
     songs_list = list(songs)  # QuerySet을 리스트로 변환
     return JsonResponse({'songs': songs_list}, safe=False)
     

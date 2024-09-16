@@ -301,13 +301,13 @@ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
             <div class="community">
                 <h2 class="header_comment">
                     {% if view_type == 'posts' %}
-                        {{ target_user.profile.nickname }}님이 작성한 {{ content_type_label }}
+                        {{ target_user.nickname }}님이 작성한 {{ content_type_label }}
                     {% elif view_type == 'drafts' %}
-                        {{ target_user.profile.nickname }}님이 임시저장 한 {{ content_type_label }}
+                        {{ target_user.nickname }}님이 임시저장 한 {{ content_type_label }}
                     {% elif view_type == 'comments' %}
-                        {{ target_user.profile.nickname }}님이 댓글 단 {{ content_type_label }}
+                        {{ target_user.nickname }}님이 댓글 단 {{ content_type_label }}
                     {% elif view_type == 'likes' %}
-                        {{ target_user.profile.nickname }}님이 좋아요 한 {{ content_type_label }}
+                        {{ target_user.nickname }}님이 좋아요 한 {{ content_type_label }}
                     {% endif %}
                 </h2>
                 {% if objects %}
