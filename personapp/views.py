@@ -157,7 +157,7 @@ class PersonDetailView(DetailView, FormMixin):
             for artist in related_artists:
                 articles_query |= Q(artist=artist)
 
-            articles = Article.objects.filter(articles_query).annotate(
+            articles = Article.objects.filter(articles_query, hide=False).annotate(
                 sort_date=Coalesce('datetime', 'date')
             )
 

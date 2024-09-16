@@ -359,8 +359,8 @@ class ArticleListView(ListView):
 class ArticleEventsAPIView(View):
     def get(self, request, *args, **kwargs):
         # 아티스트 정보와 함께 이벤트를 미리 가져오기
-        events = Article.objects.prefetch_related(
-            Prefetch('artist', queryset=Artist.objects.order_by('-like'))
+        events = Article.objects.filter(hide=False).prefetch_related(
+            Prefetch('artist', queryset=Artist.objects.filter(hide=False).order_by('-like'))
         )
 
         artist_info_by_date = defaultdict(list)
@@ -395,11 +395,13 @@ class CalendarDetailAPIView(View):
         events = []
         if date_query:
             date = datetime.strptime(date_query, "%Y-%m-%d").date()
-            # datetime 필드의 날짜 부분과 date 필드 모두에서 해당 date와 일치하는 이벤트를 조회합니다.
+            # datetime 필드의 날짜 부분과 date 필드 모두에서 해당 date와 일치하고 hide가 False인 이벤트를 조회합니다.
             events = Article.objects.filter(
-                date=date
+                date=date, 
+                hide=False
             ) | Article.objects.filter(
-                datetime__date=date  # datetime 필드에서 날짜 부분만 비교
+                datetime__date=date,  # datetime 필드에서 날짜 부분만 비교
+                hide=False
             )
 
         html = render_to_string('articleapp/calendar_detail.html', {'events': events})

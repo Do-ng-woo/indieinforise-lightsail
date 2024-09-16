@@ -29,20 +29,30 @@ class DateRangePickerInput(forms.DateInput):
 
 
 class ArticleCreationForm(ModelForm):
-    content = forms.CharField(widget=forms.Textarea(attrs={'class': 'editable text-start', 'style': 'height:auto'}))
+    content = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'editable text-start', 'style': 'height:auto'})
+    )
     
+    # Project 필드에서 hide=False 조건 추가
+    project = forms.ModelMultipleChoiceField(
+        queryset=Project.objects.filter(hide=False), 
+        widget=Select2MultipleWidget(attrs={'class': 'django-select2'})
+    )
     
-    project = forms.ModelMultipleChoiceField(queryset=Project.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}))
-    artist = forms.ModelMultipleChoiceField(queryset=Artist.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}))
+    # Artist 필드에서 hide=False 조건 추가
+    artist = forms.ModelMultipleChoiceField(
+        queryset=Artist.objects.filter(hide=False), 
+        widget=Select2MultipleWidget(attrs={'class': 'django-select2'})
+    )
+    
     datetime = forms.DateTimeField(
         widget=DateTimePickerInput(),
         required=False  # datetime 필드를 선택적으로 설정
     )
-
     
     class Meta:
         model = Article
-        fields = ['title', 'image', 'project', 'artist','content', 'datetime']
+        fields = ['title', 'image', 'project', 'artist', 'content', 'datetime']
         
         
 class ArticleSearchForm(forms.Form):

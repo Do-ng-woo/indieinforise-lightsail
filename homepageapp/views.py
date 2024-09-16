@@ -63,19 +63,14 @@ class HomepageView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
         context['latest_articles'] = Article.objects.annotate(
             sort_date=Coalesce('datetime', 'date')
-        ).filter(sort_date__gte=timezone.now()).order_by('sort_date')[:4]
-        context['popular_artists'] = Artist.objects.order_by('-like')[:6]
-        context['popular_projects'] = Project.objects.order_by('-like')[:6]
-        # created_at 필드를 기준으로 최근 10개의 커뮤니티 객체를 추가합니다.
-        context['latest_communities'] = Community.objects.order_by('-created_at')[:10]
-        # 최신 5개의 Person 객체 추가
-        context['latest_persons'] = Person.objects.order_by('-updated_at')[:5]
-        # 최신 5개의 Genre 객체 추가
-        context['latest_genres'] = Genre.objects.order_by('-updated_at')[:5]
-        # 핫 포인트가 높은 10명의 아티스트 추가
-        context['hot_artists'] = Artist.objects.order_by('-hot_point', '-like')[:10]
+        ).filter(sort_date__gte=timezone.now(), hide=False).order_by('sort_date')[:4]
+        context['popular_artists'] = Artist.objects.filter(hide=False).order_by('-like')[:6]
+        context['popular_projects'] = Project.objects.filter(hide=False).order_by('-like')[:6]
+        context['latest_communities'] = Community.objects.filter(hide=False).order_by('-created_at')[:10]
+        context['latest_persons'] = Person.objects.filter(hide=False).order_by('-updated_at')[:5]
+        context['latest_genres'] = Genre.objects.filter(hide=False).order_by('-updated_at')[:5]
+        context['hot_artists'] = Artist.objects.filter(hide=False).order_by('-hot_point', '-like')[:10]
         
         return context

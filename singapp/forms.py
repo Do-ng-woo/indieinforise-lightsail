@@ -32,7 +32,7 @@ class MediumEditorWidget(forms.Textarea):
         js = ('//cdn.jsdelivr.net/npm/medium-editor@5.23.2/dist/js/medium-editor.min.js',)
         
 class SingCreationForm(forms.ModelForm):
-    artist = forms.ModelMultipleChoiceField(queryset=Artist.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}))
+    artist = forms.ModelMultipleChoiceField(queryset=Artist.objects.filter(hide=False), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}))
     sub_titles_input = forms.CharField(max_length=100, required=False, label='부제목(쉼표로 구분)')
     content = forms.CharField(widget=MediumEditorWidget(attrs={'placeholder': '가사를 입력해주세요'}), label='가사')
     datetime = forms.DateTimeField(
@@ -71,7 +71,7 @@ class SingCreationForm(forms.ModelForm):
         return sing
 
 class SingUpdateForm(ModelForm):
-    artist = forms.ModelMultipleChoiceField(queryset=Artist.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}))
+    artist = forms.ModelMultipleChoiceField(queryset=Artist.objects.filter(hide=False), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}))
     sub_titles_input = forms.CharField(max_length=100, required=False, label='부제목(쉼표로 구분)')
     content = forms.CharField(
         widget=MediumEditorWidget(attrs={'placeholder': '가사를 입력해주세요'}),

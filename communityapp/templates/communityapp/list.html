@@ -889,16 +889,20 @@
                 <a href="{% url 'accountapp:delete_favorite_keyword' keyword.id %}" class="deleteButton material-icons" style="display: none;" onclick="event.stopPropagation();">do_not_disturb_on</a>
             </li>
         {% endfor %}
-    </ul>
+    </ul>   
     <div class="favoriteKeyword_button">
         {% if request.user.is_authenticated %}
-            <button id="toggleEditButton">즐겨찾기 관리</button>
+            {% if favorite_exists %}
+                <button id="toggleEditButton">즐겨찾기 관리</button>
+            {% else %}
+                <button id="addFavoriteButton">즐겨찾기 추가</button>
+            {% endif %}
         {% else %}
             <a class="loginButton" href="#">
-                <button>즐겨찾기 관리</button>
+                <button>로그인 후 이용해주세요</button>
             </a>
         {% endif %}
-    </div>        
+    </div>
 </div>
 <div class="main_community">
     <div class="table-container">
@@ -969,15 +973,19 @@ var isEditMode = false; // 현재 편집 모드 상태를 추적하는 변수
 
 document.addEventListener('DOMContentLoaded', function() {
     var toggleEditButton = document.getElementById('toggleEditButton');
+    var addFavoriteButton = document.getElementById('addFavoriteButton'); // addFavoriteButton 요소 선택
     var favoriteKeywordsList = document.getElementById('favoriteKeywords');
     var keywordLinks = document.querySelectorAll('.keyword-link'); // 모든 키워드 링크 선택
 
-    toggleEditButton.addEventListener('click', function() {
+    // 편집 모드 전환 함수
+    function toggleEditMode() {
         isEditMode = !isEditMode; // 편집 모드 상태 토글
 
         if (isEditMode) {
             // 편집 모드 활성화
-            this.textContent = '수정끝내기'; // 버튼 텍스트 변경
+            if (toggleEditButton) {
+                toggleEditButton.textContent = '수정끝내기'; // 버튼 텍스트 변경
+            }
             document.getElementById('addFavoriteForm').style.display = 'block'; // 즐겨찾기 추가 폼 표시
             document.querySelectorAll('.deleteButton').forEach(function(button) {
                 button.style.display = 'inline'; // 삭제 버튼 표시
@@ -989,7 +997,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         } else {
             // 편집 모드 비활성화
-            this.textContent = '수정하기'; // 버튼 텍스트 원래대로 변경
+            if (toggleEditButton) {
+                toggleEditButton.textContent = '수정하기'; // 버튼 텍스트 원래대로 변경
+            }
             document.getElementById('addFavoriteForm').style.display = 'none'; // 즐겨찾기 추가 폼 숨김
             document.querySelectorAll('.deleteButton').forEach(function(button) {
                 button.style.display = 'none'; // 삭제 버튼 숨김
@@ -1000,7 +1010,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 link.removeEventListener('click', preventLink);
             });
         }
-    });
+    }
+
+    // toggleEditButton 클릭 시 편집 모드 전환
+    if (toggleEditButton) {
+        toggleEditButton.addEventListener('click', toggleEditMode);
+    }
+
+    // addFavoriteButton 클릭 시 편집 모드 전환
+    if (addFavoriteButton) {
+        addFavoriteButton.addEventListener('click', toggleEditMode);
+    }
 
     function preventLink(e) {
         e.preventDefault(); // 링크의 기본 동작 방지

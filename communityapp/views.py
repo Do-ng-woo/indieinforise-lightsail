@@ -215,20 +215,20 @@ class CommunityListView(ListView):
         
         context['favorite_search_form'] = FavoriteSearchForm()
         if self.request.user.is_authenticated:
+            search_field = self.request.GET.get('search_field', '')
+            search_keyword = self.request.GET.get('search_keyword', '')
+
+            # 즐겨찾기 여부 확인
+            favorite_exists = FavoriteSearch.objects.filter(
+                user=self.request.user
+            ).exists()
+
             context['favorite_keywords'] = FavoriteSearch.objects.filter(user=self.request.user)
+            context['favorite_exists'] = favorite_exists  # 즐겨찾기 존재 여부 추가
         else:
             context['favorite_keywords'] = []
-            
-        # Select2에서 사용할 객체들을 컨텍스트에 추가
-        context['artists'] = Artist.objects.all()
-        context['projects'] = Project.objects.all()
-        context['persons'] = Person.objects.all()
-        context['articles'] = Article.objects.all()
-        context['sings'] = Sing.objects.all()
-        context['albums'] = Album.objects.all()
-        context['genres'] = Genre.objects.all()
-        context['instruments'] = Instrument.objects.all()
-            
+            context['favorite_exists'] = False  # 로그인하지 않은 경우 기본값 설정
+        
         return context
     
 

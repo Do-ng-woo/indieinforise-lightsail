@@ -7,7 +7,7 @@ from django_select2.forms import Select2MultipleWidget
 
 class PersonCreationForm(forms.ModelForm):
     sub_titles_input = forms.CharField(max_length=100, required=False, label='부제목(쉼표로 구분)')
-    instruments = forms.ModelMultipleChoiceField(queryset=Instrument.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), required=False)
+    instruments = forms.ModelMultipleChoiceField(queryset=Instrument.objects.filter(hide=False), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), required=False)
 
     class Meta:
         model = Person
@@ -42,7 +42,7 @@ class PersonCreationForm(forms.ModelForm):
 class PersonUpdateForm(ModelForm):
     sub_titles_input = forms.CharField(max_length=100, required=False, label='부제목 (쉼표로 구분)')
     descriptions = forms.CharField(widget=forms.Textarea(attrs={'hidden': True}), required=False, label='설명')
-    instruments = forms.ModelMultipleChoiceField(queryset=Instrument.objects.all(), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), required=False)
+    instruments = forms.ModelMultipleChoiceField(queryset=Instrument.objects.filter(hide=False), widget=Select2MultipleWidget(attrs={'class': 'django-select2'}), required=False)
 
     class Meta:
         model = Person

@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let windowWidth = window.innerWidth; // 현재 창의 너비를 감지
 
         // 조건에 따라 사용할 헤더를 선택
-        const targetHeader = windowWidth >= 768 ? mainHeader : mobileHeader;
+        const targetHeader = windowWidth >= 1000 ? mainHeader : mobileHeader;
 
         // 요소가 올바르게 선택되었는지 확인
         if (!targetHeader) {
