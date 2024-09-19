@@ -6,7 +6,7 @@
     top: 50%; /* 중앙 정렬을 위한 설정 */
     transform: translate(-50%, -50%); /* 정확한 중앙 위치로 이동 */
     width: 23vw; /* 화면 너비의 20% */
-    height: 33vh; /* 화면 높이의 30% */
+    height: 43vh; /* 화면 높이의 30% */
     background-color: #FFFFFF;
     z-index: 2000;
     display: flex;
@@ -42,6 +42,9 @@
 .close-button:hover {
     color: #f44336; /* 호버 시 색상 변경 */
 }
+.login-form h3{
+    font-family: "Poetsen One", sans-serif;
+}
 @media (max-width: 768px) {
     .lefter {
         transform: translate(-50%, -50%); /* 정확한 중앙 위치로 이동 */
@@ -64,7 +67,7 @@
         </div>
     {% else %}
         <div class="login-form">
-            <h4>IndieInfoRise</h4>
+            <h3>INDIEBOOST</h3>
             <form action="{% url 'accountapp:login' %}" method="post">
                 {% csrf_token %}
                 {% bootstrap_form login_form %}

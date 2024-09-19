@@ -205,6 +205,9 @@
     border-radius: 1rem; /* 모서리 둥글기 */
     padding: 20px;  
 }    
+.login-main h4{
+    font-family: "Poetsen One", sans-serif;
+}
 .sign_and_find{
     text-align:center; 
     justify-content: space-between; 
@@ -613,7 +616,7 @@ input[type="password"] {
         <div class="login_and_porfile_main">
             {% if not user.is_authenticated %}
             <div class="login-main">
-                <h4>IndieInfoRise</h4>
+                <h4>INDIEBOOST</h4>
                 <form action="{% url 'accountapp:login' %}" method="post">
                     {% csrf_token %}
                     <div class="form-group">

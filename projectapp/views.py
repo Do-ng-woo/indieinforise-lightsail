@@ -278,6 +278,15 @@ class ProjectUpdateView(UpdateView):
     form_class = ProjectUpdateForm
     context_object_name= 'target_project'
     template_name = 'projectapp/update.html'
+
+    def get(self, request, *args, **kwargs):  # subtitle 기존에 입력된 것을 나타내게 하기
+        self.object = self.get_object()
+        form = self.get_form()
+
+        # 기존 sub_titles 데이터를 폼에 초기값으로 설정
+        form.fields['sub_titles_input'].initial = ', '.join(self.object.sub_titles.values_list('name', flat=True))
+
+        return self.render_to_response(self.get_context_data(form=form))
     
     def get_context_data(self, **kwargs):
         context = super(ProjectUpdateView, self).get_context_data(**kwargs)

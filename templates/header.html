@@ -19,7 +19,7 @@ a {
 }
 /* 브랜드 이름 스타일 */
 .brand-name {
-  font-family: 'Lobster', cursive;
+  font-family: "Poetsen One", sans-serif;
   color:#fff;
   width:30%;
   margin-left:3%;
@@ -132,7 +132,7 @@ a {
   visibility: hidden; /* 기본적으로 보이지 않음 */
   opacity: 0; /* 투명하게 설정 */
   position: absolute;
-  top: calc(100% + 20px); /* .menu-item 아래의 간격을 마진으로 설정 */
+  top: calc(100% + 19.9px); /* .menu-item 아래의 간격을 마진으로 설정 */
   height: 50px;
   width: 200vw;
   left: 50%;
@@ -194,7 +194,7 @@ a {
 }
 /*--------------------------------------------------  */
 .profile-card {
-    position: absolute;
+    position: fixed;
     top: 12%;
     left: 79%;
     transform: translateX(-50%);
@@ -316,6 +316,16 @@ a {
   font-size: 24px; /* 아이콘 크기 조정 */
 }
     
+@media (max-width:1400px) {
+    .dropdown-content {
+        top: calc(100% + 19.8px); /* .menu-item 아래의 간격을 마진으로 설정 */
+    }
+}
+@media (max-width:1300px) {
+    .dropdown-content {
+        top: calc(100% + 19.5px); 
+    }
+}
 @media (max-width: 1200px) {
     .menu-item a {
         font-size: 20px; /* 텍스트 크기를 줄임 */
@@ -342,6 +352,9 @@ a {
     .login-section{
         width:35%;
     }
+    .dropdown-content {
+        top: calc(100% + 20px); /* .menu-item 아래의 간격을 마진으로 설정 */
+    }
 }
 @media (max-width: 900px) {
     .menu-item a {
@@ -356,7 +369,7 @@ a {
     <div class="top_header">
         <div class="brand-name">
             <a href="{% url 'homepageapp:main' %}">
-                <h1>IndieInfoRise</h1>
+                <h1>INDIEBOOST</h1>
             </a>
         </div>
         <!-- 검색창 추가 -->
@@ -452,7 +465,7 @@ a {
             <span class="material-icons">notes</span><span>작성한글:{{ user.post_count }} </span>
         </div>
         <div class="comment_count">
-            <span class="material-icons">chat</span><span>댓글단글:{{ user.comment_count }}</span>
+            <span class="material-icons">chat</span><span>댓글수:{{ user.comment_count }}</span>
         </div>
     </div>
     <div class="profile-links">

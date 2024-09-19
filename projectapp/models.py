@@ -3,11 +3,36 @@ from django.contrib.auth.models import User
 import requests
 from django.conf import settings
 
+class Subtitle(models.Model):
+    name = models.CharField(max_length=200, null=False, unique=True)
 
+    def __str__(self):
+        return self.name
+    
+class CustomProjectManager(models.Manager):
+    def get_or_create_project_by_subtitles(self, title, subtitles, defaults=None, **extra_fields):
+        defaults = defaults or {}
+        defaults.update(extra_fields)
+
+        normalized_subtitles = set(subtitle.strip().lower() for subtitle in subtitles)
+
+        # 주어진 title과 동일한 제목을 가진 아티스트가 있는지 대소문자를 구분하지 않고(iexact) 필터링하여 검색합니다.
+        project = self.filter(title__iexact=title.strip()).first()
+        if not project:
+            project = self.filter(sub_titles__name__in=normalized_subtitles).distinct().first()
+
+        if project:
+            return project, False
+
+        # 시그널에서 서브타이틀을 생성하고 연결하도록 아티스트만 생성합니다.
+        project = self.create(title=title.strip(), **defaults)
+        return project, True
+    
 
 class Project(models.Model):
     writer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name='project', null=True)
     title = models.CharField(max_length=200, null=False)
+    sub_titles = models.ManyToManyField('Subtitle', related_name='project', blank=True)
     image = models.ImageField(upload_to='project/', null=False)
     description = models.CharField(max_length=200, null=True)
     latitude = models.FloatField(null=True)  # 위도 필드
@@ -20,6 +45,7 @@ class Project(models.Model):
 
     created_at = models.DateField(auto_now_add=True, null=True)
     hide = models.BooleanField(default=True)  # 임시저장 여부를 나타내는 필드
+    objects = CustomProjectManager()
     
     def save(self, *args, **kwargs):
         if self.address:

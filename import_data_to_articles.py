@@ -12,7 +12,7 @@ django.setup()
 import pandas as pd
 from datetime import datetime
 from articleapp.models import Article
-from projectapp.models import Project
+from projectapp.models import Project, Subtitle
 from artistapp.models import Artist, Subtitle
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
@@ -55,15 +55,19 @@ def import_data_to_articles(file_path):
         )
 
         # 프로젝트를 추가하려면 해당 필드들의 데이터를 가져와서 추가합니다.
-        project_names = row['Project'].split(',')
+        project_names = [name.strip() for name in row['Project'].split(',')]
         projects = []
         for name in project_names:
-            # 기본 이미지와 기본 텍스트, 기본 주소를 설정하여 프로젝트 생성
-            project, created = Project.objects.get_or_create(
-                title=name,
+            subtitles = [name]  # Subtitle로 프로젝트 이름을 사용
+            project, created = Project.objects.get_or_create_project_by_subtitles(
+                name,
+                subtitles,
                 defaults={'image': 'defalt_image/defalt_stage.jpg', 'description': '설명을 추가해 주세요', 'address': '서울 마포구 독막로 지하 85', 'writer': user}
             )
             projects.append(project)
+
+            # Debug 출력
+            print(f"Project: {project.title}, Created: {created}")
 
         article.project.set(projects)
 
@@ -75,11 +79,7 @@ def import_data_to_articles(file_path):
             artist, created = Artist.objects.get_or_create_artist_by_subtitles(
                 name,
                 subtitles,
-                defaults={
-                    'image': 'defalt_image/defalt_artist.jpg',
-                    'description': '설명을 추가해 주세요',
-                    'writer': user
-                }
+                defaults={'image': 'defalt_image/defalt_artist.jpg', 'description': '설명을 추가해 주세요', 'writer': user}
             )
 
             artists.append(artist)
