@@ -23,6 +23,7 @@ from django.shortcuts import redirect
 
 import calendar
 from datetime import datetime
+from django.db import transaction
 from django.http import JsonResponse
 from django.views import View
 from .models import Article
@@ -285,6 +286,20 @@ class ArticleDeleteView(DeleteView):
     context_object_name= 'target_article'
     success_url = reverse_lazy('articleapp:list')
     template_name = 'articleapp/delete.html' 
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        # 포인트 회수 로직
+        with transaction.atomic():
+            profile = request.user
+            profile.points -= 10  # 프로젝트 삭제 시 10 포인트 감소
+            if profile.points < 0:
+                profile.level -= 1 
+                profile.points += 100
+            profile.save()
+        success_url = self.get_success_url()
+        self.object.delete()
+        return redirect(success_url)
 
 from django.db.models import Q
 from datetime import datetime

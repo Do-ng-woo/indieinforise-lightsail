@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from accountapp.views import hello_world, AccountCreateView, AccountDetailView, AccountUpdateView, AccountDeleteView, CustomLoginView
 from accountapp.views import add_favorite_search, delete_favorite_keyword, get_field_data
 from . import views
