@@ -280,20 +280,22 @@ a {
     color: #ccc;
 }
 
-.logout-link a {
-    display: block;
-    color: #000;
-    background-color: #eee; /* 배경색 회색으로 설정 */
-    text-decoration: none;
-    margin-bottom: 10px;
-    padding: 12px 15px; /* 위 아래 간격을 늘리고 좌우 패딩 추가 */
-    border-radius: 15px; /* 모서리를 둥글게 설정 */
-    transition: color 0.3s, background-color 0.3s; /* 색상과 배경색 변화 효과 */
-    text-align: center; /* 텍스트 중앙 정렬 */
-    font-size: 14px; /* 텍스트 크기 유지 */
+.logout-link button {
+    display: block;  /* 블록 요소로 만들어서 a 태그처럼 전체를 클릭할 수 있게 */
+    color: #000;  /* 텍스트 색상 */
+    background-color: #eee;  /* 배경색 회색 */
+    text-decoration: none;  /* 텍스트 밑줄 제거 */
+    margin: 0 auto 10px auto;
+    padding: 12px 100px;  /* 위 아래 간격을 늘리고 좌우 패딩 추가 */
+    border-radius: 15px;  /* 모서리를 둥글게 설정 */
+    transition: color 0.3s, background-color 0.3s;  /* 색상과 배경색 변화 효과 */
+    text-align: center;  /* 텍스트 중앙 정렬 */
+    font-size: 14px;  /* 텍스트 크기 */
+    border: none;  /* 기본 버튼 테두리 제거 */
+    cursor: pointer;  /* 클릭할 수 있는 커서 */
 }
 
-.logout-link a:hover {
+.logout-link button:hover {
     color: #ccc; /* 호버 시 텍스트 색상 회색으로 변경 */
     background-color: #ddd; /* 호버 시 배경색을 조금 더 밝은 회색으로 변경 */
 }
@@ -473,7 +475,10 @@ a {
         <a href="{% url 'subscribeapp:Artist_list' %}">내 구독 관리</a>
     </div>
     <div class="logout-link">
-        <a href="{% url 'accountapp:logout' %}?next={{ request.path }}">Log Out</a>
+        <form method="post" action="{% url 'accountapp:logout' %}">
+            {% csrf_token %}
+            <button type="submit">Log Out</button>
+        </form>
     </div>
     {% endif %}
 </div>

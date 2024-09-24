@@ -41,7 +41,8 @@ urlpatterns = [
     path('genres/', include('genreapp.urls')),
     path('searchs/', include('searchapp.urls')),
     path('instrumnets/', include('instrumentapp.urls')),
-    path('myshows/', include('myshowapp.urls'))
+    path('myshows/', include('myshowapp.urls')),
+    path('accounts/', include('allauth.urls')),  # allauth의 URL을 추가
     
     
     

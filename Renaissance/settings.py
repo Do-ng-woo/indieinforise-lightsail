@@ -53,6 +53,11 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.sites',    #allauth 필수
+    'allauth',                 #allauth
+    'allauth.account',         #allauth
+    'allauth.socialaccount',   #allauth
+    'allauth.socialaccount.providers.google',  # 구글 로그인 추가
     'accountapp',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -83,6 +88,30 @@ INSTALLED_APPS = [
     'myshowapp'
     
 ]
+# 구글 로그인을 위한 설정
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'APP': {
+            'client_id': '137673191859-3vuasmn846kf41ve7cbuukb10bj8dc7k.apps.googleusercontent.com',
+            'secret': env('GOOGLE_CLIENT_SECRET'),
+            'key': ''
+        }
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -92,7 +121,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # allauth의 AccountMiddleware 추가
 ]
+
 
 ROOT_URLCONF = 'Renaissance.urls'
 
@@ -138,7 +169,7 @@ DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',  # SQLite 엔진 사용
 #         'NAME': BASE_DIR / 'db.sqlite3',  # 데이터베이스 파일 경로
-#     }
+#     } 
 # }
 
 
@@ -186,7 +217,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),
                    os.path.join(BASE_DIR, 'staticfiles/django_select2'),]
 
 LOGIN_REDIRECT_URL = reverse_lazy('home')
-LOGOUT_REDIRECT_URL = reverse_lazy('accountapp:login')
+LOGOUT_REDIRECT_URL = reverse_lazy('home')
 
 MEDIA_URL = '/media/'
 

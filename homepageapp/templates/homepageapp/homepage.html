@@ -3,6 +3,7 @@
 {% block content %}
 {% load static %}
 {% load bootstrap4 %}
+{% load socialaccount %}
 <style>
 
 .entire_main{
@@ -562,7 +563,7 @@ input[type="password"] {
 <div class="entire_main">
     <div class="left_main">
         <div class="banner">
-            <img src="{% static 'defalut_image/main_banner.png' %}" alt="배너 광고" class="banner-image">
+            <img src="{% static 'defalut_image/indieboost_default_banner.png' %}" alt="배너 광고" class="banner-image">
         </div>
         <div class="entire-container">
             <div class="article-header">
@@ -633,7 +634,7 @@ input[type="password"] {
                     <br>
                     <div class="sign_and_find">
                     <div><a href="{% url 'accountapp:create' %}" class="signup-button" >회원가입</a></div>
-                    <div><a>정보찾기</a></div>
+                    <div><a href="{% provider_login_url 'google' %}">Google</a></div>
                     </div>
                 </form>
             </div>
