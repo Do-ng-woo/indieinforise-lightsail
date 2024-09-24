@@ -17,5 +17,4 @@ urlpatterns = [
     path('add_favorite_search/', views.add_favorite_search, name='add_favorite_search'),
     path('delete_favorite_keyword/<int:keyword_id>/', views.delete_favorite_keyword, name='delete_favorite_keyword'),
     path('get-field-data/', get_field_data, name='get_field_data'),
-    
 ]
