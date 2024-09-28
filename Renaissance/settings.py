@@ -243,3 +243,10 @@ TINYMCE_DEFAULT_CONFIG = {
 CRISPY_TEMPLATE_PACK = 'bootstrap4'  # Bootstrap4를 사용하는 경우
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://www.indieboost.co.kr',
+    'https://indieboost.co.kr'
+]
+
+CSRF_COOKIE_SECURE = True
