@@ -8,10 +8,10 @@ from .models import CustomUser
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('image','gender', 'birth_date', 'nickname', 'purpose_of_use', 'message', 'level', 'points', 'post_count', 'comment_count','performance_points')}),
+        (None, {'fields': ('image','gender', 'birth_date', 'nickname', 'purpose_of_use', 'message', 'level', 'points', 'post_count', 'comment_count','performance_points','privacy_policy_agreement')}),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
-        (None, {'fields': ('image','gender', 'birth_date', 'nickname', 'purpose_of_use', 'message', 'level', 'points', 'post_count', 'comment_count','performance_points')}),
+        (None, {'fields': ('image','gender', 'birth_date', 'nickname', 'purpose_of_use', 'message', 'level', 'points', 'post_count', 'comment_count','performance_points','privacy_policy_agreement')}),
     )
 
 admin.site.register(CustomUser, CustomUserAdmin)

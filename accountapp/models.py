@@ -38,3 +38,5 @@ class CustomUser(AbstractUser):
     comment_count = models.IntegerField(default=0)  # 작성한 댓글 수
     
     performance_points = models.IntegerField(default=0)  # 공연 포인트 필드 추가 공연을 사용자가 몇분이나 봤는지를 저장
+
+    privacy_policy_agreement = models.BooleanField(default=False)

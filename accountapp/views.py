@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.list import MultipleObjectMixin
+from allauth.account.models import EmailAddress  # EmailAddress 모델 가져오기
 
 
 from accountapp.decorators import account_ownership_required
@@ -57,24 +58,42 @@ def hello_world(request):
         hello_world_list = HelloWorld.objects.all()
         return render(request, 'accountapp/hello_world.html', context={'hello_world_list': hello_world_list})
 
-        
+def privacy_policy(request):
+    return render(request, 'accountapp/privacy_policy.html')
     
 class AccountCreateView(CreateView):
     model = User
     form_class = CustomUserCreationForm
-    success_url = reverse_lazy('articleapp:list')
+    success_url = reverse_lazy('homepageapp:main')
     template_name = 'accountapp/create.html'
 
     def dispatch(self, request, *args, **kwargs):
-        # 사용자가 로그인 상태인지 확인
         if request.user.is_authenticated:
-            # 로그인되어 있으면 메인 페이지로 리다이렉트
-            return redirect('homepageapp:main')  # 원하는 URL로 리다이렉트
-        # 로그인되어 있지 않으면 원래대로 dispatch 진행
+            return redirect('homepageapp:main')
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        return super().form_valid(form)
+        # 사용자 객체 생성
+        response = super().form_valid(form)
+        # 이메일 추가
+        user = form.instance
+        email = form.cleaned_data.get('email')
+        # EmailAddress 모델에 이메일 추가
+        EmailAddress.objects.create(
+            user=user,
+            email=email,
+            verified=False,  # 기본적으로 False로 설정
+            primary=True
+        )
+        # 개인정보 처리방침 동의 상태 저장
+        privacy_policy_agreement_value = self.request.POST.get('privacy_policy_agreement')
+        user.privacy_policy_agreement = privacy_policy_agreement_value == "on"
+        user.save()
+        return response
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return super().form_invalid(form)
     
 @method_decorator(has_ownership, 'get')
 @method_decorator(has_ownership, 'post')

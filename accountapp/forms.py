@@ -39,7 +39,12 @@ class CustomUserCreationForm(UserCreationForm):
     purpose_of_use = forms.CharField(label=_("사용 목적"), widget=forms.Textarea)
     image = forms.ImageField(label=_("프로필 이미지"), required=False)
     message = forms.CharField(label=_("메시지"), required=False)
-
+    # 개인정보 처리방침 동의 필드 추가
+    privacy_policy_agreement = forms.BooleanField(
+        label=_("개인정보 처리방침에 동의합니다."),
+        required=True,
+        help_text=_("개인정보 처리방침을 읽고 동의합니다.")
+    )
     class Meta(UserCreationForm.Meta):
         model = get_user_model()
         fields = UserCreationForm.Meta.fields + (
@@ -68,19 +73,42 @@ class CustomUserUpdateForm(UserChangeForm):
     purpose_of_use = forms.CharField(label=_("사용 목적"), widget=forms.Textarea)
     image = forms.ImageField(label=_("프로필 이미지"), required=False)
     message = forms.CharField(label=_("메시지"), required=False)
+    
+    # 개인정보 처리방침 동의 필드 추가
+    privacy_policy_agreement = forms.BooleanField(
+        label=_("개인정보 처리방침에 동의"),
+        required=False
+    )
 
     class Meta:
-        model = User
+        model = User  # CustomUser 모델을 사용하도록 변경
         fields = [
             'username', 'email', 'gender', 'birth_date', 'nickname',
-            'purpose_of_use', 'image', 'message'
+            'purpose_of_use', 'image', 'message', 'privacy_policy_agreement'
         ]
+
+    def __init__(self, *args, **kwargs):
+        super(CustomUserUpdateForm, self).__init__(*args, **kwargs)
+        
+        # 사용자의 기존 동의 여부에 따라 필드의 초기값 설정
+        if self.instance and self.instance.privacy_policy_agreement:
+            self.fields['privacy_policy_agreement'].initial = True
+            # 이미 동의한 경우 수정할 수 없도록 비활성화
+            self.fields['privacy_policy_agreement'].widget.attrs['disabled'] = True
+        else:
+            self.fields['privacy_policy_agreement'].initial = False
 
     def clean_nickname(self):
         nickname = self.cleaned_data.get('nickname')
         if User.objects.filter(nickname=nickname).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("이미 사용 중인 닉네임입니다. 다른 닉네임을 선택해 주세요.")
         return nickname
+
+    def clean_privacy_policy_agreement(self):
+        # 비활성화된 경우 클린 단계에서 값을 가져오지 않으므로 동의한 상태를 그대로 반환
+        if self.instance and self.instance.privacy_policy_agreement:
+            return self.instance.privacy_policy_agreement
+        return self.cleaned_data['privacy_policy_agreement']
     
 class FavoriteSearchForm(forms.ModelForm):
     SEARCH_FIELD_CHOICES = [

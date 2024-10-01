@@ -13,18 +13,112 @@
         padding: 10px 20px;
         font-size: 16px;
     }
+    /* 닫기 버튼 스타일 */
+        .close_policy {
+        background-color: transparent;
+        border: none;
+        font-size: 1.5rem;
+        color: #333;
+        opacity: 0.8;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* 마우스를 올렸을 때의 효과 */
+    .close_policy:hover {
+        background-color: #f0f0f0;
+        color: #000;
+        opacity: 1;
+    }
 </style>
+
+
 <div class="container" style="max-width: 700px; margin-top: 40px;">
     <div class="text-center mb-4">
         <h4>회원가입</h4>
     </div>
-    <form action="{% url 'accountapp:create' %}" method="post" class="needs-validation" novalidate>
+
+    <form id="signupForm" action="{% url 'accountapp:create' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {% bootstrap_form form layout='horizontal' %}
+
+        <!-- 오류 메시지 출력 -->
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% bootstrap_field form.username %}
+        {% bootstrap_field form.email %}
+        {% bootstrap_field form.password1 %}  <!-- 비밀번호 필드 추가 -->
+        {% bootstrap_field form.password2 %}  <!-- 비밀번호 확인 필드 추가 -->
+        {% bootstrap_field form.gender %}
+        {% bootstrap_field form.birth_date %}
+        {% bootstrap_field form.nickname %}
+        {% bootstrap_field form.purpose_of_use %}
+        {% bootstrap_field form.image %}
+        {% bootstrap_field form.message %}
+
+        <!-- 개인정보 처리방침 동의 체크박스 추가 -->
+        <div class="form-group">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="privacyPolicyAgree" name="privacy_policy_agreement" required>
+                <label class="form-check-label" for="privacyPolicyAgree">
+                    <a href="#" onclick="openPrivacyPolicy(); return false;">개인정보 처리방침</a>에 동의합니다.
+                </label>
+            </div>
+        </div>
+
         <div class="form-group">
             <button type="submit" class="btn btn-primary btn-block">가입하기</button>
         </div>
     </form>
 </div>
+
+<!-- 개인정보 처리방침 모달 -->
+<div id="privacyPolicyModal" class="modal" tabindex="-1" role="dialog" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">개인정보 처리방침</h5>
+                <button type="button" class="close_policy" onclick="closePrivacyPolicy();">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>1. 수집하는 개인정보 항목<br>이름, 이메일, 성별, 생년월일, 프로필 이미지</p>
+                <p>2. 개인정보의 수집 및 이용 목적<br>회원가입 및 관리: 본인 식별, 가입 의사 확인, 회원 관리<br>서비스 제공: 콘텐츠 제공, 맞춤형 서비스 제공, 이용자 정보 분석</p>
+                <p>3. 개인정보의 보유 및 이용기간<br>회원 탈퇴 시까지 개인정보를 보유 및 이용합니다. 단, 관련 법령에 따라 보존이 필요한 경우 해당 기간 동안 개인정보를 보관합니다.</p>
+                <p>4. 개인정보의 제3자 제공<br>웹사이트는 이용자의 동의 없이 개인정보를 제3자에게 제공하지 않습니다.</p>
+                <p>5. 개인정보 처리방침의 변경<br>본 개인정보 처리방침은 변경될 수 있으며, 변경 시 공지사항을 통해 안내합니다.</p>
+                <p>6. 동의 거부 권리<br>회원은 개인정보 수집 및 이용에 대한 동의를 거부할 권리가 있습니다. 단, 동의를 거부할 경우 서비스 이용에 제한이 있을 수 있습니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closePrivacyPolicy();">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 개인정보 처리방침 모달 열기
+    function openPrivacyPolicy() {
+        document.getElementById('privacyPolicyModal').style.display = 'block';
+    }
+
+    // 개인정보 처리방침 모달 닫기
+    function closePrivacyPolicy() {
+        document.getElementById('privacyPolicyModal').style.display = 'none';
+    }
+</script>
 
 {% endblock %}

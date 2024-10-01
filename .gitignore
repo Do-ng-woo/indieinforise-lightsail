@@ -97,6 +97,8 @@ venv
 __pycache__/
 migrations/**/*
 !migrations/__init__.py
+**/migrations/**/*
+**/!migrations/__init__.py
 .env
 .git
 db.sqlite3
@@ -107,5 +109,7 @@ media/instrument
 media/person
 media/sing 
 media/project
-meida/genre 
-meida/community 
+media/genre 
+media/community 
+media/profile
+**/meida/profile/*
