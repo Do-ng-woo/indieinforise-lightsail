@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .search-results {
+        font-family: 'Arial', sans-serif;
+        background-color: #f9f9f9;
+        max-width:1200px;
+        width:90%;
+        margin: 30px auto;
+        padding:20px;
+        border-radius:10px;
+    }
+
+    .search-header {
+        font-size: 24px;
+        color: #333;
+    }
+
+    .search-query {
+        color: #555;
+        font-size: 16px;
+    }
+
+    .search-summary {
+        padding: 10px 0;
+        font-size: 18px;
+        color: #666;
+    }
+
+    .search-section {
+        background: #ffffff;
+        margin: 10px 0;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .search-section h2 {
+        font-size: 18px;
+        color: #333;
+    }
+
+    .search-results ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .search-results li {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .search-results li:last-child {
+        border-bottom: none;
+    }
+    .search-section button {
+    background-color: #f0f0f0; /* 무채색 배경 */
+    color: #333; /* 어두운 글씨 색 */
+    border: none; /* 테두리 제거 */
+    padding: 10px 20px; /* 내부 여백 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    text-decoration: none; /* 밑줄 제거 */
+    display: inline-block; /* 인라인 블록 요소로 표시 */
+    font-size: 16px; /* 글씨 크기 */
+    margin: 10px 2px; /* 주변 여백 */
+    cursor: pointer; /* 마우스 오버 시 포인터 모양 변경 */
+    border-radius: 5px; /* 둥근 모서리 */
+    transition: background-color 0.3s, color 0.3s; /* 색상 변화 애니메이션 */
+    }
+
+    /* 마우스 오버 시 */
+    .search-section button:hover {
+        background-color: #e0e0e0; /* 마우스 오버 시 밝은 회색으로 변경 */
+        color: #000; /* 글씨 색을 더 어둡게 변경 */
+    }
+@media (max-width: 1000px) {
+
+}
+</style>
+
+<div class="search-results">
+    <h1 class="search-header">검색 결과</h1>
+    <p class="search-query">검색어: "{{ query }}"</p>
+    {% if message %}
+    <p class="alert">{{ message }}</p>
+    {% else %}
+    <p class="search-summary">
+        공연: {{ article_count }} |
+        아티스트: {{ artist_count }} |
+        공연장: {{ project_count }} |
+        인물: {{ person_count }} |
+        노래: {{ sing_count }} |
+        장르: {{ genre_count }} |
+        앨범: {{ album_count }} |
+        커뮤니티: {{ community_count }}
+    </p>
+    {% endif %}
+
+    {% if article_results %}
+    <section class="search-section">
+        <h2>공연 검색 결과</h2>
+        <ul id="articleResults">
+        {% for article in article_results %}
+            <li>
+                <a href="{% url 'articleapp:detail' pk=article.pk %}">
+                    {{ article.title }} - 작성일:{{ article.created_at|date:"Y년 n월 j일" }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+        {% if article_results.has_other_pages %}
+            <button id="loadMoreArticles">더보기</button>
+        {% endif %}
+    </section>
+    {% endif %}
+    
+    {% if artist_results %}
+    <section class="search-section">
+        <h2>아티스트 검색 결과</h2>
+        <ul id="artistResults">
+        {% for artist in artist_results %}
+            <li>
+                <a href="{% url 'artistapp:detail' pk=artist.pk %}">
+                {{ artist.title }} - 작성일:{{ artist.created_at|date:"Y년 n월 j일" }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+        {% if artist_results.has_other_pages %}
+            <button id="loadMoreArtists">더보기</button>
+        {% endif %}
+    </section>
+    {% endif %}
+    
+    {% if project_results %}
+    <section class="search-section">
+        <h2>공연장 검색 결과</h2>
+        <ul id="projectResults">
+        {% for project in project_results %}
+             <li>
+                <a href="{% url 'projectapp:detail' pk=project.pk %}">
+                    {{ project.title }} - 작성일:{{ project.created_at|date:"Y년 n월 j일" }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+        {% if project_results.has_other_pages %}
+            <button id="loadMoreProjects">더보기</button>
+        {% endif %}
+    </section>
+    {% endif %}
+    
+    {% if person_results %}
+    <section class="search-section">
+        <h2>인물 검색 결과</h2>
+        <ul id="personResults">
+        {% for person in person_results %}
+            <li>
+                <a href="{% url 'personapp:detail' pk=person.pk %}">
+                    {{ person.title }} - 작성일:{{ person.created_at|date:"Y년 n월 j일" }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+        {% if person_results.has_other_pages %}
+            <button id="loadMorePersons">더보기</button>
+        {% endif %}
+    </section>
+    {% endif %}
+    
+    {% if sing_results %}
+    <section class="search-section">
+        <h2>노래 검색 결과</h2>
+        <ul id="singResults">
+        {% for sing in sing_results %}
+            <li>
+                <a href="{% url 'singapp:detail' pk=sing.pk %}">
+                    {{ sing.title }} - 작성일:{{ sing.created_at|date:"Y년 n월 j일" }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+        {% if sing_results.has_other_pages %}
+            <button id="loadMoreSings">더보기</button>
+        {% endif %}
+    </section>
+    {% endif %}
+    
+    {% if genre_results %}
+    <section class="search-section">
+        <h2>장르 검색 결과</h2>
+        <ul id="genreResults">
+        {% for genre in genre_results %}
+            <li>
+                <a href="{% url 'genreapp:detail' pk=genre.pk %}">
+                    {{ genre.title }} - 작성일:{{ genre.created_at|date:"Y년 n월 j일" }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+        {% if genre_results.has_other_pages %}
+            <button id="loadMoreGenres">더보기</button>
+        {% endif %}
+    </section>
+    {% endif %}
+    
+    {% if album_results %}
+    <section class="search-section">
+        <h2>앨범 검색 결과</h2>
+        <ul id="albumResults">
+        {% for album in album_results %}
+            <li>
+                <a href="{% url 'albumapp:detail' pk=album.pk %}">
+                    {{ album.title }} - 작성일:{{ album.created_at|date:"Y년 n월 j일" }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+        {% if album_results.has_other_pages %}
+            <button id="loadMoreAlbums">더보기</button>
+        {% endif %}
+    </section>
+    {% endif %}
+    
+    {% if community_results %}
+    <section class="search-section">
+        <h2>커뮤니티 검색 결과</h2>
+        <ul id="communityResults">
+        {% for community in community_results %}
+            <li>
+                <a href="{% url 'communityapp:detail' pk=community.pk %}">
+                    {{ community.title }} - 작성일:{{ community.created_at|date:"Y년 n월 j일" }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+        {% if community_results.has_other_pages %}
+            <button id="loadMoreCommunitys">더보기</button>
+        {% endif %}
+    </section>
+    {% endif %}
+</div>
+
+<script>
+function setupLoadMore(modelName, resultContainerId, loadMoreButtonId) {
+    const loadMoreButton = document.getElementById(loadMoreButtonId);
+
+    if (loadMoreButton) { // 버튼이 존재하는지 확인
+        let currentPage = 1;
+
+        loadMoreButton.addEventListener('click', function() {
+            currentPage += 1;
+            const query = '{{ query }}';  // 서버사이드 템플릿 변수를 사용하는 경우, 해당 부분을 다른 방식으로 처리해야 할 수 있습니다.
+            fetch(`/searchs/load-more-data/${modelName.toLowerCase()}/?q=${query}&page=${currentPage}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.data) {
+                        data.data.forEach(item => {
+                            const itemElement = document.createElement('li');
+                            itemElement.innerHTML = `<a href="${item.url}">${item.title} - ${item.created_at}</a>`;
+                            document.getElementById(resultContainerId).appendChild(itemElement);
+                        });
+                        // 다음 페이지가 없다면 "더보기" 버튼 제거
+                        if (!data.has_next) {
+                            loadMoreButton.remove();
+                        }
+                    }
+                })
+                .catch(error => console.error(`Error loading more ${modelName}:`, error));
+        });
+    } else {
+        console.info(`Button with ID '${loadMoreButtonId}' does not exist.`);
+    }
+}
+
+// 예를 들어, Article 모델에 대한 더보기 설정
+setupLoadMore('Article', 'articleResults', 'loadMoreArticles');
+setupLoadMore('Artist', 'artistResults', 'loadMoreArtists');
+setupLoadMore('Project', 'projectResults', 'loadMoreProjects');
+setupLoadMore('Person', 'personResults', 'loadMorePersons');
+setupLoadMore('Sing', 'singResults', 'loadMoreSings');
+setupLoadMore('Album', 'albumResults', 'loadMoreAlbums');
+setupLoadMore('Genre', 'genreResults', 'loadMoreGenres');
+setupLoadMore('Community', 'communityResults', 'loadMoreCommunitys');
+// 기타 모델에 대한 설정을 추가할 수 있습니다.
+</script>
+
+{% endblock %}

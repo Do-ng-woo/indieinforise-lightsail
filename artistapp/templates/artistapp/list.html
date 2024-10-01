@@ -1,0 +1,706 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+.entire_artist_list_content {
+    display: flex;
+    margin: 0 auto; /* 양쪽 여백 자동 */
+    max-width: 1400px; /* 최대 너비 설정 */
+    padding: 20px; /* 내부 여백 추가 */
+}
+
+.right_artist_info {
+    width: 280px;
+    background-color: #FFF;
+    padding: 0px;
+    border-radius: 1rem;
+    margin-left:2rem;
+}
+
+.left_artist_list {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 1100px;
+}
+
+.container{
+    width:100%;
+}
+.container div {
+    display: flex;
+    justify-content: left;
+    border-radius: 1rem;
+    margin:0px 0px;
+    padding:0px;
+}
+.container img {
+    width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+    height: 14rem; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+    object-fit: cover; /* 이미지 비율 유지 */
+    border-radius: 1rem; /* 이미지 모서리 둥글기 */
+}
+    
+a {
+    color: black;
+     text-decoration-line: none;
+}
+.container a {
+    flex: 0 0 100%; /* flex-grow, flex-shrink, flex-basis */
+    box-sizing: border-box; /* 패딩과 보더를 너비에 포함 */
+    margin: 1%; /* 각 요소 사이의 마진 */
+    text-align: center; 
+    border-radius: 1rem;
+    padding: 15px; /* 내부 패딩 */
+    background-color: #FFFFFF; /* 배경색 */
+    height: 300px; /* 카드의 높이, 필요에 따라 조정 */
+    width:250px;
+    flex-wrap: wrap; /* 요소들이 컨테이너를 벗어나지 않도록 줄바꿈 설정 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* X축, Y축, 흐림 반경, 색상 */
+}
+.form-container{
+    display: flex; 
+    justify-content: flex-end; 
+    margin-bottom: 10px; 
+    margin-top:15px;
+}
+.artist_search{
+    background-color: #4CAF50; 
+    color: white; 
+    padding: 7px 15px; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer;
+    
+}
+.sort_button {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 7px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.sort_button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+    .search_input{
+        width:200px;
+        height:38px;
+    }
+/* ================아티스트 랭킹 디자인 ================== */
+
+.ranking-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 580px;
+    padding: 0px;
+    background-color:#f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
+}
+
+.ranking-switch-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    background-color: #f8f9fa;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.switch-button {
+    flex: 1;
+    background-color: #757575; /* 어두운 회색 배경 */
+    color: #fff; /* 흰색 글자 */
+    padding: 10px 0;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center;
+    border-right: 1px solid #ddd;
+}
+
+.switch-button:last-child {
+    border-right: none;
+}
+
+.switch-button.active,
+.switch-button:hover {
+    background-color: #282b29; /* 더 어두운 회색 배경 */
+    color: #fff;
+}
+
+.ranking-table {
+    width: 100%;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    background-color: #fff;
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ranking-switch-row .switch-button:first-child {
+    border-top-left-radius: 1rem;
+}
+
+.ranking-switch-row .switch-button:last-child {
+    border-top-right-radius: 1rem;
+}
+
+/* 테이블 마지막 행의 셀 모서리 스타일 */
+.ranking-table .ranking-table-body .ranking-table-row:last-child .ranking-table-cell:first-child {
+    border-bottom-left-radius: 1rem;
+}
+
+.ranking-table .ranking-table-body .ranking-table-row:last-child .ranking-table-cell:last-child {
+    border-bottom-right-radius: 1rem;
+}
+.ranking-table-head,
+.ranking-table-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.ranking-table-row {
+    display: flex;
+    width: 100%;
+}
+
+.ranking-table-cell {
+    padding: 12.5px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+}
+
+.ranking-table-head .ranking-table-cell {
+    background-color: #494c4d;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.ranking-table-body .ranking-table-row:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.ranking-table-body .ranking-table-row:nth-child(odd) {
+    background-color: #fefefe;
+}
+
+.ranking-table-body .ranking-table-row:hover {
+    background-color: #f1f1f1;
+}
+
+/* 툴팁 스타일 */
+.tooltip-icon {
+    position: relative;
+    cursor: pointer;
+}
+
+.tooltip-icon .tooltip-text {
+    visibility: hidden;
+    width: 250px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 12px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -125px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: normal;
+    line-height: 1.5em;
+}
+
+.tooltip-icon .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.tooltip-icon:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+/* 광고 영역 스타일 */
+.advertisement {
+    width: 100%;
+    height: 150px;
+    margin-top: 20px;
+    border-radius: 1rem;
+    overflow: hidden; /* 이미지가 영역을 벗어나지 않도록 설정 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    margin-bottom:20px;
+}
+
+.advertisement img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지 비율 유지 */
+    border-radius: 1rem;
+}
+/* 구독목록 스타일  */
+.subscribed_artists_section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 460px;
+    padding: 0px;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem;
+    margin-top: 20px;
+}
+
+.subscribed_artists_head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color:#494C4D;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+.subscribed_artists_head h3 {
+    color:#FFF;
+    margin: 0; /* 텍스트 위아래 마진 제거 */
+    padding: 0; /* 텍스트 위아래 패딩 제거 */
+}
+
+.subscribed_artists_table {
+    width: 100%;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    background-color: #fff;
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.subscribed_artists_table_head,
+.subscribed_artists_table_body {
+    display: flex;
+    flex-direction: column;
+}
+
+.subscribed_artists_table_row {
+    display: flex;
+    width: 100%;
+}
+
+.subscribed_artists_table_cell {
+    padding: 12.5px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+}
+
+.subscribed_artists_table_head .subscribed_artists_table_cell {
+    background-color: #494c4d;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.subscribed_artists_table_body .subscribed_artists_table_row:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.subscribed_artists_table_body .subscribed_artists_table_row:nth-child(odd) {
+    background-color: #fefefe;
+}
+
+.subscribed_artists_table_body .subscribed_artists_table_row:hover {
+    background-color: #f1f1f1;
+}
+
+/* 테이블 마지막 행의 셀 모서리 스타일 */
+.subscribed_artists_table_body .subscribed_artists_table_row:last-child .subscribed_artists_table_cell:first-child {
+    border-bottom-left-radius: 1rem;
+}
+
+.subscribed_artists_table_body .subscribed_artists_table_row:last-child .subscribed_artists_table_cell:last-child {
+    border-bottom-right-radius: 1rem;
+}
+@media (max-width: 900px) {
+    .entire_artist_list_content {
+        flex-direction: column; /* 세로 배치로 변경 */
+        width:100%;
+    }
+    .right_artist_info {
+        width: 100%;
+        margin-left: 0;
+    }
+    .left_artist_list{
+        width: 100%;
+        margin-left: 0;
+    }
+    .artist-container-card-link {
+        width: 30%;
+        max-width: 250px;
+        margin: 10px; /* 상하좌우 마진 추가 */
+    }
+    .page_button{
+        width:100%;
+    }
+    .container{
+        margin:0 0;
+        width:100%;
+        max-width:1000px;
+    }
+    .advertisement {
+        display:none;
+    }
+}
+@media (max-width: 768px) {
+    .artist-container-card-link {
+        width: 45%;
+        max-width: 240px;
+        margin: 10px; /* 상하좌우 마진 추가 */
+    }
+
+}
+@media (max-width: 600px) {
+    .container{
+        margin-top:20px;
+    }
+    .artist-container-card-link {
+        width: 45%;
+        max-width: 200px;
+        margin: 10px; /* 상하좌우 마진 추가 */
+    }
+    .container img {
+        width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+        height: 10rem; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+        object-fit: cover; /* 이미지 비율 유지 */
+        border-radius: 1rem; /* 이미지 모서리 둥글기 */
+    }
+    .container a {
+        height: 250px; /* 카드의 높이, 필요에 따라 조정 */
+        width:250px;
+    }
+}
+@media (max-width: 520px) {
+    .search_input{
+        width:155px;
+        height:38px;
+    }
+}
+@media (max-width: 500px) {
+    .container img {
+        width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+        height: 160px; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+    }
+    .container a {
+        height: 240px; /* 카드의 높이, 필요에 따라 조정 */
+    }
+    .subscribed_artists_section{
+        height:415px;
+    }
+    .ranking-section{
+        height:540px;
+    }
+}
+@media (max-width: 465px) {
+    .form-container{
+        display: flex; 
+        justify-content: center; 
+        margin-bottom: 10px; 
+        margin-left:0px;
+    }
+    .sort_button {
+        padding: 5px 12px;
+        margin-left: 0px;
+    }
+    .search_input{
+        width:145px;
+        height:29.5px;
+    }
+    .artist_search{
+        padding: 5px 12px; 
+    }
+}
+@media (max-width: 420px) {
+    .container img {
+        width: 100%; /* 이미지를 a 태그의 너비에 맞춤 */
+        height: 130px; /* 이미지 높이를 자동으로 설정하여 비율 유지 */
+    }
+    .container a {
+        height: 210px; /* 카드의 높이, 필요에 따라 조정 */
+    }
+    .form-container{
+        display: flex; 
+        justify-content: center; 
+        margin-bottom: 10px; 
+        margin-left:0px;
+    }
+    .sort_button {
+        padding: 5px 10px;
+        margin-left: 0px;
+    }
+    .search_input{
+        width:120px;
+        height:29.5px;
+    }
+    .artist_search{
+        padding: 5px 9px; 
+    }
+}
+</style>
+
+<div class="form-container" style="display: flex; justify-content: flex-end; margin-bottom: 10px; margin-top:10px;">
+    <form method="get" action="{% url 'artistapp:list' %}" style="margin-right: 10px;">
+        <button type="submit" name="order_by" value="newest" class="sort_button {% if request.GET.order_by == 'newest' %}active{% endif %}">최신순</button>
+        <button type="submit" name="order_by" value="popularity" class="sort_button {% if request.GET.order_by == 'popularity' %}active{% endif %}">인기순</button>
+        <button type="submit" name="order_by" value="title" class="sort_button {% if request.GET.order_by == 'title' %}active{% endif %}">제목순</button>
+        <input type="text" name="search_keyword" class="search_input" placeholder="검색어를 입력하세요">
+        <button type="submit" class="artist_search">검색</button>
+    </form>
+</div>
+<div class="entire_artist_list_content">
+    <div class="left_artist_list">
+        {% if artist_list %}
+        <div class="container">
+            {% for artist in artist_list %}
+            <div class="artist-container-card-link">
+                <a href="{% url 'artistapp:detail' pk=artist.pk %}">
+                    {% include 'snippets/card_artist.html' with artist=artist %}
+                </a>
+            </div>
+            {% endfor %}   
+        </div>
+        <div style="margin:0 auto;">
+        {% include 'snippets/pagination.html' with pageobj=page_obj %}
+        </div>
+        {% else %}
+        <div style="text-align:center" >
+            <h1>
+                No Articles Yet!!!!!
+            </h1>
+        </div>
+        {% endif %}
+    </div>
+    <div class="right_artist_info">
+         <!-- 광고 영역 추가 -->
+        <div class="advertisement">
+            <img src="{% static 'defalut_image/artist_list_advertise_demo.png' %}" alt="Advertisement">
+        </div>
+        <div class="ranking-section">
+            <!-- 스위칭 버튼 영역 추가 -->
+            <div class="ranking-switch-row">
+                <button class="switch-button active" data-target="major">메이저랭킹</button>
+                <button class="switch-button" data-target="pop">마이너랭킹</button>
+                <button class="switch-button" data-target="artist">myhot</button>
+            </div>
+            <div class="ranking-table" id="first_rank_table">
+                <div class="ranking-table-head">
+                    <div class="ranking-table-row">
+                        <div class="ranking-table-cell" style="width: 5%;"></div>
+                        <div class="ranking-table-cell" style="width: 55%;">Artist</div>
+                        <div class="ranking-table-cell" style="width: 25%;">Point</div>
+                        <div class="ranking-table-cell" style="width: 15%; position: relative;">
+                            <span class="material-icons tooltip-icon">info
+                                <span class="tooltip-text">이 랭킹은 유저들이 사용한 HOT 포인트를 기준으로 한 순위입니다. HOT 포인트는 커뮤니티 및 아카이브 활동을 통해 획득할 수 있습니다. HOT 포인트는 다양한 목적으로 사용됩니다. 자세한 내용은 상세 페이지를 확인하세요.</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ranking-table-body">
+                    {% for artist in hot_artists %}
+                        <div class="ranking-table-row" data-href="{% url 'artistapp:detail' artist.pk %}" style="cursor: pointer;">
+                            <div class="ranking-table-cell" style="width: 10%;">{{ forloop.counter }}</div>
+                            <div class="ranking-table-cell" style="width: 65%;">{{ artist.title|truncatechars:15 }}</div>
+                            <div class="ranking-table-cell" style="width: 25%;">{{ artist.hot_point }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="ranking-table" id="second_rank_table" style="display:none;">
+                <div class="ranking-table-head">
+                    <div class="ranking-table-row">
+                        <div class="ranking-table-cell" style="width: 5%;"></div>
+                        <div class="ranking-table-cell" style="width: 55%;">Artist</div>
+                        <div class="ranking-table-cell" style="width: 25%;">Point</div>
+                        <div class="ranking-table-cell" style="width: 15%; position: relative;">
+                            <span class="material-icons tooltip-icon">info
+                                <span class="tooltip-text">이 랭킹은 유저들이 사용한 HOT 포인트를 기준으로 한 순위입니다. HOT 포인트는 커뮤니티 및 아카이브 활동을 통해 획득할 수 있습니다. HOT 포인트는 다양한 목적으로 사용됩니다. 자세한 내용은 상세 페이지를 확인하세요.</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ranking-table-body">
+                    {% for artist in hot_artists %}
+                        <div class="ranking-table-row" data-href="{% url 'artistapp:detail' artist.pk %}" style="cursor: pointer;">
+                            <div class="ranking-table-cell" style="width: 10%;">{{ forloop.counter }}</div>
+                            <div class="ranking-table-cell" style="width: 65%;">{{ artist.title|truncatechars:15 }}</div>
+                            <div class="ranking-table-cell" style="width: 25%;">{{ artist.hot_point }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="ranking-table" id="third_rank_table" style="display:none;">
+                <div class="ranking-table-head">
+                    <div class="ranking-table-row">
+                        <div class="ranking-table-cell" style="width: 5%;"></div>
+                        <div class="ranking-table-cell" style="width: 55%;">Artist</div>
+                        <div class="ranking-table-cell" style="width: 25%;">Point</div>
+                        <div class="ranking-table-cell" style="width: 15%; position: relative;">
+                            <span class="material-icons tooltip-icon">info
+                                <span class="tooltip-text">이 랭킹은 유저들이 사용한 HOT 포인트를 기준으로 한 순위입니다. HOT 포인트는 커뮤니티 및 아카이브 활동을 통해 획득할 수 있습니다. HOT 포인트는 다양한 목적으로 사용됩니다. 자세한 내용은 상세 페이지를 확인하세요.</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ranking-table-body">
+                    {% for artist in user_hot_artists %}
+                        <div class="ranking-table-row" data-href="{% url 'artistapp:detail' artist.pk %}" style="cursor: pointer;">
+                            <div class="ranking-table-cell" style="width: 10%;">{{ forloop.counter }}</div>
+                            <div class="ranking-table-cell" style="width: 65%;">{{ artist.title|truncatechars:15 }}</div>
+                            <div class="ranking-table-cell" style="width: 25%;">{{ artist.hot_point }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- 구독 목록 섹션 -->
+        <div class="subscribed_artists_section">
+            {% if request.user.is_authenticated %}
+                <div class="subscribed_artists_head">
+                    <h3>구독목록</h3>
+                    <a href="{% url 'subscribeapp:Artist_list' %}" class="btn btn-outline-secondary" style="color: #fff; border-color: #fff;">더보기</a>
+                </div>
+                <div class="subscribed_artists_table">
+                    <div class="subscribed_artists_table_body">
+                        {% if subscribed_artists %}
+                            {% for artist in subscribed_artists %}
+                                <div class="subscribed_artists_table_row">
+                                    <div class="subscribed_artists_table_cell">
+                                        <a href="{% url 'artistapp:detail' artist.pk %}" style="text-decoration: none; color: #000;">{{ artist.title }}</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            {% for i in "12345678" %}
+                                {% if forloop.counter > subscribed_artists|length %}
+                                    <div class="subscribed_artists_table_row">
+                                        <div class="subscribed_artists_table_cell">
+                                            &nbsp;
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% for i in "123" %}
+                                <div class="subscribed_artists_table_row">
+                                    <div class="subscribed_artists_table_cell">
+                                        &nbsp;
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <div class="subscribed_artists_table_row">
+                                <div class="subscribed_artists_table_cell" style="text-align: center; color: #444;">
+                                    구독 아티스트가 존재하지 않습니다
+                                </div>
+                            </div>
+                            <div class="subscribed_artists_table_row">
+                                <div class="subscribed_artists_table_cell" style="text-align: center; color: #444;">
+                                    아티스트를 구독하시면 다양한 정보를 받을 수 있습니다
+                                </div>
+                            </div>
+                            {% for i in "123" %}
+                                <div class="subscribed_artists_table_row">
+                                    <div class="subscribed_artists_table_cell">
+                                        &nbsp;
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="subscribed_artists_head">
+                    <h3>구독목록</h3>
+                    <a class="loginButton btn btn-outline-secondary" style="color: #fff; border-color: #fff;" href="#">더보기</a>
+                </div>
+                <div style="text-align: center; padding: 20px; margin-top:90px;">
+                    <a class="loginButton btn btn-dark rounded-pill col-6 mt-3 mb-3 px-3" href="#">로그인</a>
+                    <h6 style="text-align: center; color: #444;">로그인이 하시면 더 많은</h6>
+                    <h6 style="text-align: center; color: #444;">기능을 이용할 수 있습니다</h6>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div style="text-align: center">
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'artistapp:create' %}" class="btn btn-dark rounded-pill col-6 mt-3 mb-3 px-3">
+        아티스트 추가하기
+    </a>
+    {% else %}
+    <a class="loginButton btn btn-dark rounded-pill col-6 mt-3 mb-3 px-3" href="#">
+        아티스트 추가하기
+    </a>
+    {% endif %}
+</div>
+
+<script src="{% static 'js/magicgrid.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const switchButtons = document.querySelectorAll('.switch-button');
+    const tables = {
+        major: document.getElementById('first_rank_table'),
+        pop: document.getElementById('second_rank_table'),
+        artist: document.getElementById('third_rank_table')
+    };
+
+    function showTable(target) {
+        for (const key in tables) {
+            if (tables.hasOwnProperty(key)) {
+                tables[key].style.display = key === target ? 'block' : 'none';
+            }
+        }
+    }
+
+    switchButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            switchButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            const target = this.getAttribute('data-target');
+            showTable(target);
+        });
+    });
+
+    // Initially show only the first table
+    showTable('major');
+});
+</script>
+{% endblock %}

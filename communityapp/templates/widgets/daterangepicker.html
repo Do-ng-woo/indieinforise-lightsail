@@ -1,0 +1,43 @@
+{% include "django/forms/widgets/input.html" %}
+
+<style>
+    /* 기존 스타일 정의 */
+    .container {
+        margin: 0 auto;
+        padding: 0;
+        /* ... */
+    }
+
+    /* id_date_range에 대한 스타일 추가 */
+    #id_date_range {
+        color: black; /* 텍스트 색상 변경 */
+        display: block; /* 필요한 경우 다른 스타일 속성 추가 */
+        /* 여기에 추가적인 스타일 속성을 정의할 수 있습니다 */
+    }
+
+    /* 기타 스타일 정의 */
+    .search-form {
+        /* ... */
+    }
+    /* ... */
+</style>
+
+<script>
+$(document).ready(function() {
+    $('#id_date_range').daterangepicker({
+        locale: {
+            format: "YYYY-MM-DD",
+            separator: " ~ ",
+            // ... 추가적인 로케일 설정 ...
+        },
+            // 기본값: 이번 달의 종료 날짜
+        drops: "auto",
+    }, function(start, end, label) {
+        var formattedDate = start.format("YYYY-MM-DD") + " ~ " + end.format("YYYY-MM-DD");
+        $('#id_date_range').val(formattedDate);
+
+        // 입력 필드에 대한 변경 사항을 명시적으로 트리거합니다.
+        $('#id_date_range').trigger('change');
+    });
+});
+</script>

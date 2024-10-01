@@ -1,0 +1,554 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .entire_container {
+        display: flex; /* Flex 컨테이너 설정 */
+        justify-content: space-between; /* 자식 요소를 가운데 정렬 */
+        align-items: flex-start; /* 세로 축에서 상단 정렬 */
+        width: 70%; /* 전체 너비 */
+        margin: auto; /* 자동 마진으로 중앙 정렬 */
+    } 
+    .illust_container {
+        width: 900px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 20px;
+    }
+    .form_container{
+        width: 40%;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 10px;
+    }
+    .controls {
+        margin-left: 20px;
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .controls label {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+    .controls select {
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+    .resize-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+    .resize-buttons button {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .resize-buttons button:hover {
+        background-color: #0056b3;
+    }
+    .stage { 
+        position: relative; 
+        width: 800px; 
+        height: 600px; 
+        border: 1px solid #ccc; 
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 0;
+    }
+
+    .background-image {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1; /* 다른 요소들보다 뒤에 위치 */
+    }
+    .small-element { 
+        position: absolute; 
+        width:100px;
+        height:100px;
+        z-index: 1;
+    }
+    .background-element {
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+    .small-element {
+        z-index: 2;
+    }
+    .update_buttons{
+        display: flex; /* Flex 컨테이너 설정 */
+        justify-content: space-between; /* 자식 요소를 가운데 정렬 */
+        align-items: flex-start; /* 세로 축에서 상단 정렬 */
+        width: 70%; /* 전체 너비 */
+        margin: auto; /* 자동 마진으로 중앙 정렬 */
+    }
+    .save_btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        background-color: #28a745;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+    }
+    .save_btn:hover {
+        background-color: #218838;
+    }
+    .delete_btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        background-color: #c70202;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+    }
+    .delete_btn:hover {
+        background-color: #9e0202;
+    }
+    /* ================== 삭제 모달 시작 ==================*/
+    .modal {
+        display: none; /* 기본적으로 모달을 숨깁니다. */
+        position: fixed; /* 화면에 고정됩니다. */
+        z-index: 1000; /* 앞에 위치합니다. */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5); /* 배경을 어둡게 합니다. */
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 화면 가운데에 배치합니다. */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 8px;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    /* ==================모달 스타일 끝============== */
+</style>
+<h1 style="text-align: center; margin-bottom: 20px;">나만의 공연장 수정하기</h1>
+<div class="entire_container">
+    <div class="illust_container">
+        <div class="stage" id="stage">
+            <img src="{{ myshow.background.image.url }}" class="background-image" alt="Background">
+            {% if myshow.singer %}
+                <img src="{{ myshow.singer.image.url }}" class="small-element" id="singer-element" alt="{{ myshow.singer.name }}">
+            {% endif %}
+            {% if myshow.guitarist %}
+                <img src="{{ myshow.guitarist.image.url }}" class="small-element" id="guitarist-element" alt="{{ myshow.guitarist.name }}">
+            {% endif %}
+            {% if myshow.bassist %}
+                <img src="{{ myshow.bassist.image.url }}" class="small-element" id="bassist-element" alt="{{ myshow.bassist.name }}">
+            {% endif %}
+            {% if myshow.drummer %}
+                <img src="{{ myshow.drummer.image.url }}" class="small-element" id="drummer-element" alt="{{ myshow.drummer.name }}">
+            {% endif %}
+            {% if myshow.keyboardist %}
+                <img src="{{ myshow.keyboardist.image.url }}" class="small-element" id="keyboardist-element" alt="{{ myshow.keyboardist.name }}">
+            {% endif %}
+            {% if myshow.audience %}
+                <img src="{{ myshow.audience.image.url }}" class="small-element" id="audience-element" alt="{{ myshow.audience.name }}">
+            {% endif %}
+            {% if myshow.lighting %}
+                <img src="{{ myshow.lighting.image.url }}" class="small-element" id="lighting-element" alt="{{ myshow.lighting.name }}">
+            {% endif %}
+        </div>
+    </div>
+    <div class="form_container">
+        <form id="show-form" method="post">
+            {% csrf_token %}
+            {{ form.positions }}
+            {{ form.sizes }}
+            {{ form.z_indices }}
+            <div class="controls">
+                <div>
+                    <label for="{{ form.background.id_for_label }}">Background:</label>
+                    <select id="id_background" name="background">
+                        <option value="">선택 안함</option> <!-- 선택 안함 옵션 추가 -->
+                        {% for background in backgrounds %}
+                            <option value="{{ background.id }}" data-img-url="{{ background.image.url }}" {% if background.id == selected_background %}selected{% endif %}>{{ background.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% if performance_points >= 1 %}
+                <div>
+                    <label for="{{ form.singer.id_for_label }}">Singer:</label>
+                    <select id="id_singer" name="singer">
+                        <option value="">선택 안함</option>
+                        {% for singer in singers %}
+                            <option value="{{ singer.id }}" data-img-url="{{ singer.image.url }}" {% if singer.id == selected_singer %}selected{% endif %}>{{ singer.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="resize-buttons">
+                        <button type="button" class="resize-btn" data-target="singer-element" data-action="increase">+</button>
+                        <button type="button" class="resize-btn" data-target="singer-element" data-action="decrease">-</button>
+                    </div>
+                </div>
+                {% endif %}
+                {% if performance_points >= 3 %}
+                <div>
+                    <label for="{{ form.guitarist.id_for_label }}">Guitarist:</label>
+                    <select id="id_guitarist" name="guitarist">
+                        <option value="">선택 안함</option>
+                        {% for guitarist in guitarists %}
+                            <option value="{{ guitarist.id }}" data-img-url="{{ guitarist.image.url }}"{% if guitarist.id == selected_guitarist %}selected{% endif %}>{{ guitarist.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="resize-buttons">
+                        <button type="button" class="resize-btn" data-target="guitarist-element" data-action="increase">+</button>
+                        <button type="button" class="resize-btn" data-target="guitarist-element" data-action="decrease">-</button>
+                    </div>
+                </div>
+                {% endif %}
+                {% if performance_points >= 5 %}
+                <div>
+                    <label for="{{ form.bassist.id_for_label }}">Bassist:</label>
+                    <select id="id_bassist" name="bassist">
+                        <option value="">선택 안함</option>
+                        {% for bassist in bassists %}
+                            <option value="{{ bassist.id }}" data-img-url="{{ bassist.image.url }}" {% if bassist.id == selected_bassist %}selected{% endif %}>{{ bassist.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="resize-buttons">
+                        <button type="button" class="resize-btn" data-target="bassist-element" data-action="increase">+</button>
+                        <button type="button" class="resize-btn" data-target="bassist-element" data-action="decrease">-</button>
+                    </div>
+                </div>
+                {% endif %}
+                {% if performance_points >= 7 %}
+                <div>
+                    <label for="{{ form.drummer.id_for_label }}">Drummer:</label>
+                    <select id="id_drummer" name="drummer">
+                        <option value="">선택 안함</option>
+                        {% for drummer in drummers %}
+                            <option value="{{ drummer.id }}" data-img-url="{{ drummer.image.url }}" {% if drummer.id == selected_drummer %}selected{% endif %}>{{ drummer.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="resize-buttons">
+                        <button type="button" class="resize-btn" data-target="drummer-element" data-action="increase">+</button>
+                        <button type="button" class="resize-btn" data-target="drummer-element" data-action="decrease">-</button>
+                    </div>
+                </div>
+                {% endif %}
+                {% if performance_points >= 9 %}
+                <div>
+                    <label for="{{ form.keyboardist.id_for_label }}">Keyboardist:</label>
+                    <select id="id_keyboardist" name="keyboardist">
+                        <option value="">선택 안함</option>
+                        {% for keyboardist in keyboardists %}
+                            <option value="{{ keyboardist.id }}" data-img-url="{{ keyboardist.image.url }}" {% if keyboardist.id == selected_keyboardist %}selected{% endif %}>{{ keyboardist.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="resize-buttons">
+                        <button type="button" class="resize-btn" data-target="keyboardist-element" data-action="increase">+</button>
+                        <button type="button" class="resize-btn" data-target="keyboardist-element" data-action="decrease">-</button>
+                    </div>
+                </div>
+                {% endif %}
+                {% if performance_points >= 20 %}
+                <div>
+                    <label for="{{ form.audience.id_for_label }}">Audience:</label>
+                    <select id="id_audience" name="audience">
+                        <option value="">선택 안함</option> <!-- 선택 안함 옵션 추가 -->
+                        {% for audience in audiences %}
+                            <option value="{{ audience.id }}" data-img-url="{{ audience.image.url }}" {% if audience.id == selected_audience %}selected{% endif %}>{{ audience.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="resize-buttons">
+                        <button type="button" class="resize-btn" data-target="audience-element" data-action="increase">+</button>
+                        <button type="button" class="resize-btn" data-target="audience-element" data-action="decrease">-</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="{{ form.lighting.id_for_label }}">Lighting:</label>
+                    <select id="id_lighting" name="lighting">
+                        <option value="">선택 안함</option> <!-- 선택 안함 옵션 추가 -->
+                        {% for lighting in lightings %}
+                            <option value="{{ lighting.id }}" data-img-url="{{ lighting.image.url }}" {% if lighting.id == selected_lighting %}selected{% endif %}>{{ lighting.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="resize-buttons">
+                        <button type="button" class="resize-btn" data-target="lighting-element" data-action="increase">+</button>
+                        <button type="button" class="resize-btn" data-target="lighting-element" data-action="decrease">-</button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="update_buttons">
+                <button class="save_btn" type="submit">저장</button>
+                <a href="#" id="deleteBtn" class="delete_btn">삭제</a>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- 삭제 확인 모달 -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>정말로 이 일러스트를 삭제하시겠습니까?</p>
+        <form method="post" action="{% url 'myshowapp:delete_myshow_illust' %}" style="display: flex; justify-content: space-between;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">삭제</button>
+            <button type="button" class="btn btn-secondary" id="cancelBtn">취소</button>
+        </form>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<script>
+
+$(document).ready(function() {
+    // 초기 데이터 로드
+    var positions = {{ positions|safe }};
+    var sizes = {{ sizes|safe }};
+    var z_indices = {{ z_indices|safe }};
+    let highestZIndex = Math.max(...Object.values(z_indices).map(Number)) || 0;
+
+    // 1. 초기 위치, 크기, z-index 설정
+    for (var id in positions) {
+        console.log(`Setting initial properties for ${id}`);
+        $('#' + id).css({
+            left: positions[id].left,
+            top: positions[id].top,
+            width: sizes[id] ? sizes[id].width : '100px',
+            height: sizes[id] ? sizes[id].height : '100px',
+            zIndex: z_indices[id] ? z_indices[id] : ++highestZIndex
+        }).draggable({
+            containment: "#stage",
+            start: function() {
+                this.style.zIndex = ++highestZIndex; // 드래그 시작 시 가장 높은 z-index 할당
+            },
+            stop: function() {
+                updatePositionsAndZIndices();
+            }
+        });
+        console.log(`${id} - left: ${positions[id].left}, top: ${positions[id].top}, width: ${sizes[id] ? sizes[id].width : '100px'}, height: ${sizes[id] ? sizes[id].height : '100px'}, zIndex: ${z_indices[id] ? z_indices[id] : highestZIndex}`);
+    }
+
+    console.log("Initial Positions:", positions);
+    console.log("Initial Sizes:", sizes);
+    console.log("Initial Z-indices:", z_indices);
+
+    // 2. 데이터를 hidden 필드에 넣고 출력
+    document.getElementById('id_positions').value = JSON.stringify(positions);
+    document.getElementById('id_sizes').value = JSON.stringify(sizes);
+    document.getElementById('id_z_indices').value = JSON.stringify(z_indices);
+    console.log("Hidden Positions:", document.getElementById('id_positions').value);
+    console.log("Hidden Sizes:", document.getElementById('id_sizes').value);
+    console.log("Hidden Z-indices:", document.getElementById('id_z_indices').value);
+
+    // 3. 각 select 요소에 이벤트 리스너 추가
+    const elementMapping = {
+        'id_background': 'background-element',
+        'id_singer': 'singer-element',
+        'id_guitarist': 'guitarist-element',
+        'id_bassist': 'bassist-element',
+        'id_drummer': 'drummer-element',
+        'id_keyboardist': 'keyboardist-element',
+        'id_audience': 'audience-element',
+        'id_lighting': 'lighting-element'
+    };
+
+    Object.keys(elementMapping).forEach(selectId => {
+        const selectElement = document.getElementById(selectId);
+        if (selectElement) {
+            selectElement.addEventListener('change', function() {
+                const elementId = elementMapping[selectId];
+                const imageUrl = this.options[this.selectedIndex].getAttribute('data-img-url');
+                let imgElement = document.getElementById(elementId);
+
+                if (this.value === "") {
+                    // 선택 안함이 선택된 경우
+                    if (imgElement) {
+                        imgElement.remove();
+                    }
+                    return;
+                }
+
+                if (!imgElement) {
+                    // 이미지 요소가 없을 경우 생성
+                    imgElement = document.createElement('img');
+                    imgElement.id = elementId;
+                    imgElement.classList.add('element');
+                    if (selectId === 'id_background') {
+                        imgElement.classList.add('background-element');
+                        imgElement.style.zIndex = 0; // 배경은 항상 가장 아래
+                    } else {
+                        imgElement.classList.add('small-element');
+                        imgElement.style.position = 'absolute';
+                        imgElement.style.left = '0px';
+                        imgElement.style.top = '0px';
+                        imgElement.style.zIndex = ++highestZIndex; // 새로운 요소에 가장 높은 z-index 할당
+                        $(imgElement).draggable({
+                            containment: "#stage",
+                            start: function() {
+                                this.style.zIndex = ++highestZIndex; // 드래그 시작 시 가장 높은 z-index 할당
+                            },
+                            stop: function() {
+                                updatePositionsAndZIndices();
+                            }
+                        });
+                    }
+                    document.getElementById('stage').appendChild(imgElement);
+
+                    // 배경을 제외한 요소가 추가된 경우 크기 조절 버튼 클릭
+                    if (selectId !== 'id_background') {
+                        document.querySelector(`.resize-btn[data-target="${elementId}"][data-action="increase"]`).click();
+                        document.querySelector(`.resize-btn[data-target="${elementId}"][data-action="decrease"]`).click();
+                    }
+                }
+                imgElement.src = imageUrl;
+                if (selectId === 'id_background') {
+                    imgElement.style.zIndex = 0;
+                } else {
+                    imgElement.style.zIndex = ++highestZIndex;
+                }
+            });
+        }
+    });
+
+
+
+    // 5. 이미지 크기 조절
+    document.querySelectorAll('.resize-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const action = this.getAttribute('data-action');
+            const imgElement = document.getElementById(targetId);
+            if (imgElement) {
+                let width = parseFloat(imgElement.style.width) || imgElement.getBoundingClientRect().width;
+                let height = parseFloat(imgElement.style.height) || imgElement.getBoundingClientRect().height;
+                if (action === 'increase') {
+                    width += 10;
+                    height += 10;
+                } else if (action === 'decrease') {
+                    width -= 10;
+                    height -= 10;
+                }
+                imgElement.style.width = width + 'px';
+                imgElement.style.height = height + 'px';
+                console.log(`Resized ${targetId} to ${width}px by ${height}px`);
+                updateSizes(); // 크기 업데이트
+            }
+        });
+    });
+
+    // 6. small-element 드래그 설정
+    $('.small-element').draggable({
+        containment: "#stage",
+        start: function() {
+            this.style.zIndex = ++highestZIndex; // 드래그 시작 시 가장 높은 z-index 할당
+        },
+        stop: function() {
+            updatePositionsAndZIndices(); // 위치와 z-index 업데이트
+        }
+    });
+
+    // 7. small-element 드래그 멈춤 시 위치 업데이트
+    function updatePositionsAndZIndices() {
+        const elements = document.querySelectorAll('.small-element');
+        const updatedPositions = JSON.parse(document.getElementById('id_positions').value || '{}');
+        const updatedZIndices = JSON.parse(document.getElementById('id_z_indices').value || '{}');
+
+        elements.forEach(element => {
+            updatedPositions[element.id] = {
+                left: element.style.left,
+                top: element.style.top
+            };
+            updatedZIndices[element.id] = window.getComputedStyle(element).zIndex;
+        });
+
+        console.log("Updated Positions:", updatedPositions);
+        console.log("Updated Z-indices:", updatedZIndices);
+        document.getElementById('id_positions').value = JSON.stringify(updatedPositions); // 폼의 히든 필드 업데이트
+        document.getElementById('id_z_indices').value = JSON.stringify(updatedZIndices); // 폼의 히든 필드 업데이트
+    }
+
+    // 8. 크기 업데이트 함수
+    function updateSizes() {
+        const elements = document.querySelectorAll('.small-element');
+        const updatedSizes = JSON.parse(document.getElementById('id_sizes').value || '{}');
+
+        elements.forEach(element => {
+            updatedSizes[element.id] = {
+                width: element.getBoundingClientRect().width + 'px',
+                height: element.getBoundingClientRect().height + 'px'
+            };
+        });
+
+        console.log("Updated Sizes:", updatedSizes);
+        document.getElementById('id_sizes').value = JSON.stringify(updatedSizes); // 폼의 히든 필드 업데이트
+    }
+
+    // 폼 제출 시 위치, 크기, z-index 데이터를 히든 필드에 저장
+    document.querySelector('form').addEventListener('submit', function() {
+        updatePositionsAndZIndices();
+        updateSizes();
+    });
+});
+</script>
+<script>
+    // 모달 열기
+    document.getElementById('deleteBtn').onclick = function() {
+        document.getElementById('deleteModal').style.display = 'block';
+    };
+
+    // 모달 닫기
+    document.querySelector('.close').onclick = function() {
+        document.getElementById('deleteModal').style.display = 'none';
+    };
+
+    document.getElementById('cancelBtn').onclick = function() {
+        document.getElementById('deleteModal').style.display = 'none';
+    };
+
+    // 모달 외부 클릭 시 닫기
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('deleteModal')) {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+    };
+</script>
+
+
+
+{% endblock %}

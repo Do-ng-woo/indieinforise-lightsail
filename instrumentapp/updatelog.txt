@@ -1,0 +1,12 @@
+1. 앱 복사
+2. 앱 내 이름 변경
+3. settings에 앱 추가
+4. 마이그레이션 삭제
+5.마이그레이션 생성 및 적용
+6.메인 urls 에 추가
+7.템플릿 파일 내 이름들 변경
+8.스니펫에 card_instrument 추가 
+9.detailview 수정(구독기능 등 삭제) 
+10커뮤니티 모델에 instrument 추가
+11. instrument_like 삭제
+12.header에 링크 추가

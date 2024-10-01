@@ -1,0 +1,478 @@
+<style>
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden; /* 수평 스크롤을 숨김 */
+}
+a {
+    text-decoration: none; /* 모든 링크에서 밑줄 제거 */
+    color: #000; /* 기본 링크 색상 설정, 필요에 따라 조정 */
+}
+/* 모바일 헤더 스타일 */
+.mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #333;
+  color: white;
+  padding: 1rem;
+}
+
+/* 오프캔버스 메뉴 스타일 */
+.off-canvas-menu {
+  position: fixed;
+  top: 0; /* 메뉴가 화면 상단에서 시작하도록 설정 */
+  left: -70%; /* 메뉴가 보이지 않도록 왼쪽으로 숨김 */
+  width: 70%;
+  height: 100%;
+  background: #444;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  transition: left 0.3s;
+  z-index: 1500; /* z-index가 헤더보다 높도록 설정하여 헤더 위에 표시됨 */
+  padding-top: 0; /* 이전에 60px로 설정되어 있던 것을 제거함 */
+}
+
+/* 오프캔버스 메뉴 링크 스타일 */
+.off-canvas-menu a {
+  padding: 8px 15px;
+  text-decoration: none;
+  font-size: 25px;
+  color: white;
+  display: block;
+  transition: 0.3s;
+}
+
+/* 오프캔버스 메뉴 활성화 스타일 */
+.off-canvas-menu.active {
+  left: 0; /* 메뉴를 화면에 표시 */
+}
+.brand-name {
+  font-family: 'Lobster', cursive;
+  color:#fff;
+  width:auto;
+  /* 추가 스타일 */
+}
+.brand-name a{
+    text-decoration: none; /* 기본 상태에서 밑줄 제거 */
+    color:#fff;
+    display: block; /* 링크를 블록 요소로 만들어 너비 전체에 걸쳐 확장 */
+    width:auto;
+}
+.offCanvasMenu_top{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #333;
+    color: white;
+    padding: 1rem;
+}
+/* ---------------------- */
+.profile_menu-mobile{
+    padding:20px 40px;
+}
+.profile-top {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-image-mobile {
+    width: 80px; /* 또는 원하는 크기 */
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 10px; /* 이미지와 텍스트 사이의 간격 */
+}
+
+.profile-details-mobile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 세로 중앙 정렬 */
+}
+
+.profile-details-mobile h2, .profile-details-mobile h3 {
+    margin: 5px 30px;
+}
+
+.profile-details-mobile h2 {
+    font-size: 18px; /* 또는 원하는 크기 */
+    color: #fff;
+}
+
+.profile-details-mobile h3 {
+    font-size: 14px; /* 또는 원하는 크기 */
+    color: #ccc;
+}
+
+.profile-stats {
+    justify-content: space-around;
+    border-radius: 10px; /* 더 부드러운 모서리 */
+    margin-bottom: 10px;
+    background-color: #eee;
+}
+
+.profile-stats .info_level, .profile-stats .points, .profile-stats .comment_count, .profile-stats .post_count {
+    flex: 1;
+    padding: 5px;
+    text-align:left;
+    display: flex;
+    align-items: center; /* 아이콘과 텍스트를 중앙 정렬합니다 */
+    gap: 10px; /* 아이콘과 텍스트 사이에 간격을 줍니다 */
+}
+
+    
+.profile-links-mobile{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0 10px;
+}
+.profile-links-mobile a {
+    display: block;
+    color: #ccc;
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: color 0.3s;
+    font-size:13px;
+    min-width:80px;
+    padding:8px 4px;
+}
+
+.profile-links-mobile a:hover {
+    color: #000;
+}
+
+/*--------------------- 아코디언 메뉴 스타일 -------------------*/
+.accordion-menu {
+  background: #444;
+  color: white;
+  padding: 1rem;
+  cursor: pointer;
+}
+
+.accordion-content {
+  display: none;
+  background: #555;
+  color: white;
+  overflow: hidden;
+}
+.accordion-content a{
+    font-size:13px;
+}
+.accordion-toggle:after {
+  content: '\02795'; /* 유니코드 문자 'V' */
+  font-size: 13px;
+  color: white;
+  float: right;
+}
+
+.accordion-toggle.active:after {
+  content: "\2796"; /* 유니코드 문자 'X' */
+}
+/* ------------검색 오버레이----------- */
+.search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.search-box {
+    position: relative; /* 상대 위치 설정 */
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.close-button {
+    position: absolute; /* 절대 위치 설정 */
+    top: 10px; /* 위쪽에서 10px */
+    right: 10px; /* 오른쪽에서 10px */
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.search-box input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+.search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.search-box {
+    position: relative; /* 상대 위치 설정 */
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.search-close-button {
+    position: absolute; /* 절대 위치 설정 */
+    top: 10px; /* 위쪽에서 10px */
+    right: 10px; /* 오른쪽에서 10px */
+    background: none;
+    border: none;
+    color: #000;
+    cursor: pointer;
+}
+
+
+.search-box form {
+    display: flex;
+    flex-direction: column; /* 입력 필드와 버튼을 수직으로 정렬 */
+    align-items: center; /* 중앙 정렬 */
+    width: 100%; /* 폼 너비를 상자 너비에 맞춤 */
+}
+
+
+.search-box button.search_input {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s; /* 부드러운 색상 변화 */
+}
+
+.search-box button.search_input:hover {
+    background-color: #0056b3; /* 버튼 호버 시 색상 변경 */
+}
+
+
+/* --------------- */
+@media (max-width: 650px) {}
+/*--------------------- 500px  언더 ------------------------------*/
+@media (max-width: 500px) {
+    .profile_menu-mobile{
+        padding:20px 10px;
+    }
+    .profile-image-mobile {
+        width: 50px; /* 또는 원하는 크기 */
+        height: 50px;
+        border-radius: 50%;
+        margin-left:15px;
+        margin-right: 6px; /* 이미지와 텍스트 사이의 간격 */
+    }
+    .profile-details-mobile h2 {
+        font-size: 15px; /* 또는 원하는 크기 */
+        color: #fff;
+    }
+    .profile-links-mobile a {
+        font-size:13px;
+        min-width:80px;
+        padding:8px 4px;
+    }
+    .brand-name {
+      width:auto;
+      margin-right:40px;
+      /* 추가 스타일 */
+    }
+
+}
+</style>
+{% load static %}
+
+<div class="mobile-header mobile_full_header">
+    <span id="menuButton" class="material-icons">menu</span>
+    <div class="brand-name">
+        <a href="{% url 'homepageapp:main' %}"><h1>INDIEBOOST</h1></a>
+    </div>
+    <div class="search_button">
+        <span class="material-icons">search</span>
+    </div>
+  <!-- 로고나 브랜드명을 여기에 추가할 수 있습니다 -->
+</div>
+
+<!-- 오프캔버스 메뉴 -->
+<nav id="offCanvasMenu" class="off-canvas-menu">
+    <div class="offCanvasMenu_top" >
+        <span id="closeMenuButton" class="material-icons">menu</span>
+    </div>
+    <div class="profile_menu-mobile">
+        {% if user.is_authenticated %}
+        <div class="profile-top">
+            <img src="{{ user.image.url }}" alt="Profile Image" class="profile-image-mobile"/>
+            <div class="profile-details-mobile">
+                <h2>{{ user.username }}</h2>
+                <h3>{{ user.nickname }}</h3>
+            </div>
+        </div>
+        <div class="profile-stats">
+           <div class="info_level">
+                <span class="material-icons">grade</span><span>정보레벨:{{ user.level }}</span>
+            </div>
+            <div class="points">
+                <span class="material-icons">paid</span><span>포인트:{{ user.points }}</span>
+            </div>
+            <div class="post_count">
+                <span class="material-icons">notes</span><span>작성한글:{{ user.post_count }} </span>
+            </div>
+            <div class="comment_count">
+                <span class="material-icons">chat</span><span>댓글수:{{ user.comment_count }}</span>
+            </div>
+        </div>
+        <div class="profile-links-mobile">
+            <a href="{% url 'accountapp:detail' pk=user.pk %}">마이페이지</a>
+            <a href="{% url 'subscribeapp:Artist_list' %}">내 구독 관리</a>
+            <a href="{% url 'accountapp:logout' %}?next={{ request.path }}">Log Out</a>
+        </div>
+        {% else %}
+        <div class="profile-top">
+            <img src="{% static 'defalut_image/default_profile.jpg' %}" alt="Default Profile Image" class="profile-image"/>
+            <div class="profile-details-mobile">
+                <h2>로그인이</h2>
+                <h2>필요합니다</h2>
+            </div>
+        </div>
+        <div class="profile-links-mobile">
+            <a class="loginButton" href="{% url 'accountapp:login' %}?next={{ request.path }}" >로그인</a>
+            <a href="{% url 'accountapp:create' %}">회원가입</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="menu_content">
+        <div class="accordion-menu accordion-toggle" data-accordion="articles-dropdown">Articles</div>
+        <div class="accordion-content" id="articles-dropdown">
+            <a href="{% url 'articleapp:list' %}">Articles</a>
+            <a href="{% url 'subscribeapp:C_list' %}">구독 게시물</a>
+            <a href="{% url 'articleapp:calendar' %}">공연달력</a>
+        </div>
+        <div class="accordion-menu accordion-toggle" data-accordion="stage-dropdown">Stage</div>
+        <div class="accordion-content" id="stage-dropdown">
+            <a href="{% url 'projectapp:list' %}" >Stage</a>
+            <a href="{% url 'projectapp:list' %}">라이브공연장</a>
+            <a href="{% url 'projectapp:list' %}">대관전문공연</a>
+            <a href="{% url 'subscribeapp:Project_list' %}">구독 공연장</a>
+        </div>
+        <div class="accordion-menu accordion-toggle" data-accordion="artist-dropdown">Artist</div>
+        <div class="accordion-content" id="artist-dropdown">
+            <a href="{% url 'artistapp:list' %}" >Artist</a>
+            <a href="{% url 'artistapp:list' %}">국내아티스트</a>
+            <a href="{% url 'artistapp:list' %}">해외아티스트</a>
+            <a href="{% url 'artistapp:list' %}">구독아티스트</a>
+
+        </div>
+        <div class="accordion-menu accordion-toggle" data-accordion="archive-dropdown">archive</div>
+        <div class="accordion-content" id="archive-dropdown">
+            <a href="{% url 'personapp:list' %}">인물</a> 
+            <a href="{% url 'singapp:list' %}">노래</a>
+            <a href="{% url 'albumapp:list' %}">앨범</a>
+            <a href="{% url 'genreapp:list' %}">장르</a>
+            <a href="{% url 'instrumentapp:list' %}">악기</a>
+        </div>
+        <div class="accordion-menu accordion-toggle" data-accordion="community-dropdown">Community</div>
+        <div class="accordion-content" id="community-dropdown">
+            <a href="{% url 'communityapp:list' %}" >Community</a>
+            <a href="{% url 'communityapp:list' %}">자유게시판</a>
+        </div>
+        <div class="accordion-menu accordion-toggle" data-accordion="myshow-dropdown">Myshow</div>
+        <div class="accordion-content" id="myshow-dropdown">
+            <a href="{% url 'myshowapp:card_list' %}" >Myshow</a>
+            <a href="{% url 'myshowapp:card_list' %}" >내 공연</a>
+        </div>
+    </div>
+</nav>
+
+<div class="search-overlay" style="display:none;">
+    <div class="search-box">
+        <!-- 닫기 버튼 -->
+        <button class="search-close-button" onclick="closeSearch()">
+            <span class="material-icons">close</span>
+        </button>
+        <h4>통합검색</h4>
+        <!-- 검색 폼 -->
+        <form class="mobile-search-form" action="{% url 'searchapp:search' %}" method="get" id="mobilesearchForm">
+            <input type="text" name="q" placeholder="검색어를 입력해주세요" id="mobilesearchInput">
+                <button class="search_input"type="submit">검색</button>
+        </form>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const offCanvasMenu = document.getElementById('offCanvasMenu');
+
+    // 메뉴 버튼 클릭 시 오프캔버스 메뉴 활성화
+    document.getElementById('menuButton').addEventListener('click', function(event) {
+        offCanvasMenu.classList.add('active');
+        event.stopPropagation(); // 이벤트 버블링 방지
+    });
+
+    // 메뉴 닫기 버튼 클릭 시 오프캔버스 메뉴 비활성화
+    document.getElementById('closeMenuButton').addEventListener('click', function() {
+        offCanvasMenu.classList.remove('active');
+    });
+
+    // 외부 클릭 감지
+    document.addEventListener('click', function(event) {
+        // 메뉴 내부 클릭이 아니고, 메뉴가 활성화된 경우에만 동작
+        if (!offCanvasMenu.contains(event.target) && offCanvasMenu.classList.contains('active')) {
+            offCanvasMenu.classList.remove('active');
+            event.preventDefault(); // 기본 동작 방지
+            event.stopPropagation(); // 이벤트 버블링 방지
+        }
+    });
+
+    // 아코디언 메뉴 토글 동작
+    document.querySelectorAll('.accordion-toggle').forEach(function(item) {
+        item.addEventListener('click', function(event) {
+            const targetId = this.getAttribute('data-accordion');
+            const content = document.getElementById(targetId);
+            this.classList.toggle('active');
+            content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+            event.stopPropagation(); // 메뉴 내 클릭이 외부로 전파되지 않도록
+        });
+    });
+});
+</script>
+<script>
+document.querySelector('.search_button').addEventListener('click', function() {
+    document.querySelector('.search-overlay').style.display = 'flex';
+});
+
+function closeSearch() {
+    document.querySelector('.search-overlay').style.display = 'none';
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchForm = document.getElementById('mobilesearchForm');  // 폼 ID
+    const searchText = document.getElementById('mobilesearchInput'); // 입력 필드 ID
+
+    searchForm.addEventListener('submit', function(event) {
+        if (searchText.value.length < 2) {
+            alert('두 글자 이상 입력해주세요.'); // 경고 메시지
+            event.preventDefault();  // 폼 제출 차단
+        }
+    });
+});
+</script>

@@ -1,0 +1,150 @@
+1. 리스트 순위 생성
+가중치를 합한 검색방식을 사용하지 않고 다른 방식으로 가중치를 사용할건데 리스트를 만들거야 
+
+title_scores의 유사도가 0.7 이상인것을 리스트에 1순위로 넣고 
+combined_text_scores의 유사도가 0.8이상인것을 리스트에 2순위로 넣고
+content_scores의 유사도가 0.9 이상인것을 리스트에 3순위로 넣고 
+title_scores의 유사도가 0.7미만 0.6 이상인것을 4순위,
+combined_text_scores의 유사도가 0.8미만 0.7 이상인것을 5순위,
+content_scores의 유사도가 0.9미만 0.8 이상인것을 6순위,
+
+로 리스트에 쭉 넣어서 순서대로 반환하면 현재의 문제를 해결할 수 있지 않을까?
+
+이런 방식을 임베딩 검색에서 사용해? 사용한다면 이름이 뭐야?
+
+
+
+def search_performances(request):
+    query = request.GET.get('q')
+    results = []
+    
+    if query:
+        # 검색어 임베딩
+        query_embedding = model.encode(query)
+        
+        # 모든 임베딩 데이터 로드
+        articles = Article.objects.filter(title_embedding__isnull=False, content_embedding__isnull=False, combined_text_embedding__isnull=False)
+        title_embeddings = []
+        content_embeddings = []
+        combined_text_embeddings = []
+        article_list = []
+
+        for article in articles:
+            title_embedding = np.frombuffer(article.title_embedding, dtype=np.float32)
+            content_embedding = np.frombuffer(article.content_embedding, dtype=np.float32)
+            combined_text_embedding = np.frombuffer(article.combined_text_embedding, dtype=np.float32)
+            
+            title_embeddings.append(title_embedding)
+            content_embeddings.append(content_embedding)
+            combined_text_embeddings.append(combined_text_embedding)
+            article_list.append(article)
+        
+        title_embeddings = np.array(title_embeddings)
+        content_embeddings = np.array(content_embeddings)
+        combined_text_embeddings = np.array(combined_text_embeddings)
+        
+        # FAISS 인덱스 생성 및 검색
+        dimension = title_embeddings.shape[1]
+        index = faiss.IndexFlatL2(dimension)
+        index.add(title_embeddings)
+        
+        query_embedding = query_embedding.reshape(1, -1)
+        _, title_indices = index.search(query_embedding, len(article_list))
+        
+        title_scores = util.pytorch_cos_sim(query_embedding, title_embeddings).cpu().numpy().flatten()
+        content_scores = util.pytorch_cos_sim(query_embedding, content_embeddings).cpu().numpy().flatten()
+        combined_text_scores = util.pytorch_cos_sim(query_embedding, combined_text_embeddings).cpu().numpy().flatten()
+
+        # 리스트 순위 생성
+        priority_1 = [article_list[idx] for idx in np.argsort(-title_scores) if title_scores[idx] >= 0.3]
+        priority_2 = [article_list[idx] for idx in np.argsort(-combined_text_scores) if combined_text_scores[idx] >= 0.4]
+        priority_3 = [article_list[idx] for idx in np.argsort(-content_scores) if content_scores[idx] >= 0.5]
+        priority_4 = [article_list[idx] for idx in np.argsort(-title_scores) if 0.2 <= title_scores[idx] < 0.3]
+        priority_5 = [article_list[idx] for idx in np.argsort(-combined_text_scores) if 0.3 <= combined_text_scores[idx] < 0.4]
+        priority_6 = [article_list[idx] for idx in np.argsort(-content_scores) if 0.4 <= content_scores[idx] < 0.5]
+
+        # 리스트 합치기
+        results = priority_1 + priority_2 + priority_3 + priority_4 + priority_5 + priority_6
+
+        # 중복 제거 (set을 사용하여 중복 제거 후 순서 유지)
+        seen = set()
+        results = [x for x in results if not (x in seen or seen.add(x))]
+    
+    return render(request, 'myshowapp/search_result.html', {'results': results, 'query': query})
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+2. 필터링 기준은 같고 정렬 기준을 다르게 하기 
+
+from django.shortcuts import render
+from articleapp.models import Article
+from sentence_transformers import SentenceTransformer, util
+import numpy as np
+
+# 임베딩 모델 로드
+model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
+
+def search_performances(request):
+    query = request.GET.get('q')
+    results = []
+    
+    if query:
+        # 검색어 임베딩
+        query_embedding = model.encode(query)
+        
+        # 모든 임베딩 데이터 로드
+        articles = Article.objects.filter(title_embedding__isnull=False, content_embedding__isnull=False, combined_text_embedding__isnull=False)
+        title_embeddings = []
+        content_embeddings = []
+        combined_text_embeddings = []
+        article_list = []
+
+        for article in articles:
+            title_embedding = np.frombuffer(article.title_embedding, dtype=np.float32)
+            content_embedding = np.frombuffer(article.content_embedding, dtype=np.float32)
+            combined_text_embedding = np.frombuffer(article.combined_text_embedding, dtype=np.float32)
+            
+            title_embeddings.append(title_embedding)
+            content_embeddings.append(content_embedding)
+            combined_text_embeddings.append(combined_text_embedding)
+            article_list.append(article)
+        
+        title_embeddings = np.array(title_embeddings)
+        content_embeddings = np.array(content_embeddings)
+        combined_text_embeddings = np.array(combined_text_embeddings)
+        
+        # 유사도 계산
+        title_scores = util.pytorch_cos_sim(query_embedding, title_embeddings).cpu().numpy().flatten()
+        content_scores = util.pytorch_cos_sim(query_embedding, content_embeddings).cpu().numpy().flatten()
+        combined_text_scores = util.pytorch_cos_sim(query_embedding, combined_text_embeddings).cpu().numpy().flatten()
+
+        # 필터링 임계치 설정
+        title_threshold = 0.6
+        combined_text_threshold = 0.7
+        content_threshold = 0.8
+
+        # 필터링 및 중복 제거
+        filtered_indices = set(
+            np.where(title_scores >= title_threshold)[0].tolist() +
+            np.where(combined_text_scores >= combined_text_threshold)[0].tolist() +
+            np.where(content_scores >= content_threshold)[0].tolist()
+        )
+        
+        # 필터링된 기사 리스트
+        filtered_article_list = [article_list[idx] for idx in filtered_indices]
+        filtered_title_scores = title_scores[list(filtered_indices)]
+        filtered_combined_text_scores = combined_text_scores[list(filtered_indices)]
+        filtered_content_scores = content_scores[list(filtered_indices)]
+
+        # 가중치 적용
+        final_scores = (
+            filtered_title_scores * 3 +
+            filtered_combined_text_scores * 2 +
+            filtered_content_scores * 1
+        )
+
+        # 최종 정렬
+        sorted_indices = np.argsort(-final_scores)
+        results = [filtered_article_list[idx] for idx in sorted_indices]
+    
+    return render(request, 'myshowapp/search_result.html', {'results': results, 'query': query})

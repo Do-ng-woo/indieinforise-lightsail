@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.search-results-container {
+    max-width: 900px;
+    margin: 4rem auto;
+    text-align: center;
+}
+
+.search-results-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.search-form {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.search-input {
+    width: 70%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+.search-button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #0056b3;
+}
+
+.search-results-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    padding: 1rem 0;
+    cursor: pointer;
+}
+.search-result-item:hover {
+    background-color: #f0f0f0;
+}
+.result-image {
+    width: 120px;
+    height: auto;
+    margin-right: 1rem;
+}
+
+.result-info {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.result-title {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.result-details {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.result-action {
+    margin-right: 0.5rem;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.no-results {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #777;
+}
+</style>
+<div class="search-results-container">
+    <form method="get" action="{% url 'myshowapp:search_performances' %}" class="search-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="검색어 입력" class="search-input">
+        <button type="submit" class="search-button">검색</button>
+    </form>
+    {% if results %}
+        <ul class="search-results-list" id="results-list">
+            {% for article in results %}
+                <li class="search-result-item" data-url="{% url 'myshowapp:userperformance_create' pk=article.pk %}">
+                    <img src="{{ article.image.url }}" alt="{{ article.title }}" class="result-image">
+                    <div class="result-info">
+                        <h2 class="result-title">{{ article.title }}</h2>
+                        <p class="result-details">출연: 
+                            {% for artist in article.artist.all|slice:":10" %}
+                                {{ artist }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                            {% if article.artist.count > 10 %}
+                                외 {{ article.artist.count|add:"-10" }}명
+                            {% endif %}
+                        </p>
+                        <p class="result-details">
+                            {% if article.datetime %}
+                                날짜: {{ article.datetime|date:"Y-m-d H:i" }}
+                            {% else %}
+                                날짜: {{ article.date|date:"Y-m-d" }}
+                            {% endif %}
+                        </p>
+                        <p class="result-details">장소: 
+                            {% for project in article.project.all %}
+                                {{ project }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        {% if page_obj.has_next %}
+            <button id="load-more" class="search-button" data-next-page="{{ page_obj.next_page_number }}">더보기</button>
+        {% endif %}
+    {% else %}
+        <p class="no-results">검색 결과가 없습니다.</p>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchResultItems = document.querySelectorAll('.search-result-item');
+    searchResultItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const url = item.getAttribute('data-url');
+            window.location.href = url;
+        });
+    });
+
+    document.getElementById('load-more').addEventListener('click', function() {
+        const button = this;
+        const nextPage = button.getAttribute('data-next-page');
+        const query = "{{ query }}";
+        const url = `{% url 'myshowapp:search_performances' %}?q=${query}&page=${nextPage}`;
+        
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data, 'text/html');
+                const newResults = doc.getElementById('results-list').innerHTML;
+                document.getElementById('results-list').innerHTML += newResults;
+
+                const newButton = doc.getElementById('load-more');
+                if (newButton) {
+                    button.setAttribute('data-next-page', newButton.getAttribute('data-next-page'));
+                } else {
+                    button.remove();
+                }
+
+                // Add click event to newly added items
+                const newItems = doc.querySelectorAll('.search-result-item');
+                newItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const url = item.getAttribute('data-url');
+                        window.location.href = url;
+                    });
+                });
+            });
+    });
+});
+</script>
+{% endblock %}

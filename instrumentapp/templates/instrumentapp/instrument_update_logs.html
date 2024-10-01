@@ -1,0 +1,44 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+.update-log-box {
+    border: 1px solid #ccc; /* 경계선 */
+    padding: 10px; /* 안쪽 여백 */
+    margin-bottom: 10px; /* 박스 사이의 마진 */
+    border-radius: 5px; /* 경계선 둥글기 */
+    background-color: #f9f9f9; /* 배경색 */
+}
+    
+.back-to-article-btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    color: #fff;
+    background-color: #6e6767; /* 부트스트랩의 기본 파란색 */
+    border-radius: 0.25rem;
+    text-decoration: none; /* 밑줄 제거 */
+    transition: background-color 0.15s ease-in-out; /* 호버 효과 */
+    margin-bottom:1rem;
+}
+
+.back-to-article-btn:hover {
+    background-color: #ccc4c4; /* 호버 시 색상 변경 */
+}
+</style>
+<div style="max-width:100rem; margin: 4rem auto">
+    <h2>{{ instrument.title }}의 수정 이력</h2>  
+    <a href="{% url 'instrumentapp:detail' instrument.pk %}" class="back-to-article-btn">게시글로 돌아가기</a>
+
+    {% for log in update_logs %}
+    <div class="update-log-box">
+        <strong>수정자:</strong> {{ log.updated_by.username }} <br>
+        <strong>수정 시간:</strong> {{ log.updated_at|date:"Y-m-d H:i:s" }} <br>
+        <strong>설명:</strong> <br> {{ log.update_description|linebreaksbr }}
+    </div>
+    {% endfor %}
+    
+</div>
+
+
+{% endblock %}

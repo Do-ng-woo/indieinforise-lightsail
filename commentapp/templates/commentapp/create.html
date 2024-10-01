@@ -1,0 +1,50 @@
+{% load bootstrap4 %}
+
+{% block content %}
+<style>
+.comment-form {
+    box-sizing: border-box; /* 패딩과 테두리를 너비와 높이에 포함 */
+    width: 100%; /* 최대 너비 설정 */
+    max-width: none; /* 기본 최대 너비 제한 없애기 */
+    padding: 0; /* 필요에 따라 패딩 조정 */
+    margin: 0 auto; /* 중앙 정렬 유지 */
+}
+
+.comment-form {
+    width: 100%; /* 버튼의 너비를 폼에 맞춤 */
+    font-weight: bold; /* 버튼의 텍스트를 굵게 만듭니다 */
+}
+.submit-comment-container {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽으로 정렬 */
+    width: 100%; /* 컨테이너의 너비를 부모 요소와 동일하게 설정 */
+    margin-top: 1rem; /* 필요에 따라 상단 여백 추가 */
+}
+
+.form-group {
+    margin-bottom: 1rem; /* 폼 그룹 간의 간격 조정 */
+}
+</style>
+<div class="container mt-5">
+    <form action="{% url 'commentapp:create' %}" method="post" class="comment-form">
+        {% csrf_token %}
+        <div class="form-group">
+            {% bootstrap_form form %}
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="submit-comment-container">
+            <button type="submit" class="btn btn-dark rounded-pill">작성하기</button>
+        </div>
+        {% else %}
+        <div class="submit-comment-container">
+            <a class="loginButton btn btn-dark rounded-pill" href="#">로그인이 필요합니다</a>
+        </div>
+        {% endif %}
+        
+        <!-- 대상 객체 정보를 폼에 추가 -->
+        <input type="hidden" name="content_type_id" value="{{ content_type_id }}">
+        <input type="hidden" name="object_id" value="{{ object_id }}">    
+    </form>
+</div>
+{% endblock %}

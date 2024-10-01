@@ -1,0 +1,29 @@
+<style>
+.profile-card {
+    position: absolute;
+    top: 100%; /* "MyPage" 버튼의 아래에 위치 */
+    left: 50%; /* 중앙 정렬을 위해 왼쪽에서 50% 떨어진 위치에 배치 */
+    transform: translateX(-50%); /* X축 기준으로 -50% 이동하여 중앙 정렬 */
+    display: none; /* 초기에는 숨김 */
+    opacity: 0;
+    transition: opacity 0.5s ease, visibility 0.5s;
+    visibility: hidden; /* 숨긴 상태 유지 */
+    width: 23vw;
+    background-color: #FFFFFF;
+    z-index: 1000;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    color: #333;
+}
+
+</style>
+<div class="profile-card">
+    <img src="{{ user.image.url }}" alt="Profile Image" class="profile-image"/>
+    <div class="profile-info">
+        <h2>{{ user.username }}</h2>
+        <button onclick="logout()">로그아웃</button>
+    </div>
+</div> 

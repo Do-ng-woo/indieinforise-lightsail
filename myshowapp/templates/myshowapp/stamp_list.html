@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+/*========================================= 검색창========================= */
+.search-results-container {
+    max-width: 900px;
+    margin: 4rem auto;
+    text-align: center;
+}
+
+.search-form {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.search-input {
+    width: 70%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+.search-button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #0056b3;
+}
+/* =========================검색창 끝====================== */
+
+.button-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.button-container a {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #ff69b4;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button-container a:hover {
+    background-color: #ff1493;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 0;
+    max-width: 900px;
+}
+
+.container-card-link {
+    width: 45%;
+    margin: 1%;
+}
+
+.container-card-link img {
+    width: 100%;
+    border-radius: 1rem;
+}
+</style>
+
+<div class="search-results-container">
+    <form method="get" action="{% url 'myshowapp:search_performances' %}" class="search-form">
+        <input type="text" name="q" placeholder="추가할 공연을 검색하세요" class="search-input">
+        <button type="submit" class="search-button">검색</button>
+    </form>
+</div>
+
+<div class="button-container">
+    <a href="{% url 'myshowapp:card_list' %}">Card List</a>
+    <a href="{% url 'myshowapp:stamp_list' %}">Stamp List</a>
+    <!-- {% if myshow_exists %}
+        <a href="{% url 'myshowapp:detail_myshow_illust' username=request.user.username %}">My Stage</a>
+    {% else %}
+        <a href="{% url 'myshowapp:start_illust' %}">My Stage</a>
+    {% endif %} -->
+</div>
+
+{% if performance_list %}
+<div class="container">
+    {% for performance in performance_list %}
+    <div class="container-card-link">
+        <a href="{% url 'myshowapp:userperformance_detail' pk=performance.pk %}">
+            <div class="card-container">
+                <img src="{{ performance.stamp_image.url }}" alt="Stamp Image">
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+    <div style="text-align:center">
+        <h1>No Performances Yet!!!!!</h1>
+    </div>
+{% endif %}
+
+{% endblock %}

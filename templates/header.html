@@ -1,0 +1,533 @@
+<style>
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden; 
+}
+a {
+    text-decoration: none; /* 모든 링크에서 밑줄 제거 */
+    color: #000; /* 기본 링크 색상 설정, 필요에 따라 조정 */
+}
+/*--------------------------  */
+/* 전체 헤더 영역 스타일 */
+.top_header{
+  display: flex; /* Flex 컨테이너 설정 */
+  align-items: center; /* 세로 축에서 중앙 정렬 */
+  width: 100%; /* 전체 너비 */
+  background-color:rgba(75, 75, 75, 1); /* 검은색 배경에 50% 투명도 */
+  justify-content: center;
+  height:56px;
+}
+/* 브랜드 이름 스타일 */
+.brand-name {
+  font-family: "Poetsen One", sans-serif;
+  color:#fff;
+  width:30%;
+  margin-left:3%;
+  /* 추가 스타일 */
+}
+.brand-name a{
+    text-decoration: none; /* 기본 상태에서 밑줄 제거 */
+    color:#fff;
+}
+.header-search-form{
+    margin-left:5%;
+    width:40%;
+    display: flex; /* Flex 컨테이너 설정 */
+    }
+.header-search-form input[type="text"] {
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    margin-left:20%;
+    width:60%;
+}
+
+.header-search-form button {
+    padding: 8px 16px;
+    background-color: white;
+    color: #003366;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left:1rem;
+}
+.entire_header {
+  display: flex; /* Flex 컨테이너 설정 */
+  justify-content:center; /* 자식 요소를 양 끝에 정렬 */
+  align-items: center; /* 세로 축에서 중앙 정렬 */
+  width: 100%; /* 전체 너비 */
+}
+/* 기본 헤더 스타일 */
+.header {
+  text-align: center;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  height:76px;
+  position: relative; /* 세부 메뉴의 절대 위치를 위해 필요 */
+  width: 75%;
+  transition: background-color 0.5s ease 0.4s; /* 배경색 변경에 대한 부드러운 전환 효과 */
+  justify-content: center; /* 중앙 정렬을 위해 추가 */
+}
+/* 헤더 내의 모든 텍스트를 굵게 설정 */
+.header a {
+  font-weight: bold; /* 글자 굵게 */
+  color: #000; /* 초기 텍스트 색상 지정 */
+  transition: color 0.4s ease 0.4s; /* 텍스트 색상 변경에 대한 부드러운 전환 효과 */
+}
+
+
+/* 전체 헤더 영역에 마우스를 올렸을 때의 효과 */
+.entire_header:hover .header, 
+.entire_header:hover .login-section {
+  background-color: rgba(0, 0, 0, 0.7); /* 검은색 배경에 50% 투명도 */
+  transition: none; /* 배경색 변경에 대한 부드러운 전환 효과 */
+}
+
+/* .header 내 링크의 전환 효과 유지 */
+.entire_header:hover .header a {
+  color: #fff; /* 텍스트 색상을 하얀색으로 변경 */
+  transition: color 0s; /* 호버 시 즉시 색상 변경 */
+}
+/* 메뉴 네비게이션 스타일 */
+.menu {
+  display: flex;
+  justify-content: space-around; /* 항목들 사이에 균등한 간격을 둠 */
+  flex-grow: 1; /* 사용 가능한 공간을 균등하게 차지 */
+  max-width: 70%; /* 메뉴의 최대 너비 */
+}
+
+/* 메뉴 항목 스타일 */
+.menu-item {
+  /* 각 메뉴 항목이 동일한 공간을 차지하도록 설정 */
+  flex: 1;
+  text-align: center; /* 텍스트 가운데 정렬 */
+  position: relative; /* 드롭다운 컨텐츠의 기준점 */
+  /* 스타일 설정 */
+}
+/* 메뉴 항목 링크 스타일 */
+.menu-item a {
+  text-decoration: none; /* 기본 상태에서 밑줄 제거 */
+  padding: 0 10px 0 10px; /* 링크 주변에 여백 추가 */
+  transition: background-color 0.3s, color 0.4s ease 0.4s; /* 올바른 형식으로 수정 */
+  /* 기타 스타일 */
+}
+
+/* 메뉴 항목 링크 호버 시 스타일 */
+.menu-item a:hover {
+  color: #ccc !important; /* 호버 시 글자 색상을 연한 회색으로 변경 */
+}
+.menu-item:after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%; /* 메뉴 아이템 하단에서 시작 */
+  height: 20px; /* 마진과 같은 높이로 설정 */
+  background-color: transparent; /* 배경색을 투명하게 설정 */
+  z-index: 2; /* 드롭다운 내용물보다 높게 설정하지만, 드롭다운 내용물은 더 높게 설정해야 함 */
+}
+.dropdown-content {
+  visibility: hidden; /* 기본적으로 보이지 않음 */
+  opacity: 0; /* 투명하게 설정 */
+  position: absolute;
+  top: calc(100% + 19.9px); /* .menu-item 아래의 간격을 마진으로 설정 */
+  height: 50px;
+  width: 200vw;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  transition: visibility 0s linear 0.3s, opacity 0.3s linear; /* transition-delay를 0.3초로 설정 */
+}
+
+.menu-item:hover .dropdown-content {
+  visibility: visible; /* 호버 시 보이게 설정 */
+  opacity: 1; /* 불투명하게 설정 */
+  transition-delay: 0s; /* 호버 시 지연 없이 바로 효과 적용 */
+}
+.dropdown-content:hover {
+  display: block; /* 드롭다운 컨텐츠 위에 호버하면 보이기 */
+}
+
+/*---------------------------------------------------------------  */
+/* 로그인 및 회원가입 버튼 영역 스타일 */
+.login-section {
+  width: 25%;
+  display: flex;
+  justify-content: left; /* 버튼을 가운데 정렬 */
+  align-items: center; /* 버튼을 세로축 중앙에 배치 */
+  background-color: #ffffff; /* 배경색 설정 */
+  padding: 16px 0; /* 상하 패딩 */
+  justify-content: left; /* 중앙 정렬을 위해 추가 */
+}
+/* 로그인 섹션 링크 스타일 */
+.login-section a {
+  display: inline-block; /* 블록 요소처럼 처리하여 패딩과 마진 적용 가능 */
+  margin: 0 10px; /* 좌우 마진으로 버튼 사이 간격 조정 */
+  padding: 10px 20px; /* 상하 좌우 패딩 */
+  background-color: #007bff; /* 배경색 설정 */
+  color: #ffffff; /* 글꼴 색상 */
+  text-decoration: none; /* 밑줄 제거 */
+  border-radius: 5px; /* 테두리 둥근 모서리 */
+  transition: background-color 0.3s ease; /* 배경색 변경 시 부드러운 전환 효과 */
+  min-width: 100px; /* 버튼의 최소 너비 설정 */
+}
+
+/* .login-section에 대한 비호버 상태의 전환 효과 추가 */
+.login-section {
+  transition: background-color 0.5s ease 0.4s; /* 비호버 상태에서의 부드러운 전환 효과 */
+}
+
+/* .login-section 내 링크의 호버 시 색상 변경 지연 없이 적용 */
+.entire_header:hover .login-section a {
+  color: #ffffff; /* 필요한 경우 호버 시 텍스트 색상 변경 */
+  transition: color 0s; /* 호버 시 즉시 색상 변경 */
+}
+
+/* 로그인 섹션 링크 호버 스타일 */
+.login-section a:hover {
+  background-color: #0056b3; /* 호버 시 배경색 어둡게 변경 */
+  color: #ffffff; /* 호버 시 글꼴 색상 유지 */
+}
+/*--------------------------------------------------  */
+.profile-card {
+    position: fixed;
+    top: 12%;
+    left: 79%;
+    transform: translateX(-50%);
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease, visibility 0.5s;
+    visibility: hidden;
+    width: 300px;
+    background-color: #f9f9f9; /* 밝은 그레이 배경 */
+    z-index: 100000;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    border-radius: 10px; /* 더 부드러운 모서리 */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.1); /* 부드러운 그림자 */
+    color: #333;
+}
+.profile-top {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-image {
+    width: 80px; /* 또는 원하는 크기 */
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 10px; /* 이미지와 텍스트 사이의 간격 */
+}
+
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 세로 중앙 정렬 */
+}
+
+.profile-details h2, .profile-details h3 {
+    margin: 5px 30px;
+}
+
+.profile-details h2 {
+    font-size: 18px; /* 또는 원하는 크기 */
+    color: #333;
+}
+
+.profile-details h3 {
+    font-size: 14px; /* 또는 원하는 크기 */
+    color: #666;
+}
+
+.profile-stats {
+    justify-content: space-around;
+    border-radius: 10px; /* 더 부드러운 모서리 */
+    margin-bottom: 10px;
+    background-color: #eee;
+}
+
+.profile-stats .info_level, .profile-stats .points, .profile-stats .comment_count, .profile-stats .post_count {
+    flex: 1;
+    padding: 5px;
+    text-align:left;
+    display: flex;
+    align-items: center; /* 아이콘과 텍스트를 중앙 정렬합니다 */
+    gap: 10px; /* 아이콘과 텍스트 사이에 간격을 줍니다 */
+}
+
+    
+.profile-links{    
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0 10px;
+}
+.profile-links a, .logout-link a {
+    display: block;
+    color: #000;
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: color 0.3s;
+}
+
+.profile-links a:hover, .logout-link a:hover {
+    color: #ccc;
+}
+
+.logout-link button {
+    display: block;  /* 블록 요소로 만들어서 a 태그처럼 전체를 클릭할 수 있게 */
+    color: #000;  /* 텍스트 색상 */
+    background-color: #eee;  /* 배경색 회색 */
+    text-decoration: none;  /* 텍스트 밑줄 제거 */
+    margin: 0 auto 10px auto;
+    padding: 12px 100px;  /* 위 아래 간격을 늘리고 좌우 패딩 추가 */
+    border-radius: 15px;  /* 모서리를 둥글게 설정 */
+    transition: color 0.3s, background-color 0.3s;  /* 색상과 배경색 변화 효과 */
+    text-align: center;  /* 텍스트 중앙 정렬 */
+    font-size: 14px;  /* 텍스트 크기 */
+    border: none;  /* 기본 버튼 테두리 제거 */
+    cursor: pointer;  /* 클릭할 수 있는 커서 */
+}
+
+.logout-link button:hover {
+    color: #ccc; /* 호버 시 텍스트 색상 회색으로 변경 */
+    background-color: #ddd; /* 호버 시 배경색을 조금 더 밝은 회색으로 변경 */
+}
+#toggle-mode {
+  background-color: #5c6bc0; /* 버튼 배경색 */
+  color: white; /* 아이콘 색상 */
+  border: none; /* 테두리 없애기 */
+  padding-top: 8px; /* 내부 여백 */
+  border-radius: 50%; /* 원형 디자인 */
+  cursor: pointer; /* 호버 시 커서 변경 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+  transition: background-color 0.3s, box-shadow 0.3s; /* 부드러운 전환 효과 */
+}
+#toggle-mode:hover {
+  background-color: #3949ab; /* 호버 시 배경색 변경 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* 호버 시 그림자 효과 강조 */
+}
+
+.material-icons {
+  font-size: 24px; /* 아이콘 크기 조정 */
+}
+    
+@media (max-width:1400px) {
+    .dropdown-content {
+        top: calc(100% + 19.8px); /* .menu-item 아래의 간격을 마진으로 설정 */
+    }
+}
+@media (max-width:1300px) {
+    .dropdown-content {
+        top: calc(100% + 19.5px); 
+    }
+}
+@media (max-width: 1200px) {
+    .menu-item a {
+        font-size: 20px; /* 텍스트 크기를 줄임 */
+    }
+    .dropdown-content a{
+        font-size: 14px; /* 텍스트 크기를 줄임 */
+        
+    }
+    .unloginedButton a{
+        font-size: 16px; /* 텍스트 크기를 줄임 */
+        display: inline-block; /* 블록 요소처럼 처리하여 패딩과 마진 적용 가능 */
+        margin: 0 10px; /* 좌우 마진으로 버튼 사이 간격 조정 */
+        padding: 10px 10px; /* 상하 좌우 패딩 */
+        background-color: #007bff; /* 배경색 설정 */
+        color: #ffffff; /* 글꼴 색상 */
+        text-decoration: none; /* 밑줄 제거 */
+        border-radius: 5px; /* 테두리 둥근 모서리 */
+        transition: background-color 0.3s ease; /* 배경색 변경 시 부드러운 전환 효과 */
+        min-width: 80px; /* 버튼의 최소 너비 설정 */
+    }
+    .header{
+        width:65%;
+    }
+    .login-section{
+        width:35%;
+    }
+    .dropdown-content {
+        top: calc(100% + 20px); /* .menu-item 아래의 간격을 마진으로 설정 */
+    }
+}
+@media (max-width: 900px) {
+    .menu-item a {
+        font-size: 18px; /* 텍스트 크기를 줄임 */
+    }
+    .dropdown-content a{
+        font-size: 15px; /* 텍스트 크기를 줄임 */
+    }
+}
+</style>
+<div class="main_full_header">
+    <div class="top_header">
+        <div class="brand-name">
+            <a href="{% url 'homepageapp:main' %}">
+                <h1>INDIEBOOST</h1>
+            </a>
+        </div>
+        <!-- 검색창 추가 -->
+        <form class="header-search-form" action="{% url 'searchapp:search' %}" method="get" id="searchForm">
+            <input type="text" name="q" placeholder="검색어를 입력해주세요" id="searchInput">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+    <div class="entire_header" style="text-align:center; margin: 0 0;"> 
+        <div class="header">
+            <nav class="menu">
+                <div class="menu-item" data-dropdown-target="articles-dropdown">
+                    <h4><a href="{% url 'articleapp:list' %}">Articles</a></h4>
+                    <div id="articles-dropdown" class="dropdown-content">
+                        <a href="{% url 'subscribeapp:C_list' %}">구독 게시물</a>
+                        <a href="{% url 'articleapp:calendar' %}">공연달력</a>
+                    </div>
+                </div>
+                <div class="menu-item" data-dropdown-target="stages-dropdown">
+                    <h4><a href="{% url 'projectapp:list' %}" >Stage</a></h4>
+                    <div id="stages-dropdown" class="dropdown-content">
+                        <a href="{% url 'projectapp:list' %}">라이브공연장</a>
+                        <a href="{% url 'projectapp:list' %}">대관전문공연</a>
+                        <a href="{% url 'subscribeapp:Project_list' %}">구독 공연장</a>
+                    </div>
+                </div>
+                <div class="menu-item" data-dropdown-target="artists-dropdown">
+                    <h4><a href="{% url 'artistapp:list' %}" >Artist</a></h4>
+                    <div id="artists-dropdown" class="dropdown-content">
+                        <a href="{% url 'artistapp:list' %}">국내아티스트</a>
+                        <a href="{% url 'artistapp:honorary_list' %}">명예의전당</a>                    
+                        <a href="{% url 'subscribeapp:Artist_list' %}">구독아티스트</a>
+                    </div>
+                </div>
+                <div class="menu-item" data-dropdown-target="archives-dropdown">
+                    <h4><a href="{% url 'personapp:list' %}" >archive</a></h4>
+                    <div id="archives-dropdown" class="dropdown-content">
+                        <a href="{% url 'personapp:list' %}">인물</a> 
+                        <a href="{% url 'singapp:list' %}">노래</a>
+                        <a href="{% url 'albumapp:list' %}">앨범</a>
+                        <a href="{% url 'genreapp:list' %}">장르</a>
+                        <a href="{% url 'instrumentapp:list' %}">악기</a>
+                    </div>
+                </div>
+                <div class="menu-item" data-dropdown-target="communities-dropdown">
+                    <h4><a href="{% url 'communityapp:list' %}" >Community</a></h4>
+                    <div id="communities-dropdown" class="dropdown-content">
+                        <a href="{% url 'communityapp:list' %}">자유게시판</a>
+                    </div>
+                </div>
+                <div class="menu-item" data-dropdown-target="myshow-dropdown">
+                    <h4><a href="{% url 'myshowapp:card_list' %}" >Myshow</a></h4>
+                    <div id="myshow-dropdown" class="dropdown-content">
+                        <a href="{% url 'myshowapp:card_list' %}" >내 공연</a>
+                        <a href="{% url 'myshowapp:search_performances' %}" >공연검색</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+            
+        <div class="login-section" style="position: relative;">
+            {% if not user.is_authenticated %}
+                <div class="unloginedButton">
+                <a class="loginButton" href="{% url 'accountapp:login' %}?next={{ request.path }}" >LOGIN</a>
+                </div>
+                <div class="unloginedButton">
+                    <a href="{% url 'accountapp:create' %}" >Sign Up</a>
+                </div>
+            {% else %}
+                <a href="{% url 'accountapp:detail' pk=user.pk %}" id="myPageButton" >MyPage</a>
+            {% endif %}
+            <button id="toggle-mode"><span class="material-icons">dark_mode</span></button>
+        </div>
+    </div>
+</div>
+<div class="profile-card">
+    {% if user.is_authenticated %}
+    <div class="profile-top">
+        <img src="{{ user.image.url }}" alt="Profile Image" class="profile-image"/>
+        <div class="profile-details">
+            <h2>{{ user.username }}</h2>
+            <h3>{{ user.nickname }}</h3>
+        </div>
+    </div>
+    <div class="profile-stats">
+        <div class="info_level">
+            <span class="material-icons">grade</span><span>정보레벨:{{ user.level }}</span>
+        </div>
+        <div class="points">
+            <span class="material-icons">paid</span><span>포인트:{{ user.points }}</span>
+        </div>
+        <div class="post_count">
+            <span class="material-icons">notes</span><span>작성한글:{{ user.post_count }} </span>
+        </div>
+        <div class="comment_count">
+            <span class="material-icons">chat</span><span>댓글수:{{ user.comment_count }}</span>
+        </div>
+    </div>
+    <div class="profile-links">
+        <a href="{% url 'accountapp:detail' pk=user.pk %}">마이페이지</a>
+        <a href="{% url 'subscribeapp:Artist_list' %}">내 구독 관리</a>
+    </div>
+    <div class="logout-link">
+        <form method="post" action="{% url 'accountapp:logout' %}">
+            {% csrf_token %}
+            <button type="submit">Log Out</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchForm = document.getElementById('searchForm');  // 폼 ID
+    const searchText = document.getElementById('searchInput'); // 입력 필드 ID
+
+    searchForm.addEventListener('submit', function(event) {
+        if (searchText.value.length < 2) {
+            alert('두 글자 이상 입력해주세요.'); // 경고 메시지
+            event.preventDefault();  // 폼 제출 차단
+        }
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var myPageButton = document.getElementById('myPageButton');
+    var profileCard = document.querySelector('.profile-card');
+
+    myPageButton.addEventListener('mouseenter', function() {
+        profileCard.style.display = 'block';
+        profileCard.style.opacity = '1';
+        profileCard.style.visibility = 'visible';
+    });
+
+    // 마우스가 "MyPage" 버튼에서 벗어날 때 바로 프로필 카드를 숨깁니다.
+    myPageButton.addEventListener('mouseleave', function() {
+        profileCard.style.display = 'none';
+        profileCard.style.opacity = '0';
+        profileCard.style.visibility = 'hidden';
+    });
+
+    // 마우스가 프로필 카드 위에 있을 때 계속 보이도록 합니다.
+    profileCard.addEventListener('mouseenter', function() {
+        profileCard.style.display = 'block';
+        profileCard.style.opacity = '1';
+        profileCard.style.visibility = 'visible';
+    });
+
+    // 마우스가 프로필 카드에서 벗어날 때 바로 숨깁니다.
+    profileCard.addEventListener('mouseleave', function() {
+        profileCard.style.display = 'none';
+        profileCard.style.opacity = '0';
+        profileCard.style.visibility = 'hidden';
+    });
+});
+</script>
+
+

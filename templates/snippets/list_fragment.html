@@ -1,0 +1,70 @@
+{% load static %}
+<style>
+   .container {
+    margin: 0 auto;
+    padding: 0;
+}
+.container div {
+    display: flex;
+    justify-content: left;
+    border-radius: 1rem;
+}
+    
+.container-card-link {
+    width: 50%;
+    max-width: 250px;
+    margin: 40px; /* 상하좌우 마진 추가 */
+}
+    
+@media (max-width: 768px) {
+    .container{
+        margin-top:20px;
+    }
+    .container-card-link {
+        width: 45%;
+        max-width: 200px;
+        margin: 10px; /* 상하좌우 마진 추가 */
+    }
+}
+@media (max-width: 550px) {
+    .container-card-link {
+        width: 45%;
+        max-width: 170px;
+        margin: 0px; /* 상하좌우 마진 추가 */
+    }
+
+}
+    
+@media (max-width: 400px) {
+     .container-card-link {
+        width: 45%;
+        max-width: 140px;
+        margin: 0px; /* 상하좌우 마진 추가 */
+    }
+}
+</style>
+    {% if article_list %}
+    <div class="container">
+        {% for article in article_list %}
+        <div class="container-card-link">
+            <a href="{% url 'articleapp:detail' pk=article.pk %}">
+                {% include 'snippets/card.html' with article=article %}
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center" >
+        <h1>
+            No Articles Yet!!!!!
+        </h1>
+    </div>
+    {% endif %}
+    
+    {% include 'snippets/pagination.html' with pageobj=page_obj %}
+    <div style="text-align: center">
+        <a href="{% url 'articleapp:create' %}" class="btn btn-dark rounded-pill col-3 mt-3 mb-3 px-3 ">
+        Create Article
+        </a>
+    </div>
+    <script src="{% static 'js/magicgrid.js' %}"></script>

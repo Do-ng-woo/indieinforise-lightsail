@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+/* 검색창 스타일 */
+.search-results-container {
+    max-width: 900px;
+    margin: 4rem auto;
+    text-align: center;
+}
+
+.search-form {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.search-input {
+    width: 70%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+.search-button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #0056b3;
+}
+/* 버튼 스타일 */
+.button-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.button-container a {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #ff69b4;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button-container a:hover {
+    background-color: #ff1493;
+}
+/* 기본 스타일 설정 */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+}
+.stage { 
+    position: relative; 
+    width: 800px; 
+    height: 600px; 
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 0;
+    display: {% if myshow_exists %}block{% else %}none{% endif %}; /* 조건에 따른 display 설정 */
+}
+
+/* 배경 이미지 스타일 */
+.background-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1; /* 다른 요소들보다 뒤에 위치 */
+    
+}
+
+/* 요소 스타일 */
+.element {
+    position: absolute;
+    transition: transform 0.2s; /* 애니메이션 효과 */
+}
+
+/* 요소 호버 효과 */
+.element:hover {
+    transform: scale(1.05); /* 확대 효과 */
+}
+
+.resize-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+.resize-buttons button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+.resize-buttons button:hover {
+    background-color: #0056b3;
+}
+.save_btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+.save_btn:hover {
+    background-color: #218838;
+}
+
+/* 추가 스타일 */
+.empty-stage {
+    width: 800px; 
+    height: 600px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.create-btn {
+    padding: 20px 40px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+.create-btn:hover {
+    background-color: #0056b3;
+}
+</style>
+
+<div class="search-results-container">
+    <form method="get" action="{% url 'myshowapp:search_performances' %}" class="search-form">
+        <input type="text" name="q" placeholder="추가할 공연을 검색하세요" class="search-input">
+        <button type="submit" class="search-button">검색</button>
+    </form>
+</div>
+
+<div class="button-container">
+    <a href="{% url 'myshowapp:card_list' %}">Card List</a>
+    <a href="{% url 'myshowapp:stamp_list' %}">Stamp List</a>
+    <a href="{% url 'myshowapp:detail_myshow_illust' username=request.user.username %}">My Stage</a>
+</div>
+<div class="container">
+    {% if myshow_exists %}
+        <div class="stage" id="stage">
+            <img src="{{ myshow.background.image.url }}" class="background-image" alt="Background">
+            {% if myshow.singer %}
+                <img src="{{ myshow.singer.image.url }}" class="element" id="singer-element" alt="{{ myshow.singer.name }}">
+            {% endif %}
+            {% if myshow.guitarist %}
+                <img src="{{ myshow.guitarist.image.url }}" class="element" id="guitarist-element" alt="{{ myshow.guitarist.name }}">
+            {% endif %}
+            {% if myshow.bassist %}
+                <img src="{{ myshow.bassist.image.url }}" class="element" id="bassist-element" alt="{{ myshow.bassist.name }}">
+            {% endif %}
+            {% if myshow.drummer %}
+                <img src="{{ myshow.drummer.image.url }}" class="element" id="drummer-element" alt="{{ myshow.drummer.name }}">
+            {% endif %}
+            {% if myshow.keyboardist %}
+                <img src="{{ myshow.keyboardist.image.url }}" class="element" id="keyboardist-element" alt="{{ myshow.keyboardist.name }}">
+            {% endif %}
+            {% if myshow.audience %}
+                <img src="{{ myshow.audience.image.url }}" class="element" id="audience-element" alt="{{ myshow.audience.name }}">
+            {% endif %}
+            {% if myshow.lighting %}
+                <img src="{{ myshow.lighting.image.url }}" class="element" id="lighting-element" alt="{{ myshow.lighting.name }}">
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="empty-stage">
+            <a href="{% url 'myshowapp:create_myshow_illust' %}" class="create-btn">생성하기</a>
+        </div>
+    {% endif %}
+</div>
+
+{% if myshow_exists %}
+    <div class="button-container">
+        <a href="{% url 'myshowapp:update_myshow_illust' %}" class="save_btn">수정하기</a>
+    </div>
+{% endif %}
+
+<script>
+    $(document).ready(function() {
+        // Set initial positions, sizes, and z-indices based on data
+        var positions = {{ positions|safe }};
+        var sizes = {{ sizes|safe }};
+        var z_indices = {{ z_indices|safe }};
+        
+        for (var id in positions) {
+            $('#' + id).css({
+                left: positions[id].left,
+                top: positions[id].top
+            });
+        }
+
+        for (var id in sizes) {
+            $('#' + id).css({
+                width: sizes[id].width,
+                height: sizes[id].height
+            });
+        }
+
+        for (var id in z_indices) {
+            $('#' + id).css({
+                zIndex: z_indices[id]
+            });
+        }
+    });
+</script>
+
+{% endblock %}

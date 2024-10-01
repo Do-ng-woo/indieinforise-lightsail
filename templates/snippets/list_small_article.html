@@ -1,0 +1,56 @@
+{% load static %}
+<style>
+    .container {
+        padding: 0;
+        margin: 0, auto;
+    }
+    
+    .container a {
+        width: 45%;
+        max-width: 250px;
+        
+    }
+    .container div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 1rem;
+    }
+    
+    .container img {
+        width: 100%;
+        border-radius: 1rem;
+    }
+    
+
+</style>
+    {% if article_list %}
+    <div class="container">
+        
+        {% for article in article_list %}
+        <a href="{% url 'articleapp:detail' pk=article.pk %}">
+            {% include 'snippets/card.html' with article=article %}
+        </a>
+        {% endfor %}
+            
+    </div>
+    <div style="text-align:center; margin-top:20px;">
+        {% if article_list.has_previous %}
+            <a href="?articles_page={{ article_list.previous_page_number }}" class="btn btn-primary">&laquo; 이전</a>
+        {% endif %}
+
+        <span class="current-page">페이지 {{ article_list.number }} / {{ article_list.paginator.num_pages }}</span>
+
+        {% if article_list.has_next %}
+            <a href="?articles_page={{ article_list.next_page_number }}" class="btn btn-primary">다음 &raquo;</a>
+        {% endif %}    
+    </div>
+    {% else %}
+    <div style="text-align:center" >
+        <h1>
+            No Articles Yet!!!!!
+        </h1>
+    </div>
+    {% endif %}
+    
+    <script src="{% static 'js/magicgrid.js' %}"></script>

@@ -1,0 +1,436 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    
+a {
+    color: black;
+     text-decoration-line: none;
+}
+.search-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+    width:70%;
+    margin: 0 auto;
+    margin-top:10px;
+}
+
+.search-item {
+    margin-right: 10px; /* 검색 필드와 버튼 사이의 간격 */
+}
+
+select, input[type="text"] {
+    padding: 10px;
+    margin-right: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* 드롭다운 스타일링 */
+select {
+    cursor: pointer;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left:3rem;
+}
+
+.search-form div {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+.sing-search-field{
+    margin-left:5px;
+    height:46px;
+}
+.search-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+    
+.table-container {
+    margin: 0 auto;
+    width: 70%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+tr[data-href] {
+    cursor: pointer;
+}
+.table th.short, .table td.short {
+    width: 15%;
+    vertical-align: middle;
+    text-align: center; /* 셀 내용을 가로로도 중앙에 위치시키기 위함 */
+    padding:5px;
+}
+.table th.image, .table td.image {
+    width: 10%;
+    word-wrap: break-word;
+    white-space: normal;
+    vertical-align: middle;
+    padding: 10px 20px; /* 상하 패딩을 추가하여 내용이 수직 중앙에 오도록 함 */
+}
+.table th.title, .table td.title {
+    width: 35%;
+    word-wrap: break-word;
+    white-space: normal;
+    vertical-align: middle;
+    padding: 10px 5px; /* 상하 패딩을 추가하여 내용이 수직 중앙에 오도록 함 */
+}
+
+.table th.artists, .table td.artists {
+    width: 40%;
+    word-wrap: break-word;
+    white-space: normal;
+    vertical-align: middle;
+    padding: 10px 5px; /* 상하 패딩을 추가하여 내용이 수직 중앙에 오도록 함 */
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    text-align: left; /* 기본적으로 텍스트를 왼쪽 정렬 */
+    padding: 10px; /* 셀 내용에 패딩을 추가하여 더 많은 공간을 제공 */
+}
+.sort_button {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 7px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.sort_button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+@media (max-width: 1400px) {
+    .search-container {
+        min-width:965px;
+    }
+    .table-container {
+        min-width:965px;
+    }
+
+}
+@media (max-width: 1075px) {
+    .search-container {
+        width:90%;
+        min-width:0px;
+    }
+    .table-container {
+        width:90%;
+        min-width:0px;
+    }
+}
+@media (max-width: 800px) {
+    .table td.short {
+        font-size:15px;
+    }
+    .table td.title {
+        font-size:15px;
+    }
+    .table td.artists {
+        font-size:15px;
+    }
+    .table-container img {
+        width: 60px; /* 이미지 크기 조절 */
+        height: 60px; /* 이미지 크기 조절 */
+    }
+}
+
+@media (max-width: 750px) {
+    .table td.short {
+        font-size:14px;
+    }
+}
+@media (max-width: 700px) {
+     .search-button {
+         min-width:50px;
+         padding: 10px 10px;
+    }
+    .search-container{
+        justify-content: flex-end;
+    }
+}
+@media (max-width: 650px) {
+     .table td.short {
+        font-size:13px;
+    }
+    .table td.title {
+        font-size:14px;
+    }
+    .table td.artists {
+        font-size:14px;
+    }
+    .table-container img {
+        width: 55px; /* 이미지 크기 조절 */
+        height: 55px; /* 이미지 크기 조절 */
+    }
+}
+@media (max-width: 620px) {
+    .table td.short {
+        font-size:12px;
+    }
+    .table td.title {
+        font-size:13px;
+    }
+    .table td.artists {
+        font-size:13px;
+    }
+    .table-container img {
+        width: 55px; /* 이미지 크기 조절 */
+        height: 55px; /* 이미지 크기 조절 */
+    }
+    .table th.short {
+        font-size:14px;
+    }
+    .table th.title {
+        font-size:14px;
+    }
+    .table th.artists {
+        font-size:14px;
+    }
+    .sing-search-keyword{
+        width:150px;
+    }
+    .sing-search-field{
+        width:110px;
+    }
+}
+@media (max-width: 575px) {
+    .search-container {
+        width:95%;
+        min-width:0px;
+    }
+    .table-container {
+        width:95%;
+        min-width:0px;
+    }
+    .table td.short {
+        font-size:12px;
+    }
+    .table td.title {
+        font-size:12px;
+    }
+    .table td.artists {
+        font-size:12px;
+    }
+    .table th.short {
+        font-size:13px;
+    }
+    .table th.title {
+        font-size:13px;
+    }
+    .table th.artists {
+        font-size:13px;
+    }
+    .sing-search-keyword{
+        width:130px;
+        font-size:14px;
+        height:42px;
+    }
+    .sing-search-field{
+        width:100px;
+        font-size:14px;
+        height:42px;
+    }
+    .sort_button{
+        height:42px;
+    }
+    .search-button{
+        height:42px;
+    }
+}
+@media (max-width: 520px) {
+    .sing-search-keyword{
+        width:110px;
+        font-size:12px;
+        height:38px;
+    }
+    .sing-search-field{
+        width:90px;
+        font-size:12px;
+        height:38px;
+    }
+    .sort_button{
+        font-size:20px;
+        height:38px;
+        padding: 7px 10px 5px 10px;
+    }
+    .search-button{
+        height:38px;
+    }
+    .sing-search-field{
+        margin-left:3px;
+    }
+}
+@media (max-width: 510px) {
+    .table td.short {
+        font-size:12px;
+    }
+    .table td.title {
+        font-size:12px;
+    }
+    .table td.artists {
+        font-size:12px;
+    }
+    .table th.short, .table td.short {
+        width: 20%;
+    }
+}
+@media (max-width: 475px) {
+    .search-form {
+        flex-direction: column;
+        width:100%;
+        margin-left:0px;
+    }
+    .sort-buttons {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        margin-bottom:5px;
+    }
+     .sort_button{
+        font-size:24px;
+        height:38px;
+        padding: 7px 10px 5px 10px;
+        width:33%;
+    }
+    .search-fields {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+    .sing-search-field {
+        width: 30%;
+        font-size: 12px;
+    }
+    .sing-search-keyword {
+        width: 50%;
+        font-size: 12px;
+    }
+    .search-button {
+        width: 20%;
+        font-size: 12px;
+        padding: 5px;
+    }
+}
+@media (max-width: 472px) {
+    .table th.short, .table td.short {
+        width: 0%;
+        display:none;
+    }
+}
+@media (max-width: 400px) {
+    .search-container {
+        justify-content: center; /* 검색 폼을 중앙으로 정렬 */
+    }
+    .search-button {
+        padding: 10px 10px;
+    }
+}
+@media (max-width: 360px) {
+    .search-button {
+        padding: 10px 10px;
+        height:41.5px;
+    }
+}
+
+</style>
+<div class="search-container">
+    <form method="get" action="{% url 'genreapp:list' %}" class="search-form">
+        <div class="sort-buttons">
+            <button type="submit" name="order_by" value="newest" class="sort_button {% if request.GET.order_by == 'newest' %}active{% endif %}">
+                <span class="material-icons">update</span>
+            </button>
+            <button type="submit" name="order_by" value="popularity" class="sort_button {% if request.GET.order_by == 'popularity' %}active{% endif %}">
+                <span class="material-icons">favorite</span>
+            </button>
+            <button type="submit" name="order_by" value="title" class="sort_button {% if request.GET.order_by == 'title' %}active{% endif %}">
+                <span class="material-icons">sort_by_alpha</span>
+            </button>
+        </div>
+        <div class="search-fields">
+            {{ search_form.search_field }}
+            {{ search_form.search_keyword }}
+            <button type="submit" class="search-button">검색</button>
+        </div>
+    </form>
+</div>
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="title">장르명</th>
+                <th class="artists">기원장르</th>
+                <th class="short">등장시기</th>
+            </tr>
+        </thead>
+        <tbody>            
+            {% if genre_list %}
+            {% for genre in genre_list %}
+            <tr data-href="{% url 'genreapp:detail' pk=genre.pk %}">
+                <td class="title">{{ genre.title }}</td>
+                <td class="artists">{% for genre in genre.origins.all %}
+                            <a href="{% url 'genreapp:detail' pk=genre.pk %}" class="genre-name">
+                                {{ genre.title }}
+                            </a>
+                        {% endfor %}
+                </td> <!-- 예시 필드, 실제 모델에 따라 조정 필요 -->
+                <td class="short">{{ genre.appearance_period }}</td> <!-- 예시 필드, 실제 모델에 따라 조정 필요 -->
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="4">검색한 노래가 없습니다</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+    
+{% include 'snippets/pagination.html' with pageobj=page_obj %}
+
+<div style="text-align: center">
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'genreapp:create' %}" class="btn btn-dark rounded-pill col-6 mt-3 mb-3 px-3 ">
+    새 장르 추가하기
+    </a>
+    {% else %}
+    <a class="loginButton btn btn-dark rounded-pill col-6 mt-3 mb-3 px-3" href="#">
+    새 장르 추가하기
+    </a>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 모든 테이블 행에 대해 이벤트 리스너 추가
+    const rows = document.querySelectorAll("tr[data-href]");
+
+    rows.forEach(row => {
+        row.addEventListener("click", function() {
+            window.location.href = this.dataset.href;
+        });
+    });
+});
+</script>
+{% endblock %}

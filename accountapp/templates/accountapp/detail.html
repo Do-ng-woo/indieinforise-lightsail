@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+/* 기본 레이아웃 스타일 */
+.entire {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 80%;
+    margin: 50px auto; /* 위아래로 마진 추가하여 중앙 정렬 */
+    background-color: #fff; /* 백그라운드 색상 */
+}
+
+.lefter_profile, .righter {
+    background-color: #f8f9fa;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px; /* 모서리 둥글게 */
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 추가 */
+}
+
+.lefter_profile {
+    width: 20%;
+    margin-right: 2rem;
+    min-width:250px;
+}
+
+.righter {
+    width: 75%;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* 요소들 사이의 간격 조절 */
+}
+.profile_header {
+    display: flex;
+    align-items: center; /* 센터 정렬을 유지 */
+    flex-direction: column; /* 기본적으로 세로 정렬 */
+    text-align: center; /* 텍스트 센터 정렬 */
+    gap: 10px; /* 요소 간 간격 설정 */
+}
+.profile-image-main{
+    height: 12rem; 
+    width:12rem; 
+    border-radius: 20rem; 
+    margin-bottom: 2rem; 
+    object-fit: cover;
+}
+/* 선택 옵션 스타일링 */
+.view_type_box, .content_type_box {
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* 제출 버튼 스타일링 */
+.type_button {
+    padding: 8px 16px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff; /* 배경색 조절 */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* 버튼 호버 시 스타일 변경 */
+.type_button:hover {
+    background-color: #0056b3; /* 호버 시 배경색 조절 */
+}
+
+/* 페이지네이션 버튼 스타일 */
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+.write_button_content, .comment_button_content, .like_button_content {
+    display: none;
+}
+
+.table_content{
+    padding: 10px; /* 컨테이너 내부 여백 */
+    border-radius: 10px; /* 모서리 둥글게 */
+    border-radius: 10px; /* 모서리 둥글게 */
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+}
+.active-button {
+    background-color: #8c9191; /* 활성화된 버튼의 배경색 */
+    color: #ffffff; /* 활성화된 버튼의 텍스트 색상 */
+}
+/* 활성화된 링크 스타일 */
+.active-link {
+    background-color: #8c9191; /* 활성화된 링크의 배경색 */
+    color: #ffffff; /* 활성화된 링크의 텍스트 색상 */
+    border-radius: 5px; /* 둥근 모서리 */
+}
+.community-item {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+     /* 커서 모양 변경 */
+    cursor: pointer;
+}
+
+.top-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+}
+
+.top-line h2 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.top-line{
+    font-size: 24px;
+    color: #666;
+}
+.likes{
+    display: flex;
+    color: #666;
+    align-items: center;
+}
+.like_count{
+    font-size: 20px;
+    margin-left:10px;
+}
+
+.bottom-line {
+    display: flex;
+    justify-content: start;
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.bottom-line span {
+    margin-right: 10px;
+}
+@media (max-width: 1100px) {
+    .header_comment{
+        font-size:26px;
+    }
+    .entire {
+        width: 90%;
+    }
+}
+@media (max-width: 900px) {
+    .entire {
+        flex-direction: column; /* 세로 정렬로 변경 */
+        align-items: center; /* 중앙 정렬 */
+    }
+
+    .lefter_profile, .righter {
+        width: 100%; /* 너비를 100%로 설정하여 화면을 꽉 채우게 함 */
+        margin-bottom: 20px; /* 요소들 사이에 마진 추가 */
+        margin-right: 0;
+    }
+
+    .righter {
+        order: 2; /* righter를 poster_content 위로 올림 */
+    }
+
+    .lefter_profile {
+        order: 1; /* poster_content를 righter 아래로 내림 */
+        margin-bottom:50px;
+    }
+    .profile_header {
+        flex-direction: row; /* 화면 너비가 900px 이상일 때 가로 정렬로 변경 */
+        justify-content: space-around; /* 요소들 사이에 공간을 균등하게 배분 */
+    }
+    .profile-image-main{
+        height: 9rem; 
+        width:9rem; 
+        border-radius: 20rem; 
+        margin-bottom: 2rem; 
+        object-fit: cover;
+    }
+}
+@media (max-width: 500px) {
+    .header_comment{
+        font-size:23px;
+    }
+    .lefter_profile, .righter {
+        padding: 10px;
+    }
+
+}
+@media (max-width: 400px) {
+    .view_type_box, .content_type_box {
+        padding: 5px;
+        font-size: 15px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+    .type_button {
+        padding: 5px 8px;
+        font-size: 15px;
+        border: none;
+        border-radius: 5px;
+    }
+    .form-container {
+        gap: 5px; /* 요소들 사이의 간격 조절 */
+    }
+    .header_comment{
+        font-size:20px;
+    }
+    .bottom-line {
+        font-size: 11px;
+        margin-top: 5px;
+    }
+}
+@media (max-width: 360px) {
+    .bottom-line {
+        font-size: 10px;
+        margin-top: 5px;
+    }
+
+}
+</style>
+<div class="entire">
+    <div class="lefter_profile">
+        {% if target_user == user %}
+        <p>
+            {{ target_user.date_joined|date:"Y년 n월 j일 H시" }} 가입
+        </p>
+        {% endif %}
+        
+        
+        <div class="profile_header">
+            <img class="profile-image-main"src="{{ target_user.profile.image.url }}" alt="">
+            <div class="profile_nickname">
+                <h2 style="font-family: ' NanumSquareB' ">
+                    {{ target_user.nickname}}
+                </h2>
+                <h5 style="margin-bottom:1rem">
+                    {{ target_user.message }}
+                </h5>
+            </div>
+        </div>
+        <div class="profile-stats">
+        <div class="info_level">
+            <span class="material-icons">grade</span><span>정보레벨:{{ target_user.level }}</span>
+        </div>
+        <div class="points">
+            <span class="material-icons">paid</span><span>포인트:{{ target_user.points }}</span>
+        </div>
+        <div class="post_count">
+            <span class="material-icons">notes</span><span>작성한글:{{ target_user.post_count }} </span>
+        </div>
+        <div class="comment_count">
+            <span class="material-icons">chat</span><span>댓글단글:{{ target_user.comment_count }}</span>
+        </div>
+    </div>
+        
+        
+            
+        {% if target_user == user %}
+        <a class="material-icons" style="box-shadow: 0 0 4px #ccc; border-radius: 10rem; padding: .4rem"
+           href="{% url 'accountapp:update' pk=user.pk %}">
+           settings
+        </a>
+        <a class="material-icons" style="box-shadow: 0 0 4px #fcc; border-radius: 10rem; padding: .4rem"
+           href="{% url 'accountapp:delete' pk=user.pk %}">
+              cancel
+        </a>
+        {% endif %}
+    </div>
+    <div class="righter">
+        <form method="GET" action="{% url 'accountapp:detail' target_user.pk %}" class="form-container">
+            <select class="view_type_box" id="view_type" name="view_type">
+                <option value="posts">작성한 글</option>
+                <option value="drafts">임시저장</option>
+                <option value="comments">댓글 단 글</option>
+                <option value="likes">좋아요 한 글</option>
+            </select>
+            <select class="content_type_box" id="content_type" name="content_type">
+            </select>
+            <button class="type_button"type="submit">보기</button>
+        </form>
+        <div class="table_content">
+            <div class="community">
+                <h2 class="header_comment">
+                    {% if view_type == 'posts' %}
+                        {{ target_user.nickname }}님이 작성한 {{ content_type_label }}
+                    {% elif view_type == 'drafts' %}
+                        {{ target_user.nickname }}님이 임시저장 한 {{ content_type_label }}
+                    {% elif view_type == 'comments' %}
+                        {{ target_user.nickname }}님이 댓글 단 {{ content_type_label }}
+                    {% elif view_type == 'likes' %}
+                        {{ target_user.nickname }}님이 좋아요 한 {{ content_type_label }}
+                    {% endif %}
+                </h2>
+                {% if objects %}
+                    {% for object in objects %}
+                    <div data-href="{% url detail_url pk=object.pk %}" onclick="window.location=this.getAttribute('data-href');" class="community-item">
+                        <div class="top-line">
+                            <h2>{{ object.title }}</h2>
+                            <div class="likes">
+                                <span class="material-icons">favorite</span>
+                                <span class="like_count">{{ object.like }}</span>  
+                            </div>
+                        </div>
+                        <div class="bottom-line">
+                            <span class="author">작성자: {{ object.writer.username }}</span>
+                            <span class="created-at"> 
+                                {% if object.created_at|date:"Y-m-d" == today %}
+                                    {{ object.created_at|date:"g:i A" }} <!-- 오늘이면 시간만 표시 -->
+                                {% else %}
+                                    {{ object.created_at|date:"y.m.d" }} <!-- 오늘이 아니면 날짜와 시간 표시 -->
+                                {% endif %}
+                            </span>
+                            <span class="views">조회수: {{ object.views }}</span>
+                            <span class="comments">댓글: {{ object.comment_count }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- 페이지네이션 컨트롤 -->
+                    <div style="text-align:center; margin-top:20px;">
+                        {% if objects.has_previous %}
+                            <!-- 'view_type'과 'content_type' 파라미터를 유지하면서 페이지를 변경합니다. -->
+                            <a href="?view_type={{ view_type }}&content_type={{ content_type }}&page={{ objects.previous_page_number }}" class="btn btn-primary">&laquo; 이전</a>
+                        {% endif %}
+
+                        <span class="current-page">페이지 {{ objects.number }} / {{ objects.paginator.num_pages }}</span>
+
+                        {% if objects.has_next %}
+                            <a href="?view_type={{ view_type }}&content_type={{ content_type }}&page={{ objects.next_page_number }}" class="btn btn-primary">다음 &raquo;</a>
+                        {% endif %}
+                    </div>
+
+                {% else %}
+                    <p>글이 존재하지 않습니다</p>
+                {% endif %}
+            </div>
+    
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var viewTypeSelect = document.getElementById('view_type');
+    var contentTypeSelect = document.getElementById('content_type');
+    var initialViewType = '{{ view_type }}';
+    var initialContentType = '{{ content_type }}';
+
+    var options = {
+        'posts': { 
+            'artist': '아티스트', 'article': '공연', 'person': '인물', 'project': '공연장', 
+            'sing': '노래', 'album': '앨범', 'genre': '장르', 'community': '커뮤니티'
+        },
+        'comments': { 
+            'artist': '아티스트', 'article': '공연', 'person': '인물', 'project': '공연장', 
+            'sing': '노래', 'album': '앨범', 'genre': '장르', 'community': '커뮤니티'
+        },
+        'likes': { 
+            'artist': '아티스트', 'article': '공연', 'person': '인물', 'project': '공연장', 
+            'sing': '노래', 'album': '앨범', 'genre': '장르', 'community': '커뮤니티'
+        },
+        'drafts': { 
+            'artist': '아티스트', 'article': '공연', 'person': '인물', 'project': '공연장', 
+            'sing': '노래', 'album': '앨범', 'genre': '장르', 'community': '커뮤니티'
+        }
+    };
+
+    function updateContentTypeOptions(viewType) {
+        contentTypeSelect.innerHTML = '';
+        var contentOptions = options[viewType];
+        for (var key in contentOptions) {
+            var option = document.createElement('option');
+            option.value = key;
+            option.text = contentOptions[key];
+            if (key === initialContentType) {
+                option.selected = true;
+            }
+            contentTypeSelect.appendChild(option);
+        }
+    }
+
+    viewTypeSelect.addEventListener('change', function() {
+        updateContentTypeOptions(this.value);
+    });
+
+    // 초기 설정
+    viewTypeSelect.value = initialViewType;
+    updateContentTypeOptions(initialViewType);
+});
+</script>
+
+
+{% endblock %}

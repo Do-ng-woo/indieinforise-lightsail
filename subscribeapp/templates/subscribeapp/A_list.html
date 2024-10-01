@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="text-align:center; margin: 2rem 0;"> 
+    <div>
+    <a href="{% url 'subscribeapp:A_list' %}" style="margin: 0rem 0.5rem" class="btn btn-info rounded-pill px-4">
+                <span>Artist List</span>
+                
+        </a>
+    <a href="{% url 'subscribeapp:P_list' %}" style="margin: 0rem 0.5rem"class="btn btn-info rounded-pill px-4">
+                
+        <span>Stage List</span>
+                </a>
+    </div>
+</div>
+    <div>
+        {% include 'snippets/list_fragment.html' with article_list=article_list %}
+    </div>
+
+{% endblock %}
