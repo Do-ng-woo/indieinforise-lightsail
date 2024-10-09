@@ -14,7 +14,7 @@
         font-size: 16px;
     }
     /* 닫기 버튼 스타일 */
-        .close_policy {
+    .close_policy {
         background-color: transparent;
         border: none;
         font-size: 1.5rem;
@@ -33,7 +33,6 @@
         opacity: 1;
     }
 </style>
-
 
 <div class="container" style="max-width: 700px; margin-top: 40px;">
     <div class="text-center mb-4">
@@ -60,7 +59,11 @@
         {% endif %}
 
         {% bootstrap_field form.username %}
-        {% bootstrap_field form.email %}
+        <div class="form-group">
+            {% bootstrap_field form.email %}
+            <button type="button" id="sendEmailVerificationBtn" class="btn btn-secondary" onclick="sendVerificationEmail()">이메일 인증 요청</button>
+            <input type="hidden" id="isEmailVerified" name="is_email_verified" value="False">
+        </div>
         {% bootstrap_field form.password1 %}  <!-- 비밀번호 필드 추가 -->
         {% bootstrap_field form.password2 %}  <!-- 비밀번호 확인 필드 추가 -->
         {% bootstrap_field form.gender %}
@@ -118,6 +121,49 @@
     // 개인정보 처리방침 모달 닫기
     function closePrivacyPolicy() {
         document.getElementById('privacyPolicyModal').style.display = 'none';
+    }
+
+    // 이메일 인증 요청
+    function sendVerificationEmail() {
+        const email = document.querySelector('[name="email"]').value;
+
+        if (!email) {
+            alert("이메일을 입력해주세요.");
+            return;
+        }
+
+        // AJAX 요청으로 이메일 인증 전송
+        fetch("{% url 'accountapp:send_verification_email' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({ email: email })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("인증 이메일이 전송되었습니다. 이메일을 확인해주세요.");
+                // 이메일 필드 수정 불가 및 버튼 상태 변경
+                document.querySelector('[name="email"]').readOnly = true;
+                const verificationButton = document.getElementById("sendEmailVerificationBtn");
+                verificationButton.textContent = "이메일 전송 완료";
+                verificationButton.disabled = true;  // 버튼 비활성화
+                verificationButton.classList.remove("btn-secondary");
+                verificationButton.classList.add("btn-success");
+            } else {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert("인증 이메일 전송에 실패했습니다. 다시 시도해주세요.");
+                }
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("인증 이메일 전송 중 오류가 발생했습니다.");
+        });
     }
 </script>
 

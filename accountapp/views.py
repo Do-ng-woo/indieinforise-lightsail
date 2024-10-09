@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.db import transaction
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.list import MultipleObjectMixin
 from allauth.account.models import EmailAddress  # EmailAddress 모델 가져오기
-
 
 from accountapp.decorators import account_ownership_required
 from accountapp.models import HelloWorld
@@ -21,7 +21,7 @@ from instrumentapp.models import Instrument
 from commentapp.models import Comment
 from likeapp.models import LikeRecord,CommunityLikeRecord, ArtistLikeRecord, PersonLikeRecord, ProjectLikeRecord, SingLikeRecord, GenreLikeRecord, AlbumLikeRecord
 from accountapp.forms import FavoriteSearchForm, CustomUserCreationForm, CustomUserUpdateForm
-from accountapp.models import FavoriteSearch
+from accountapp.models import FavoriteSearch,EmailUser
 from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
 
@@ -36,6 +36,18 @@ from .forms import CustomLoginForm
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db import IntegrityError
+
+from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.forms import SetPasswordForm
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.utils.crypto import get_random_string
+from django.contrib.auth import login, get_backends
+
 
 User = get_user_model()
 
@@ -72,23 +84,44 @@ class AccountCreateView(CreateView):
             return redirect('homepageapp:main')
         return super().dispatch(request, *args, **kwargs)
 
+    @transaction.atomic
     def form_valid(self, form):
-        # 사용자 객체 생성
-        response = super().form_valid(form)
-        # 이메일 추가
-        user = form.instance
         email = form.cleaned_data.get('email')
+        email_user = get_object_or_404(EmailUser, email=email)
+
+        # 이메일 인증 여부 확인
+        if not email_user.is_verified:
+            form.add_error('email', '이메일 인증이 완료되지 않았습니다.')
+            return self.form_invalid(form)
+
+        # 새로운 사용자 생성
+        response = super().form_valid(form)
+        user = form.instance
+        email_user.account_created = True  # 계정 생성 완료 상태로 업데이트
+        email_user.save()
+
         # EmailAddress 모델에 이메일 추가
         EmailAddress.objects.create(
             user=user,
             email=email,
-            verified=False,  # 기본적으로 False로 설정
+            verified=True,  # 기본적으로 True로 설정
             primary=True
         )
+
         # 개인정보 처리방침 동의 상태 저장
         privacy_policy_agreement_value = self.request.POST.get('privacy_policy_agreement')
         user.privacy_policy_agreement = privacy_policy_agreement_value == "on"
         user.save()
+
+        # 사용자 로그인 처리
+        backend = get_backends()[0]  # 첫 번째 인증 백엔드를 사용 (필요에 따라 다른 백엔드를 사용할 수도 있음)
+        user.backend = f'{backend.__module__}.{backend.__class__.__name__}'
+        login(self.request, user)
+
+        # 10분이 지난 인증되지 않은 EmailUser 객체 삭제 실행
+        from django.core.management import call_command
+        call_command('delete_expired_emailusers')
+
         return response
 
     def form_invalid(self, form):
@@ -332,3 +365,84 @@ def get_field_data(request):
         data = list(Instrument.objects.filter(hide=False).values('id', 'title'))
 
     return JsonResponse(data, safe=False)
+
+
+@csrf_exempt
+def send_verification_email_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+
+            if email:
+                # EmailUser 모델에서 해당 이메일이 이미 존재하는지 확인
+                email_user, created = EmailUser.objects.get_or_create(email=email)
+
+                if not created and email_user.is_verified:
+                    return JsonResponse({'success': False, 'error': '이미 인증된 이메일입니다. 그냥 진행할 수 있습니다.'})
+
+                # User 모델에서 해당 이메일을 가진 사용자가 있는지 확인 (중복된 계정 생성 방지)
+                if User.objects.filter(email=email).exists():
+                    return JsonResponse({'success': False, 'error': '이미 가입된 이메일입니다.'})
+
+                # 이메일 인증에 필요한 토큰 및 UID 생성 (임시 방식으로 처리)
+                token = get_random_string(20)  # 인증에 사용할 임시 토큰
+                uid = urlsafe_base64_encode(force_bytes(email_user.pk))
+
+                # 이메일 전송
+                success = send_verification_email(email, token, uid)
+
+                if success:
+                    # 토큰을 저장해 인증 단계에서 비교할 수 있도록 처리
+                    email_user.token = token
+                    email_user.save()
+                    return JsonResponse({'success': True})
+                else:
+                    return JsonResponse({'success': False, 'error': '이메일 전송에 실패했습니다. 다시 시도해주세요.'})
+
+            else:
+                return JsonResponse({'success': False, 'error': '유효한 이메일이 아닙니다.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': '유효하지 않은 요청입니다.'})
+
+def send_verification_email(email, token, uid):
+    subject = '이메일 인증을 완료해주세요'
+    message = f'회원가입을 완료하려면 다음 링크를 클릭해주세요: https://indieboost.co.kr/accounts/activate/{uid}/{token}/'
+
+    try:
+        send_mail(
+            subject,
+            message,
+            'indieboostkorea@gmail.com',  # 발신자 이메일
+            [email],  # 수신자 이메일
+            fail_silently=False,
+        )
+        return True
+    except Exception as e:
+        print(f"이메일 전송 실패: {str(e)}")
+        return False
+
+def activate_account(request, uidb64, token):
+    try:
+        # UID를 사용해 EmailUser 객체를 복호화하고 검색
+        uid = urlsafe_base64_decode(uidb64).decode()
+        email_user = get_object_or_404(EmailUser, pk=uid)
+
+        # 토큰이 유효한지 확인
+        if email_user.token == token:
+            # 이메일 인증 완료
+            email_user.is_verified = True
+            email_user.save()
+            return render(request, 'accountapp/activation_success.html', {
+                'message': '이메일 인증이 성공적으로 완료되었습니다.'
+            })
+        else:
+            return render(request, 'accountapp/activation_failure.html', {
+                'message': '유효하지 않은 링크입니다.'
+            })
+    except Exception as e:
+        return render(request, 'accountapp/activation_failure.html', {
+            'message': f'오류가 발생했습니다: {str(e)}'
+        })

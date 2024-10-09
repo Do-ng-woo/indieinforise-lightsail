@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계정 활성화 실패</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Poetsen+One&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .activation-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        .logo-container {
+            margin-bottom: 20px;
+        }
+        .logo-image {
+            width: 300px;
+            height: 300px;
+        }
+        .indieboost-text {
+            font-family: 'Poetsen One', sans-serif;
+            font-size: 36px;
+            color: #333;
+            margin-top: 10px;
+        }
+        .activation-header {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .activation-message {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        .close-button {
+            display: inline-block;
+            background-color: #28a745;
+            color: #fff;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        .close-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="activation-container">
+        <div class="logo-container">
+            <img src="{% static 'defalut_image/indieboost_logo.png' %}" alt="Indieboost 로고" class="logo-image">
+        </div>
+        <div class="activation-header">계정 활성화 실패</div>
+        <div class="activation-message">{{ message }}</div>
+        잠시 후 시도해 주세요. 지속적인 오류가 발생할시 고객센터에 문의해주세요
+        <a href="#" class="close-button" onclick="window.close(); return false;">페이지 닫기</a>
+    </div>
+</body>
+</html>

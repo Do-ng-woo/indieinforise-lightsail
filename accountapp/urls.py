@@ -18,4 +18,6 @@ urlpatterns = [
     path('delete_favorite_keyword/<int:keyword_id>/', views.delete_favorite_keyword, name='delete_favorite_keyword'),
     path('get-field-data/', get_field_data, name='get_field_data'),
     path('privacy-policy/', privacy_policy, name='privacy_policy'),
+    path('activate/<uidb64>/<token>/', views.activate_account, name='activate'),
+    path('send-verification-email/', views.send_verification_email_view, name='send_verification_email'),
 ]

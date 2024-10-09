@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 # Create your models here.
 class HelloWorld(models.Model):
     text = models.CharField(max_length=255, null=False)
@@ -40,3 +42,18 @@ class CustomUser(AbstractUser):
     performance_points = models.IntegerField(default=0)  # 공연 포인트 필드 추가 공연을 사용자가 몇분이나 봤는지를 저장
 
     privacy_policy_agreement = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.username
+    
+
+class EmailUser(models.Model):
+    email = models.EmailField(unique=True)  # 이메일 (고유)
+    is_verified = models.BooleanField(default=False)  # 인증 완료 여부
+    account_created = models.BooleanField(default=False)  # 계정이 만들어졌는지 여부
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성된 시간
+    token = models.CharField(max_length=50, blank=True, null=True)  # 인증 토큰 필드
+
+    def is_expired(self):
+        # 생성 후 10분이 지나면 만료로 간주
+        return timezone.now() > self.created_at + timedelta(minutes=10)

@@ -260,3 +260,13 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CSRF_COOKIE_SECURE = True
+
+# 이메일 백엔드 설정
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# Gmail SMTP 설정
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'indieboostkorea@gmail.com'  # 발신자 이메일 주소
+EMAIL_HOST_PASSWORD = env('EMAILPASSWORD')  # 발신자 이메일의 비밀번호 또는 앱 비밀번호

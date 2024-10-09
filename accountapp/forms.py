@@ -58,6 +58,7 @@ class CustomUserCreationForm(UserCreationForm):
             raise forms.ValidationError("이미 사용 중인 닉네임입니다. 다른 닉네임을 선택해 주세요.")
         return nickname
     
+    
 class CustomUserUpdateForm(UserChangeForm):
     password = None  # 비밀번호 변경 필드를 제외합니다.
 
