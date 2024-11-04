@@ -100,5 +100,5 @@ def import_data_to_articles(file_path):
 
 
 # 파일 경로 설정
-file_path = 'articleapp/mydata/events_info_1008_finished.csv'  # 본인의 데이터 파일 경로로 변경
+file_path = 'articleapp/mydata/events_info_1104_finished.csv'  # 본인의 데이터 파일 경로로 변경
 import_data_to_articles(file_path)
