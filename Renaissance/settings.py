@@ -122,6 +122,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+SOCIALACCOUNT_ADAPTER = 'accountapp.adapters.CustomSocialAccountAdapter'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -132,6 +134,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # allauth의 AccountMiddleware 추가
     'analyticsapp.middleware.VisitorSessionMiddleware',  # VisitorSession 미들웨어 추가
+    'accountapp.middleware.ProfileCompletionMiddleware',
 ]
 
 

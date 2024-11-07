@@ -26,6 +26,13 @@ class CustomUser(AbstractUser):
         ('F', 'Female'),
         ('O', 'Other')
     )
+    SIGNUP_METHOD_CHOICES = (
+        ('manual', 'Manual'),
+        ('google', 'Google'),
+        ('facebook', 'Facebook'),
+        ('kakao', 'Kakao'),
+        ('naver', 'Naver'),
+    )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     birth_date = models.DateField(null=True, blank=True)
     email = models.EmailField(unique=True)
@@ -42,6 +49,7 @@ class CustomUser(AbstractUser):
     performance_points = models.IntegerField(default=0)  # 공연 포인트 필드 추가 공연을 사용자가 몇분이나 봤는지를 저장
 
     privacy_policy_agreement = models.BooleanField(default=False)
+    signup_method = models.CharField(max_length=20, choices=SIGNUP_METHOD_CHOICES, default='manual')  # 가입 방식
 
     def __str__(self):
         return self.username

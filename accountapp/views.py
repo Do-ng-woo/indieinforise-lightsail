@@ -48,6 +48,8 @@ import json
 from django.utils.crypto import get_random_string
 from django.contrib.auth import login, get_backends
 
+from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
+from .forms import CustomSetPasswordForm, CustomPasswordResetForm
 
 User = get_user_model()
 
@@ -107,6 +109,10 @@ class AccountCreateView(CreateView):
             verified=True,  # 기본적으로 True로 설정
             primary=True
         )
+
+        # 가입 방식 설정
+        user.signup_method = 'manual'
+        user.save()
 
         # 개인정보 처리방침 동의 상태 저장
         privacy_policy_agreement_value = self.request.POST.get('privacy_policy_agreement')
@@ -446,3 +452,21 @@ def activate_account(request, uidb64, token):
         return render(request, 'accountapp/activation_failure.html', {
             'message': f'오류가 발생했습니다: {str(e)}'
         })
+    
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'accountapp/password_reset.html'
+    form_class = CustomPasswordResetForm
+    email_template_name = 'accountapp/password_reset_email.html'
+    success_url = reverse_lazy('accountapp:password_reset_done')
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'accountapp/password_reset_done.html'
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'accountapp/password_reset_confirm.html'
+    success_url = reverse_lazy('accountapp:password_reset_complete')
+    form_class = CustomSetPasswordForm
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'accountapp/password_reset_complete.html'

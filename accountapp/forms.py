@@ -14,6 +14,9 @@ from albumapp.models import Album
 from genreapp.models import Genre
 from instrumentapp.models import Instrument
 from django_select2.forms import Select2Widget
+from django.contrib.auth.forms import SetPasswordForm, PasswordResetForm
+
+
 
 
 User = get_user_model()
@@ -24,7 +27,7 @@ class CustomLoginForm(AuthenticationForm):
 
 
 class CustomUserCreationForm(UserCreationForm):
-    username = forms.CharField(label=_("사용자 이름"), help_text=_("필수. 150자 이하. 문자, 숫자, @/./+/-/_ 만 사용 가능합니다."))
+    username = forms.CharField(label=_("사용자 이름"), help_text=_("다른 사용자에게 공개되지 않으며 계정 복구에 사용될 수 있습니다. 신중히 입력해주세요."))
     password1 = forms.CharField(label=_("비밀번호"), widget=forms.PasswordInput, help_text=_("비밀번호는 적어도 8자 이상이어야 하며, 너무 일반적이거나 개인 정보와 비슷할 수 없습니다."))
     password2 = forms.CharField(label=_("비밀번호 확인"), widget=forms.PasswordInput, help_text=_("확인을 위해 위와 동일한 비밀번호를 입력하세요."))
 
@@ -62,7 +65,7 @@ class CustomUserCreationForm(UserCreationForm):
 class CustomUserUpdateForm(UserChangeForm):
     password = None  # 비밀번호 변경 필드를 제외합니다.
 
-    username = forms.CharField(label=_("사용자 이름"), help_text=_("필수. 150자 이하. 문자, 숫자, @/./+/-/_ 만 사용 가능합니다."))
+    username = forms.CharField(label=_("사용자 이름"), help_text=_("다른 사용자에게 공개되지 않으며 계정 복구에 사용될 수 있습니다. 신중히 입력해주세요"))
     email = forms.EmailField(label=_("이메일"))
     gender = forms.ChoiceField(label=_("성별"), choices=[
         ('M', _('남성')),
@@ -156,3 +159,38 @@ class FavoriteSearchForm(forms.ModelForm):
                 self.add_error(None, "더이상 추가할 수 없습니다. 수정 후 추가를 진행해주세요.")
         return cleaned_data
     
+class CustomSetPasswordForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        label=_("새 비밀번호"),
+        widget=forms.PasswordInput,
+        help_text=_("비밀번호는 적어도 8자 이상이어야 하며, 너무 일반적이거나 개인 정보와 비슷할 수 없습니다."),
+    )
+    new_password2 = forms.CharField(
+        label=_("새 비밀번호 확인"),
+        widget=forms.PasswordInput,
+        help_text=_("위와 동일한 비밀번호를 입력하세요."),
+    )
+
+class CustomPasswordResetForm(PasswordResetForm):
+    username = forms.CharField(
+        label=_("사용자 이름"),
+        max_length=150,
+        help_text=_("회원가입 시 사용한 사용자 이름을 입력하세요.")
+    )
+    email = forms.EmailField(
+        label=_("이메일"),
+        help_text=_("회원가입 시 사용한 이메일 주소를 입력하세요.")
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get("username")
+        email = cleaned_data.get("email")
+
+        user = User.objects.filter(username=username, email=email).first()
+        if not user:
+            raise forms.ValidationError("입력된 사용자 이름과 이메일이 일치하는 계정을 찾을 수 없습니다.")
+        elif user.signup_method != 'manual':
+            raise forms.ValidationError(f"해당 계정은 {user.signup_method}을(를) 통해 가입되었습니다. 해당 플랫폼으로 로그인을 시도해주세요.")
+
+        return cleaned_data

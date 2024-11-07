@@ -5,10 +5,10 @@ from .models import CustomUser, EmailUser
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('image','gender', 'birth_date', 'nickname', 'purpose_of_use', 'message', 'level', 'points', 'post_count', 'comment_count','performance_points','privacy_policy_agreement')}),
+        (None, {'fields': ('image','gender', 'birth_date', 'nickname', 'purpose_of_use', 'message', 'level', 'points', 'post_count', 'comment_count','performance_points','privacy_policy_agreement','signup_method')}),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
-        (None, {'fields': ('image','gender', 'birth_date', 'nickname', 'purpose_of_use', 'message', 'level', 'points', 'post_count', 'comment_count','performance_points','privacy_policy_agreement')}),
+        (None, {'fields': ('image','gender', 'birth_date', 'nickname', 'purpose_of_use', 'message', 'level', 'points', 'post_count', 'comment_count','performance_points','privacy_policy_agreement','signup_method')}),
     )
 
 # EmailUser 모델을 Admin에 추가

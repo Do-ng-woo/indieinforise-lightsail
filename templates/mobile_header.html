@@ -21,12 +21,12 @@ a {
 .off-canvas-menu {
   position: fixed;
   top: 0; /* 메뉴가 화면 상단에서 시작하도록 설정 */
-  left: -70%; /* 메뉴가 보이지 않도록 왼쪽으로 숨김 */
+  right: -70%; /* 메뉴가 보이지 않도록 오른쪽으로 숨김 */
   width: 70%;
   height: 100%;
   background: #444;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-  transition: left 0.3s;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5); /* 그림자가 오른쪽에서 왼쪽으로 보이도록 변경 */
+  transition: right 0.3s;
   z-index: 1500; /* z-index가 헤더보다 높도록 설정하여 헤더 위에 표시됨 */
   padding-top: 0; /* 이전에 60px로 설정되어 있던 것을 제거함 */
 }
@@ -43,7 +43,7 @@ a {
 
 /* 오프캔버스 메뉴 활성화 스타일 */
 .off-canvas-menu.active {
-  left: 0; /* 메뉴를 화면에 표시 */
+  right: 0; /* 메뉴를 화면에 표시 */
 }
 .brand-name {
   font-family: 'Lobster', cursive;
@@ -63,7 +63,15 @@ a {
     align-items: center;
     background: #333;
     color: white;
-    padding: 1rem;
+    padding: 2.3rem;
+}
+#closeMenuButton {
+  position: absolute; /* 부모 요소를 기준으로 위치 조정 */
+  top: 1rem;          /* 메뉴 상단에서 1rem 내려오도록 설정 */
+  right: 1rem;        /* 메뉴 오른쪽 끝에서 1rem 왼쪽으로 이동하도록 설정 */
+  cursor: pointer;    /* 마우스를 올렸을 때 커서가 포인터로 변경 */
+  font-size: 2rem;    /* 버튼의 크기를 키워 사용자에게 눈에 잘 띄도록 설정 */
+  color: #ffffff;     /* 닫기 버튼 색상 */
 }
 /* ---------------------- */
 .profile_menu-mobile{
@@ -303,13 +311,13 @@ a {
 {% load static %}
 
 <div class="mobile-header mobile_full_header">
-    <span id="menuButton" class="material-icons">menu</span>
-    <div class="brand-name">
-        <a href="{% url 'homepageapp:main' %}"><h1>INDIEBOOST</h1></a>
-    </div>
     <div class="search_button">
         <span class="material-icons">search</span>
     </div>
+    <div class="brand-name">
+        <a href="{% url 'homepageapp:main' %}"><h1>INDIEBOOST</h1></a>
+    </div>
+    <span id="menuButton" class="material-icons">menu</span>
   <!-- 로고나 브랜드명을 여기에 추가할 수 있습니다 -->
 </div>
 
@@ -455,13 +463,25 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script>
-document.querySelector('.search_button').addEventListener('click', function() {
+document.querySelector('.search_button').addEventListener('click', function(event) {
     document.querySelector('.search-overlay').style.display = 'flex';
+    event.stopPropagation(); // 이벤트가 부모 요소로 전파되지 않도록 방지
 });
 
+// 닫기 버튼 함수
 function closeSearch() {
     document.querySelector('.search-overlay').style.display = 'none';
 }
+
+// 검색 오버레이 외부 클릭 시 닫기
+document.addEventListener('click', function(event) {
+    const searchOverlay = document.querySelector('.search-overlay');
+    const searchBox = document.querySelector('.search-box');
+    // 검색 오버레이가 열려 있고, 검색 박스 내부를 클릭한 것이 아닌 경우 오버레이를 닫기
+    if (searchOverlay.style.display === 'flex' && !searchBox.contains(event.target)) {
+        searchOverlay.style.display = 'none';
+    }
+});
 </script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
