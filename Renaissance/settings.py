@@ -86,8 +86,8 @@ INSTALLED_APPS = [
     'genreapp',
     'searchapp',
     'instrumentapp',
-    'myshowapp'
-    
+    'myshowapp',
+    'analyticsapp'
 ]
 # 구글 로그인을 위한 설정
 SITE_ID = 1
@@ -131,6 +131,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # allauth의 AccountMiddleware 추가
+    'analyticsapp.middleware.VisitorSessionMiddleware',  # VisitorSession 미들웨어 추가
 ]
 
 
@@ -180,7 +181,6 @@ DATABASES = {
 #         'NAME': BASE_DIR / 'db.sqlite3',  # 데이터베이스 파일 경로
 #      } 
 # }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -270,3 +270,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'indieboostkorea@gmail.com'  # 발신자 이메일 주소
 EMAIL_HOST_PASSWORD = env('EMAILPASSWORD')  # 발신자 이메일의 비밀번호 또는 앱 비밀번호
+
+#Celery와 Redis가 같은 서버 내에서 통신하게 되어 설정
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
