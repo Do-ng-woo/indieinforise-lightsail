@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from articleapp.models import Article
+
 # Register your models here.
 # admin.py
 class EmptyImageFilter(admin.SimpleListFilter):
@@ -23,8 +24,8 @@ class EmptyImageFilter(admin.SimpleListFilter):
             return queryset.filter(image='')
         if self.value() == 'No':
             return queryset.exclude(image='')
-        
-        
+
+
 class OrderByFilter(admin.SimpleListFilter):
     title = _('Order by')
     parameter_name = 'order_by'
@@ -46,13 +47,29 @@ class OrderByFilter(admin.SimpleListFilter):
             return queryset.order_by('created_at')
         if self.value() == 'newest':
             return queryset.order_by('-created_at')
-        
-        
+
+
+class HiddenFilter(admin.SimpleListFilter):
+    title = _('Hidden status')
+    parameter_name = 'hidden'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('hidden', _('Hidden')),
+            ('not_hidden', _('Not Hidden')),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'hidden':
+            return queryset.filter(hide=True)
+        if self.value() == 'not_hidden':
+            return queryset.filter(hide=False)
+
+
 class ArticleAdmin(admin.ModelAdmin):
     actions = ['make_hidden', 'make_not_hidden']
     list_per_page = 1000  # 한 페이지에 100개씩 표시
-    list_filter = (EmptyImageFilter, OrderByFilter,)  # Add the custom filter to the list_filter
-
+    list_filter = (EmptyImageFilter, OrderByFilter, HiddenFilter,)  # Add the custom filters to the list_filter
 
     def make_hidden(self, request, queryset):
         queryset.update(hide=True)
@@ -61,5 +78,6 @@ class ArticleAdmin(admin.ModelAdmin):
     def make_not_hidden(self, request, queryset):
         queryset.update(hide=False)
     make_not_hidden.short_description = "Mark selected articles as not hidden"
+
 
 admin.site.register(Article, ArticleAdmin)

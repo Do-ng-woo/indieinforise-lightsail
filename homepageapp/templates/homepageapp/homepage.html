@@ -146,14 +146,17 @@
     background-color: #fefefe;
     padding: 20px;
     border: 1px solid #888;
-    width: 50rem; /* 내용에 맞는 자동 너비 */
-    max-width: 50rem; /* 최대 너비 설정 */
+    width: 70%; /* 너비를 50%로 설정 */
+    max-width: 800px; /* 최대 너비를 픽셀로 설정 */
+    max-height: 80vh; /* 화면 높이의 80%로 제한하여 팝업이 화면을 벗어나지 않도록 함 */
+    overflow-y: auto; /* 내용이 많으면 세로 스크롤 활성화 */
     z-index: 1051; /* popup-background보다 높은 z-index */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 그림자 효과 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
     position: fixed; /* 화면에 고정된 위치 */
     top: 50%; /* 상단에서 50% 위치 */
     left: 50%; /* 왼쪽에서 50% 위치 */
     transform: translate(-50%, -50%); /* 자신의 크기에 따라 정확히 중앙에 위치 */
+    border-radius: 10px; /* 테두리 둥글게 추가 (선택사항) */
 }
 
 .close-button {
@@ -594,6 +597,7 @@ input[type="password"] {
         top: 50%; /* 상단에서 50% 위치 */
         left: 50%; /* 왼쪽에서 50% 위치 */
         transform: translate(-50%, -50%); /* 자신의 크기에 따라 정확히 중앙에 위치 */
+        max-height: 80vh; /* 화면 높이의 80%로 제한하여 팝업이 화면을 벗어나지 않도록 함 */
     }
 }
 @media (max-width: 768px) {
@@ -871,7 +875,8 @@ input[type="password"] {
 <!-- 팝업 내용 -->
 <div id="popupContent" class="popup-content" style="display:none;">
     <div class="popup-header">
-        <span class="close-button" onclick="closePopup()">&times;</span>
+        <!-- 공연 상세 정보 팝업 닫기 버튼 -->
+        <span class="close-button" onclick="closeContentPopup()">&times;</span>
         <h2>공연 상세 정보</h2>
     </div>
     <div class="popup-body">
@@ -882,7 +887,8 @@ input[type="password"] {
     <div class="notice-popup-content">
         <h2>현재 사이트는 개발 중입니다!</h2>
         <p>Indieboost는 곧 공식 오픈 예정입니다. 지금은 개발 중이지만, 멋진 인디 밴드 정보와 기능들을 준비 중이니 기대해 주세요!</p>
-        <button class="notice-popup-button" onclick="closePopup()">알겠습니다</button>
+        <!-- 공지 팝업 닫기 버튼 -->
+    <button class="notice-popup-button" onclick="closeNoticePopup()">알겠습니다</button>
     </div>
 </div>
 <script>
@@ -944,8 +950,8 @@ function openPopup() {
     document.getElementById("popupContent").style.display = "block";
 }
 
-// 팝업 닫기
-function closePopup() {
+// 팝업 닫기 (공연 상세 정보 팝업용)
+function closeContentPopup() {
     document.getElementById("popupBackground").style.display = "none";
     document.getElementById("popupContent").style.display = "none";
 }
@@ -979,14 +985,14 @@ function closePopup() {
     };
 
     // 팝업 닫기 함수
-    function closePopup() {
+    function closeNoticePopup() {
         document.getElementById("noticePopup").style.display = "none";
         setCookie("popupShown", "true", 1); // 1일 동안 팝업 재표시 안 함
     }
 </script>
 
 
-
+    
 
 
 

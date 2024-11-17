@@ -28,10 +28,24 @@ def import_data_to_articles(file_path):
         title = row['Title']
         content = row['Content']
         date_str = row['Date']
+        artist_str = row['Artist']
 
-        # 동일한 title과 content를 가진 article이 이미 존재하는지 확인
-        existing_article = Article.objects.filter(title=title, content=content, date=date_str).first()
-        if existing_article:
+        # 날짜 문자열을 datetime 객체로 변환
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+        # 아티스트 이름 목록을 정렬하여 중복 확인에 사용
+        artist_names = sorted([name.strip() for name in artist_str.split(',')])
+
+        # 동일한 title, artist, date를 가진 article이 이미 존재하는지 확인
+        existing_articles = Article.objects.filter(title=title, date=date)
+        found = False
+        for article in existing_articles:
+            existing_artist_names = sorted(list(article.artist.values_list('title', flat=True)))
+            if artist_names == existing_artist_names:
+                found = True
+                break
+
+        if found:
             print(f"Title이 '{title}'인 Article은 이미 존재합니다. 생성을 건너뜁니다.")
             continue
 
@@ -100,5 +114,5 @@ def import_data_to_articles(file_path):
 
 
 # 파일 경로 설정
-file_path = 'articleapp/mydata/events_info_1104_finished.csv'  # 본인의 데이터 파일 경로로 변경
+file_path = 'articleapp/mydata/filtered_data_final_output_20241117.csv'  # 본인의 데이터 파일 경로로 변경
 import_data_to_articles(file_path)
