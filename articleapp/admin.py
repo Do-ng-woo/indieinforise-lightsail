@@ -68,7 +68,7 @@ class HiddenFilter(admin.SimpleListFilter):
 
 class ArticleAdmin(admin.ModelAdmin):
     actions = ['make_hidden', 'make_not_hidden']
-    list_per_page = 1000  # 한 페이지에 100개씩 표시
+    list_per_page = 100  # 한 페이지에 100개씩 표시
     list_filter = (EmptyImageFilter, OrderByFilter, HiddenFilter,)  # Add the custom filters to the list_filter
 
     def make_hidden(self, request, queryset):

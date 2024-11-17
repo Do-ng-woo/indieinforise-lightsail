@@ -58,7 +58,7 @@ admin.site.register(Artist, ArtistAdmin)
 
 class SubtitleAdmin(admin.ModelAdmin):
     actions = ['delete_selected_subtitles', 'delete_orphan_subtitles']
-    list_per_page = 1000  # 한 페이지에 1000개씩 표시
+    list_per_page = 100  # 한 페이지에 1000개씩 표시
     actions_on_top = True
     actions_on_bottom = True
     list_filter = (HiddenFilter,)
