@@ -28,10 +28,15 @@ def import_data_to_articles(file_path):
         title = row['Title']
         content = row['Content']
         date_str = row['Date']
+        raw_image_path = row['Image']
         artist_str = row['Artist']
 
         # 날짜 문자열을 datetime 객체로 변환
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+        # 이미지 경로 표준화
+        image_path = os.path.normpath(raw_image_path)
+
 
         # 아티스트 이름 목록을 정렬하여 중복 확인에 사용
         artist_names = sorted([name.strip() for name in artist_str.split(',')])
