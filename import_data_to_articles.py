@@ -16,6 +16,7 @@ from projectapp.models import Project, Subtitle
 from artistapp.models import Artist, Subtitle
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+import math
 
 User = get_user_model()
 
@@ -31,7 +32,11 @@ def import_data_to_articles(file_path):
         raw_image_path = row['Image']
         artist_str = row['Artist']
         link = row.get('Link', None)  # Link 필드 처리
-        running_time = row.get('Time', None)  # RunningTime 필드 처리
+        # Check if running_time exists, and handle NaN
+        running_time = row.get('RunningTime', None)
+        if running_time is not None and (math.isnan(running_time) or pd.isnull(running_time)):
+            running_time = None  # Set to None if NaN or missing
+
 
         # 날짜 문자열을 datetime 객체로 변환
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
