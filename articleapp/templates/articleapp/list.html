@@ -341,5 +341,126 @@ document.addEventListener('DOMContentLoaded', function() {
 
     addObserverIfAvailable();
 });
+</script><script>
+document.addEventListener("DOMContentLoaded", function() {
+    const titleElements = document.querySelectorAll(".dynamic-title"); // 모든 제목 요소 선택
+
+    function truncateText() {
+        let maxLength;
+        const screenWidth = window.innerWidth;
+
+        // 화면 크기에 따라 잘라낼 문자 수 설정
+        if (screenWidth > 1200) {
+            maxLength = 50; // 큰 화면
+        } else if (screenWidth > 768) {
+            maxLength = 35; // 중간 화면
+        } else {
+            maxLength = 25; // 작은 화면
+        }
+
+        // 각 제목 요소에 대해 잘라내기 적용
+        titleElements.forEach(titleElement => {
+            const fullTitle = titleElement.getAttribute("data-full-title");
+
+            // 제목을 잘라내고, 잘린 경우 '...' 추가
+            const truncatedTitle = fullTitle.length > maxLength
+                ? fullTitle.substring(0, maxLength) + "..."
+                : fullTitle;
+
+            // 잘린 제목을 화면에 표시
+            titleElement.textContent = truncatedTitle;
+        });
+    }
+
+    // 초기 실행
+    truncateText();
+
+    // 화면 크기 변경 시 실행
+    window.addEventListener("resize", truncateText);
+});
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const titleElements = document.querySelectorAll(".dynamic-title"); // 모든 제목 요소 선택
+    
+        function truncateText() {
+            let maxLength;
+            const screenWidth = window.innerWidth;
+    
+            // 화면 크기에 따라 잘라낼 문자 수 설정
+            if (screenWidth > 1200) {
+                maxLength = 50; // 큰 화면
+            } else if (screenWidth > 768) {
+                maxLength = 35; // 중간 화면
+            } else if (screenWidth > 550) {
+                maxLength = 27; // 중간 화면
+            } else if (screenWidth > 500) {
+                maxLength = 20; // 중간 화면
+            } else if (screenWidth > 400) {
+                maxLength = 25; // 중간 화면
+            } else {
+                maxLength = 20; // 작은 화면
+            }
+            
+    
+            // 각 제목 요소에 대해 잘라내기 적용
+            titleElements.forEach(titleElement => {
+                const fullTitle = titleElement.getAttribute("data-full-title");
+    
+                // 제목을 잘라내고, 잘린 경우 '...' 추가
+                const truncatedTitle = fullTitle.length > maxLength
+                    ? fullTitle.substring(0, maxLength) + "..."
+                    : fullTitle;
+    
+                // 잘린 제목을 화면에 표시
+                titleElement.textContent = truncatedTitle;
+            });
+        }
+    
+        // 초기 실행
+        truncateText();
+    
+        // 화면 크기 변경 시 실행
+        window.addEventListener("resize", truncateText);
+    });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 모든 프로젝트 이름 요소를 선택
+            const projectElements = document.querySelectorAll(".project-name");
+        
+            function truncateProjects() {
+                const screenWidth = window.innerWidth;
+        
+                projectElements.forEach((project) => {
+                    const fullProject = project.getAttribute("data-full-project"); // 원본 이름 저장
+                    let maxLength = 12; // 기본적으로 12글자
+                    
+                    // 화면 크기에 따라 maxLength를 조정
+                    if (screenWidth <= 400) {
+                        maxLength = 9; // 400px 이하일 때 9글자
+                    } else if (screenWidth <= 600) {
+                        maxLength = 10; // 600px 이하일 때 10글자
+                    } else if (screenWidth <= 800) {
+                        maxLength = 11; // 600px 이하일 때 10글자
+                    }
+        
+                    // 프로젝트 이름을 잘라내고, 잘린 경우 '...' 추가
+                    const truncatedProject =
+                        fullProject.length > maxLength
+                            ? fullProject.substring(0, maxLength) + "..."
+                            : fullProject;
+        
+                    project.textContent = truncatedProject; // 잘린 이름을 화면에 표시
+                });
+            }
+        
+            // 초기 실행
+            truncateProjects();
+        
+            // 화면 크기 변경 시 실행
+            window.addEventListener("resize", truncateProjects);
+        });
+    </script>
+        
 {% endblock %}

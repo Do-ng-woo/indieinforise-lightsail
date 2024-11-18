@@ -23,9 +23,11 @@
     z-index: 1051; /* popup-background보다 높은 z-index */
     box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 그림자 효과 */
     position: fixed; /* 화면에 고정된 위치 */
-    top: 50%; /* 상단에서 50% 위치 */
+    top: 55%; /* 상단에서 50% 위치 */
     left: 50%; /* 왼쪽에서 50% 위치 */
     transform: translate(-50%, -50%); /* 자신의 크기에 따라 정확히 중앙에 위치 */
+    max-height: 85vh; /* 화면 높이의 80%로 제한하여 팝업이 화면을 벗어나지 않도록 함 */
+    overflow-y: auto; /* 내용이 많으면 세로 스크롤 활성화 */
 }
 
 .close-button {
@@ -67,7 +69,7 @@
 
 @media (max-width: 768px) {
     .popup-content {
-        width: 80vw; /* 내용에 맞는 자동 너비 */ 
+        width: 90vw; /* 내용에 맞는 자동 너비 */ 
     }
     .calendar-container {
         padding: 0.5rem; /* 화면이 작을 때 패딩 감소 */
@@ -135,6 +137,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     calendar.render();
+
+        // 팝업 배경 클릭 시 닫기
+        document.getElementById("popupBackground").addEventListener("click", function(e) {
+        // 클릭한 대상이 popupBackground이면 팝업 닫기
+        if (e.target.id === "popupBackground") {
+            closePopup();
+        }
+    });
 });
 
 // 팝업 열기
