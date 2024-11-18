@@ -30,13 +30,14 @@ def import_data_to_articles(file_path):
         date_str = row['Date']
         raw_image_path = row['Image']
         artist_str = row['Artist']
+        link = row.get('Link', None)  # Link 필드 처리
+        running_time = row.get('Time', None)  # RunningTime 필드 처리
 
         # 날짜 문자열을 datetime 객체로 변환
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
 
         # 이미지 경로 표준화
         image_path = os.path.normpath(raw_image_path)
-
 
         # 아티스트 이름 목록을 정렬하여 중복 확인에 사용
         artist_names = sorted([name.strip() for name in artist_str.split(',')])
@@ -54,14 +55,7 @@ def import_data_to_articles(file_path):
             print(f"Title이 '{title}'인 Article은 이미 존재합니다. 생성을 건너뜁니다.")
             continue
 
-        content = row['Content']
-        image_path = row['Image']  # 이미지 파일의 경로
-
-        # 날짜 문자열을 datetime 객체로 변환
-        date = datetime.strptime(date_str, '%Y-%m-%d').date()
-
         # 사용자를 임의로 선택하거나 고정할 수 있습니다.
-        # 두 번째 사용자 선택
         user = User.objects.all()[0]
 
         # Article 모델에 데이터 저장
@@ -70,10 +64,11 @@ def import_data_to_articles(file_path):
             title=title,
             content=content,
             date=date,
-            # 다른 필드들도 추가
+            link=link,  # Link 필드 추가
+            running_time=running_time,  # RunningTime 필드 추가
         )
 
-        # 프로젝트를 추가하려면 해당 필드들의 데이터를 가져와서 추가합니다.
+        # 프로젝트 추가
         project_names = [name.strip() for name in row['Project'].split(',')]
         projects = []
         for name in project_names:
@@ -84,14 +79,12 @@ def import_data_to_articles(file_path):
                 defaults={'image': 'defalt_image/defalt_stage.jpg', 'description': '설명을 추가해 주세요', 'address': '서울 마포구 독막로 지하 85', 'writer': user}
             )
             projects.append(project)
-
-            # Debug 출력
             print(f"Project: {project.title}, Created: {created}")
 
         article.project.set(projects)
 
-        # 아티스트를 추가하려면 해당 필드들의 데이터를 가져와서 추가합니다.
-        artist_names = [name.strip() for name in row['Artist'].split(',')]  # 여기서 공백 제거
+        # 아티스트 추가
+        artist_names = [name.strip() for name in row['Artist'].split(',')]  # 공백 제거
         artists = []
         for name in artist_names:
             subtitles = [name]  # Subtitle로 아티스트 이름을 사용
@@ -100,15 +93,12 @@ def import_data_to_articles(file_path):
                 subtitles,
                 defaults={'image': 'defalt_image/defalt_artist.jpg', 'description': '설명을 추가해 주세요', 'writer': user}
             )
-
             artists.append(artist)
-
-             # Debug 출력
             print(f"Artist: {artist.title}, Created: {created}")
 
         article.artist.set(artists)
 
-         # 이미지 파일 등록
+        # 이미지 파일 등록
         if image_path and os.path.exists(image_path):
             with open(image_path, 'rb') as image_file:
                 article.image.save(os.path.basename(image_path), File(image_file))
@@ -117,7 +107,9 @@ def import_data_to_articles(file_path):
             with open(default_image_path, 'rb') as default_image_file:
                 article.image.save(os.path.basename(default_image_path), File(default_image_file))
 
+        print(f"'{title}' Article이 생성되었습니다.")
 
 # 파일 경로 설정
-file_path = 'articleapp/mydata/filtered_data_final_output_20241117.csv'  # 본인의 데이터 파일 경로로 변경
+file_path = 'articleapp/mydata/filtered_data_final_output_20241118.csv'  # 본인의 데이터 파일 경로로 변경
 import_data_to_articles(file_path)
+

@@ -18,7 +18,8 @@ class Article(models.Model):
     title = models.CharField(max_length=200, null=True)
     image = models.ImageField(upload_to='article/', null=False)
     content = models.TextField(null=True)
-    
+    link = models.URLField(max_length=500, null=True, blank=True)  # Link 필드 추가
+
     created_at = models.DateField(auto_now_add=True, null=True)
     date = models.DateField(blank=True, null=True)  # 필수 입력 필드
     datetime = models.DateTimeField(blank=True, null=True)  # DateField에서 DateTimeField로 변경

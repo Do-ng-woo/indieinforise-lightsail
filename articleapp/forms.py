@@ -50,9 +50,21 @@ class ArticleCreationForm(ModelForm):
         required=False  # datetime 필드를 선택적으로 설정
     )
     
+    # Link 필드 추가
+    link = forms.URLField(
+        required=False,  # 필수 입력이 아니도록 설정
+        widget=forms.URLInput(attrs={'placeholder': 'Link (선택 사항)', 'class': 'form-control'})
+    )
+    
+    # RunningTime 필드 추가
+    running_time = forms.IntegerField(
+        required=False,  # 필수 입력이 아니도록 설정
+        widget=forms.NumberInput(attrs={'placeholder': 'Running Time in minutes (선택 사항)', 'class': 'form-control'})
+    )
+
     class Meta:
         model = Article
-        fields = ['title', 'image', 'project', 'artist', 'content', 'datetime']
+        fields = ['title', 'image', 'project', 'artist', 'content', 'datetime', 'link', 'running_time']
         
         
 class ArticleSearchForm(forms.Form):

@@ -186,6 +186,34 @@
     align-items: center; /* 세로 축 중앙 정렬 */
     margin-bottom: 20px; /* 하단 여백 추가 */
 }
+/* 원본 보기 버튼 컨테이너 스타일 */
+.original-link-container {
+    text-align: center;
+    margin: 20px auto;
+}
+
+/* 원본 보기 버튼 스타일 */
+.original-link-btn {
+    display: inline-block; /* 버튼처럼 보이게 설정 */
+    padding: 10px 20px; /* 버튼 내부 여백 */
+    font-size: 1rem; /* 텍스트 크기 */
+    font-weight: bold; /* 텍스트 굵게 */
+    color: #333; /* 텍스트 색상: 진한 회색 */
+    background-color: #fff; /* 버튼 배경색: 흰색 */
+    border: 2px solid #ccc; /* 테두리 색상: 연한 회색 */
+    border-radius: 5px; /* 버튼 모서리 둥글게 */
+    text-decoration: none; /* 밑줄 제거 */
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; /* 호버 효과 부드럽게 */
+    width:95%;
+    margin-left: 20px;
+}
+
+/* 버튼 호버 효과 */
+.original-link-btn:hover {
+    background-color: #f8f9fa; /* 호버 시 배경색: 약간 더 진한 흰색 */
+    border-color: #aaa; /* 호버 시 테두리 색상: 더 진한 회색 */
+    color: #555; /* 호버 시 텍스트 색상: 중간 회색 */
+}
 /* ========================================댓글섹션 스타일링====================================== */
     /* 전체 댓글 섹션 스타일링 */
 .comment-section {
@@ -367,7 +395,10 @@
     .community{
         padding: 20px; /* 패딩 추가 */
         margin-left: 0px; /* 왼쪽 마진 추가 */
-
+    }
+    .original-link-btn{
+        width: 100%;
+        margin-left: 0px; /* 왼쪽 마진 추가 */
     }
 
 }
@@ -419,6 +450,12 @@
                         <p>{{ target_article.date|date:"Y년 n월 j일" }}</p>
                     {% endif %}
                 </div>
+                {% if target_article.running_time %}
+                    <h2>공연 시간</h2>
+                    <div class="date"> <!-- 같은 디자인 적용 -->
+                        <p>{{ target_article.running_time }}분</p>
+                    </div>
+                {% endif %}
                 <div class="place_and_lineup">
                     <div class="place_container">
                         <h2>공연 장소</h2>
@@ -490,6 +527,13 @@
                     <p>이 Article을 태그한 Community 글이 없습니다.</p>
                 {% endif %}
             </div>
+            {% if target_article.link %}
+                <div class="original-link-container">
+                    <a href="{{ target_article.link }}" target="_blank" rel="noopener noreferrer" class="original-link-btn">
+                        자세히 보기
+                    </a>
+                </div>
+            {% endif %}
         </div>
         
         
