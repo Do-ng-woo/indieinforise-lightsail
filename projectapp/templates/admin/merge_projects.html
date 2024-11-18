@@ -1,0 +1,69 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Merge Projects</h1>
+
+<p>아래 폼을 작성하여 두 Project를 병합하세요. 병합 결과로 남길 Project와 삭제할 Project를 선택하고 데이터를 확인하세요.</p>
+
+<div>
+    <h3>Selected Projects</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Project 1</th>
+                <th>Project 2</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Title</strong></td>
+                <td>{{ project1.title }}</td>
+                <td>{{ project2.title }}</td>
+            </tr>
+            <tr>
+                <td><strong>Likes</strong></td>
+                <td>{{ project1.like }}</td>
+                <td>{{ project2.like }}</td>
+            </tr>
+            <tr>
+                <td><strong>Views</strong></td>
+                <td>{{ project1.views }}</td>
+                <td>{{ project2.views }}</td>
+            </tr>
+            <tr>
+                <td><strong>Description</strong></td>
+                <td>{{ project1.description|default:"No description" }}</td>
+                <td>{{ project2.description|default:"No description" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Latitude</strong></td>
+                <td>{{ project1.latitude|default:"N/A" }}</td>
+                <td>{{ project2.latitude|default:"N/A" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Longitude</strong></td>
+                <td>{{ project1.longitude|default:"N/A" }}</td>
+                <td>{{ project2.longitude|default:"N/A" }}</td>
+            </tr>
+                <tr>
+                <td><strong>Address</strong></td>
+                <td>{{ project1.address|default:"No address" }}</td>
+                <td>{{ project2.address|default:"No address" }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="button default">Merge Projects</button>
+</form>
+
+<p>
+    <a href="/admin/projectapp/project/">← 돌아가기</a>
+</p>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>Merge Artists</h1>
+<p>아래 폼을 작성하여 두 아티스트를 병합하세요.</p>
+
+<form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="button">Merge</button>
+</form>
+
+<p>
+    <a href="..">돌아가기</a>
+</p>
+{% endblock %}

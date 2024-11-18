@@ -1,0 +1,103 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Merge Articles</h1>
+
+<p>아래 폼을 작성하여 두 Article을 병합하세요. 병합 결과로 남길 Article과 삭제할 Article을 선택하고 데이터를 확인하세요.</p>
+
+<div>
+    <h3>Selected Articles</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Article 1</th>
+                <th>Article 2</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Title</strong></td>
+                <td>{{ article1.title }}</td>
+                <td>{{ article2.title }}</td>
+            </tr>
+            <tr>
+                <td><strong>Views</strong></td>
+                <td>{{ article1.views }}</td>
+                <td>{{ article2.views }}</td>
+            </tr>
+            <tr>
+                <td><strong>Likes</strong></td>
+                <td>{{ article1.like }}</td>
+                <td>{{ article2.like }}</td>
+            </tr>
+            <tr>
+                <td><strong>Image</strong></td>
+                <td>
+                    {% if article1.image %}
+                        <img src="{{ article1.image.url }}" alt="Article 1 Image" style="max-height: 100px;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                </td>
+                <td>
+                    {% if article2.image %}
+                        <img src="{{ article2.image.url }}" alt="Article 2 Image" style="max-height: 100px;">
+                    {% else %}
+                        No image
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Content</strong></td>
+                <td>{{ article1.content|default:"No content" }}</td>
+                <td>{{ article2.content|default:"No content" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Date</strong></td>
+                <td>{{ article1.date|date:"Y-m-d" }}</td>
+                <td>{{ article2.date|date:"Y-m-d" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Datetime</strong></td>
+                <td>{{ article1.datetime|date:"Y-m-d H:i" }}</td>
+                <td>{{ article2.datetime|date:"Y-m-d H:i" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Link</strong></td>
+                <td>
+                    {% if article1.link %}
+                        <a href="{{ article1.link }}" target="_blank">Visit Link</a>
+                    {% else %}
+                        No link
+                    {% endif %}
+                </td>
+                <td>
+                    {% if article2.link %}
+                        <a href="{{ article2.link }}" target="_blank">Visit Link</a>
+                    {% else %}
+                        No link
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Running Time</strong></td>
+                <td>{{ article1.running_time|default:"N/A" }}</td>
+                <td>{{ article2.running_time|default:"N/A" }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="button default">Merge Articles</button>
+</form>
+
+<p>
+    <a href="/admin/articleapp/article/">← 돌아가기</a>
+</p>
+{% endblock %}

@@ -36,7 +36,7 @@ class Artist(models.Model):
     image = models.ImageField(upload_to='artist/', null=False)
     description = models.CharField(max_length=200, null=True)
     person = models.ManyToManyField(Person, related_name='artist', blank=True)
-    text_person = models.JSONField(default=list)  # JSON 필드로 변경
+    text_person = models.JSONField(default=list, blank=True)  # JSON 필드로 변경
     
     like = models.IntegerField(default=0)
     hot_point = models.IntegerField(default=0)  # hot_point 필드 추가
