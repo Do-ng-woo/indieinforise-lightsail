@@ -286,3 +286,5 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # 세션 저장 방식: 데이터베이스 세션
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+SESSION_SAVE_EVERY_REQUEST = True
