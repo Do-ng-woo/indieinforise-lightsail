@@ -4,12 +4,18 @@ import logging
 
 logger = logging.getLogger(__name__)  # 로깅 설정
 
+
 class VisitorSessionMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
         try:
+            # 정적 및 미디어 파일 요청 필터링
+            if self.is_static_or_media_request(request.path):
+                logger.debug(f"Filtered static/media request: {request.path}")
+                return self.get_response(request)
+
             # 세션 키 생성 (없으면 새로 생성)
             if not request.session.session_key:
                 request.session.create()
@@ -25,6 +31,7 @@ class VisitorSessionMiddleware:
 
             # 로드 밸런서 및 봇 요청 필터링
             if self.is_ignored_request(ip_address, user_agent):
+                logger.info(f"Ignored request: IP={ip_address}, User-Agent={user_agent}")
                 return self.get_response(request)
 
             # VisitorSession 생성 또는 업데이트
@@ -32,11 +39,16 @@ class VisitorSessionMiddleware:
 
         except Exception as e:
             # 예외 발생 시 로깅
-            logger.error(f"Error in VisitorSessionMiddleware: {e}", exc_info=True)
+            logger.error(f"Unhandled error in VisitorSessionMiddleware: {e}", exc_info=True)
 
         # 다음 미들웨어/뷰 처리
-        response = self.get_response(request)
-        return response
+        return self.get_response(request)
+
+    def is_static_or_media_request(self, path):
+        """
+        정적 파일(static) 또는 미디어 파일 요청 여부 확인
+        """
+        return path.startswith('/static/') or path.startswith('/media/')
 
     def get_client_ip(self, request):
         """
@@ -46,7 +58,7 @@ class VisitorSessionMiddleware:
         if ip_address:
             ip_address = ip_address.split(',')[0].strip()
         else:
-            ip_address = request.META.get('REMOTE_ADDR', '')
+            ip_address = request.META.get('REMOTE_ADDR', 'unknown')
         return ip_address
 
     def is_ignored_request(self, ip_address, user_agent):
@@ -65,20 +77,34 @@ class VisitorSessionMiddleware:
         """
         VisitorSession을 생성하거나 업데이트합니다.
         """
-        session, created = VisitorSession.objects.get_or_create(
-            session_key=session_key,
-            defaults={
-                'user_id': user_id,
-                'ip_address': ip_address,
-                'user_agent': user_agent,
-                'start_time': timezone.now(),
-                'end_time': timezone.now(),
-                'page_views': 1,
-            },
-        )
+        try:
+            session, created = VisitorSession.objects.get_or_create(
+                session_key=session_key,
+                defaults={
+                    'user_id': user_id,
+                    'ip_address': ip_address,
+                    'user_agent': user_agent,
+                    'start_time': timezone.now(),
+                    'end_time': timezone.now(),
+                    'page_views': 1,
+                },
+            )
 
-        if not created:
-            # 기존 세션: 페이지뷰 증가 및 종료 시간 갱신
-            session.page_views += 1
-            session.end_time = timezone.now()
-            session.save()
+            if not created:
+                # 기존 세션: 페이지뷰 증가 및 종료 시간 갱신
+                session.page_views += 1
+                session.end_time = timezone.now()
+                session.save()
+
+            logger.info(
+                f"{'Created' if created else 'Updated'} VisitorSession: "
+                f"SessionKey={session_key}, IP={ip_address}, PageViews={session.page_views}"
+            )
+
+        except Exception as db_error:
+            # 데이터베이스 관련 오류 로깅
+            logger.error(
+                f"Database error while handling VisitorSession: {db_error}, "
+                f"SessionKey={session_key}, IP={ip_address}, User-Agent={user_agent}",
+                exc_info=True,
+            )

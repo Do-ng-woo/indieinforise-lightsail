@@ -22,6 +22,7 @@ class VisitorSession(models.Model):
     
 class DailyVisitorStatistics(models.Model):
     date = models.DateField(unique=True)
+    homepage_views = models.PositiveIntegerField(default=0)  # 홈페이지 조회수
     total_visitors = models.PositiveIntegerField()
     max_duration = models.PositiveIntegerField()      # 최대 체류 시간 (초 단위)
     min_duration = models.PositiveIntegerField()      # 최소 체류 시간 (초 단위)
