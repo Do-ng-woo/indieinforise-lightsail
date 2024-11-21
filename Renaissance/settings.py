@@ -277,3 +277,12 @@ EMAIL_HOST_PASSWORD = env('EMAILPASSWORD')  # 발신자 이메일의 비밀번�
 #Celery와 Redis가 같은 서버 내에서 통신하게 되어 설정
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+# 세션 만료 시간 (예: 30분)
+SESSION_COOKIE_AGE = 1800
+
+# 브라우저 닫아도 세션 유지
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# 세션 저장 방식: 데이터베이스 세션
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
