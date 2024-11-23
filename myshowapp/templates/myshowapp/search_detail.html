@@ -218,7 +218,7 @@
 
     .modal {
         position: fixed;
-        top: 50%;
+        bottom: -5%;
         left: 50%;
         background: #fff;
         padding: 20px;
@@ -364,10 +364,24 @@
         }
     }
 
+    @media (max-width: 750px) {
+        .top-buttons {
+            width: 95%;
+        }
+        .title {
+            width: 95%; /* 내용에 맞게 너비 조정 */
+        }
+    }
+
     @media (max-width: 650px) {
         .card_artist {
             flex: 0 0 45%;
             /* flex-grow, flex-shrink, flex-basis */
+        }
+    }
+    @media (max-width: 500px) {
+        .top-buttons a{
+            font-size: 16px !important;
         }
     }
 

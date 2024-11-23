@@ -2,11 +2,7 @@
     font-family: 'Lobster', cursive;
 }
 
-@media screen and (max-width:500px){
-    html {
-        font-size:13px
-    }
-}
+
 a {
     color: black;
     
@@ -17,13 +13,6 @@ a:hover {
     text-decoration: none;
 }
 
-body {
-    background: url('static/background/recode.png') no-repeat center center fixed;
-    -webkit-background-size: covoer;
-    -moz-background-size: cover;
-    background-size: cover;
-    -o-background-size: covoer;
-}
 
 section {
     margin-bottom: 150px;
