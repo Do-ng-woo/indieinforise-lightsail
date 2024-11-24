@@ -32,9 +32,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 # 자동 로그인 처리
                 login(request, existing_user)
 
-
-            except CustomUser.DoesNotExist:
-                # 기존 사용자가 없는 경우에만 EmailUser 생성
+                # EmailUser 업데이트
                 email_user, created = EmailUser.objects.get_or_create(email=user_email)
                 if created or not email_user.is_verified:
                     email_user.is_verified = True
@@ -42,26 +40,40 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                     email_user.created_at = now()
                     email_user.save()
 
-        # 소셜 로그인 방식에 따른 추가 정보 처리
-        extra_data = sociallogin.account.extra_data
-        if provider in ['kakao', 'naver']:
-            # 닉네임 가져오기 (카카오, 네이버 공통 처리)
-            nickname = extra_data.get('properties', {}).get('nickname', '') or \
-                       extra_data.get('kakao_account', {}).get('profile', {}).get('nickname', '') or \
-                       extra_data.get('nickname', '')
+                # 기존 사용자 처리 후 작업 종료
+                return
 
-            if nickname:
-                user.username = nickname  # 닉네임을 사용자 이름으로 설정
+            except CustomUser.DoesNotExist:
+                # 기존 사용자가 없는 경우 EmailUser 생성
+                email_user, created = EmailUser.objects.get_or_create(email=user_email)
+                if created or not email_user.is_verified:
+                    email_user.is_verified = True  # 이메일 인증 미완료 상태
+                    email_user.account_created = True
+                    email_user.created_at = now()
+                    email_user.save()
 
-        if provider == 'google':
-            user.signup_method = 'google'
-        elif provider == 'facebook':
-            user.signup_method = 'facebook'
-        elif provider == 'kakao':
-            user.signup_method = 'kakao'
-        elif provider == 'naver':
-            user.signup_method = 'naver'
-        else:
-            user.signup_method = 'manual'  # 수동으로 추가된 경우는 manual로 설정
+        # 새로운 사용자 생성 로직
+        if not sociallogin.is_existing:  # 기존 계정이 아닌 경우만 처리
+            extra_data = sociallogin.account.extra_data
+            if provider in ['kakao', 'naver']:
+                # 닉네임 가져오기 (카카오, 네이버 공통 처리)
+                nickname = extra_data.get('properties', {}).get('nickname', '') or \
+                           extra_data.get('kakao_account', {}).get('profile', {}).get('nickname', '') or \
+                           extra_data.get('nickname', '')
 
-        user.save()
+                if nickname:
+                    user.username = nickname  # 닉네임을 사용자 이름으로 설정
+
+            # 소셜 로그인 방식 설정
+            if provider == 'google':
+                user.signup_method = 'google'
+            elif provider == 'facebook':
+                user.signup_method = 'facebook'
+            elif provider == 'kakao':
+                user.signup_method = 'kakao'
+            elif provider == 'naver':
+                user.signup_method = 'naver'
+            else:
+                user.signup_method = 'manual'  # 수동으로 추가된 경우는 manual로 설정
+
+            user.save()
