@@ -58,9 +58,13 @@ else:  # 서버 환경
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE =True
+    
+    # 무한 리디렉션 방지를 위한 조건 추가
+    if 'HTTP_X_FORWARDED_PROTO' not in os.environ:
+        SECURE_SSL_REDIRECT = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['www.indieboost.co.kr', 'indieboost.co.kr','127.0.0.1:8000']
 
 
 
