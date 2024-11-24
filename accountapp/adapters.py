@@ -4,10 +4,18 @@ from django.shortcuts import get_object_or_404
 from .models import EmailUser, CustomUser
 from django.utils import timezone
 
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.socialaccount.models import SocialAccount
+from django.utils import timezone
+from .models import CustomUser, EmailUser
+
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
-        user_email = sociallogin.user.email
+        user = sociallogin.user
+        provider = sociallogin.account.provider
 
+        # 이메일 처리
+        user_email = user.email
         if user_email:
             try:
                 # 기존 사용자가 존재하는지 확인
@@ -34,10 +42,17 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                     email_user.created_at = timezone.now()
                     email_user.save()
 
-        # 소셜 로그인 방식에 따라 signup_method 설정
-        user = sociallogin.user
-        if isinstance(user, CustomUser):
-            provider = sociallogin.account.provider
+        # 소셜 로그인 방식에 따른 추가 정보 처리
+        if provider in ['google', 'facebook', 'kakao', 'naver']:
+            extra_data = sociallogin.account.extra_data
+            if provider in ['kakao', 'naver']:
+                # 닉네임 가져오기 (카카오, 네이버 공통 처리)
+                nickname = extra_data.get('properties', {}).get('nickname', '') or \
+                           extra_data.get('kakao_account', {}).get('profile', {}).get('nickname', '') or \
+                           extra_data.get('nickname', '')
+
+                if nickname:
+                    user.username = nickname  # 닉네임을 사용자 이름으로 설정
 
             if provider == 'google':
                 user.signup_method = 'google'
@@ -48,14 +63,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             elif provider == 'naver':
                 user.signup_method = 'naver'
 
-                # 네이버 API 데이터에서 추가 정보를 가져와 사용자 모델 업데이트
-                extra_data = sociallogin.account.extra_data
-                nickname = extra_data.get('nickname', '')  # 네이버에서 'nickname' 필드 가져오기
-        
-                if nickname:
-                    user.username = nickname  # 사용자 이름으로 설정
+        else:
+            user.signup_method = 'manual'  # 수동으로 추가된 경우는 manual로 설정
 
-            else:
-                user.signup_method = 'manual'  # 수동으로 추가된 경우는 manual로 설정
-
-            user.save()
+        user.save()

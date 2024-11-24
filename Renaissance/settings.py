@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',   #allauth
     'allauth.socialaccount.providers.google',  # 구글 로그인 추가
     'allauth.socialaccount.providers.naver',   # 네이버 로그인 추가
+    'allauth.socialaccount.providers.kakao',
     'accountapp',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -136,6 +137,14 @@ SOCIALACCOUNT_PROVIDERS = {
         'APP': {
             'client_id': env('NAVER_CLIENT_ID'),
             'secret': env('NAVER_CLIENT_SECRET'),
+            'key': ''
+        }
+    },
+    'kakao': {
+        'SCOPE': ['account_email','profile_nickname'],
+        'APP': {
+            'client_id': env('KAKAO_REST_API_KEY'),
+            'secret': '',
             'key': ''
         }
     }
