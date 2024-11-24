@@ -8,6 +8,7 @@ from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.socialaccount.models import SocialAccount
 from django.utils import timezone
 from .models import CustomUser, EmailUser
+from django.utils.timezone import now
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
