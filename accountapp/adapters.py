@@ -8,6 +8,7 @@ from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.socialaccount.models import SocialAccount
 from django.utils import timezone
 from .models import CustomUser, EmailUser
+from django.contrib.auth import login
 from django.utils.timezone import now
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -28,13 +29,9 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                     sociallogin.account.save()
                     sociallogin.user = existing_user  # 현재 세션에 기존 사용자 설정
 
-                # EmailUser 업데이트
-                email_user, created = EmailUser.objects.get_or_create(email=user_email)
-                if created or not email_user.is_verified:
-                    email_user.is_verified = True
-                    email_user.account_created = True
-                    email_user.created_at = now()
-                    email_user.save()
+                # 자동 로그인 처리
+                login(request, existing_user)
+
 
             except CustomUser.DoesNotExist:
                 # 기존 사용자가 없는 경우에만 EmailUser 생성
