@@ -50,7 +50,7 @@ KAKAO_API_KEY =env('KAKAO_API_KEY')
 DEBUG = env('DEBUG')
 
 
-ALLOWED_HOSTS = ['www.indieboost.co.kr', 'indieboost.co.kr','127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 
@@ -168,12 +168,14 @@ WSGI_APPLICATION = 'Renaissance.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 # 데이터베이스 설정
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',  # SQLite 엔진 사용
 #         'NAME': BASE_DIR / 'db.sqlite3',  # SQLite 파일 경로
 #     }
 # }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # MySQL 엔진 사용
