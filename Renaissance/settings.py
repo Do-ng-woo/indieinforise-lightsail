@@ -109,7 +109,8 @@ SOCIALACCOUNT_PROVIDERS = {
         'APP': {
             'client_id': '137673191859-6mr8tt40qpgchjqjhmetrbjv2nl3djek.apps.googleusercontent.com',
             'secret': env('GOOGLE_CLIENT_SECRET'),
-            'key': ''
+            'key': '',
+            'redirect_uri': 'https://www.indieboost.co.kr/accounts/google/login/callback/'
         }
     },
     'naver': {
