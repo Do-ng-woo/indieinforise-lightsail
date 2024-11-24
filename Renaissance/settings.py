@@ -49,7 +49,8 @@ KAKAO_API_KEY =env('KAKAO_API_KEY')
 # DEBUG 설정 (환경 변수에서 읽음)
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['www.indieboost.co.kr', 'indieboost.co.kr','127.0.0.1:8000']
+
+ALLOWED_HOSTS = ['www.indieboost.co.kr', 'indieboost.co.kr','127.0.0.1']
 
 
 
@@ -167,28 +168,26 @@ WSGI_APPLICATION = 'Renaissance.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 # 데이터베이스 설정
-if DEBUG:  # 로컬 환경
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',  # SQLite 엔진 사용
-            'NAME': BASE_DIR / 'db.sqlite3',  # SQLite 파일 경로
-        }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',  # SQLite 엔진 사용
+#         'NAME': BASE_DIR / 'db.sqlite3',  # SQLite 파일 경로
+#     }
+# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',  # MySQL 엔진 사용
+        'NAME': env('DB_NAME'),  # 데이터베이스 이름
+        'USER': env('DB_USER'),  # 데이터베이스 사용자 이름
+        'PASSWORD': env('DB_PASSWORD'),  # 데이터베이스 비밀번호
+        'HOST': env('DB_HOST'),  # 데이터베이스 호스트 주소
+        'PORT': env('DB_PORT', default='3306'),  # 포트 번호 (기본값 3306)
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1;",
+        },
     }
-else:  # 서버 환경
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',  # MySQL 엔진 사용
-            'NAME': env('DB_NAME'),  # 데이터베이스 이름
-            'USER': env('DB_USER'),  # 데이터베이스 사용자 이름
-            'PASSWORD': env('DB_PASSWORD'),  # 데이터베이스 비밀번호
-            'HOST': env('DB_HOST'),  # 데이터베이스 호스트 주소
-            'PORT': env('DB_PORT', default='3306'),  # 포트 번호 (기본값 3306)
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1;",
-            },
-        }
-    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
