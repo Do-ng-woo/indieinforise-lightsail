@@ -47,6 +47,14 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                 user.signup_method = 'kakao'
             elif provider == 'naver':
                 user.signup_method = 'naver'
+
+                # 네이버 API 데이터에서 추가 정보를 가져와 사용자 모델 업데이트
+                extra_data = sociallogin.account.extra_data
+                nickname = extra_data.get('nickname', '')  # 네이버에서 'nickname' 필드 가져오기
+        
+                if nickname:
+                    user.username = nickname  # 사용자 이름으로 설정
+
             else:
                 user.signup_method = 'manual'  # 수동으로 추가된 경우는 manual로 설정
 

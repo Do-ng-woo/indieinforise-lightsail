@@ -53,11 +53,13 @@ if DEBUG:  # 로컬 환경
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL='http'
 else:  # 서버 환경 (로드밸런서 사용)
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True  # HTTP 요청을 HTTPS로 리디렉션
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL='https'
 
     # 무한 리디렉션 방지를 위한 조건 추가
     if 'HTTP_X_FORWARDED_PROTO' not in os.environ:
@@ -118,7 +120,6 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_DEFAULT_HTTP_PROTOCOL='https'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -131,7 +132,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     },
     'naver': {
-        'SCOPE': ['nickname', 'email', 'gender', 'age'],
+        'SCOPE': ['nickname', 'email'],
         'APP': {
             'client_id': env('NAVER_CLIENT_ID'),
             'secret': env('NAVER_CLIENT_SECRET'),
