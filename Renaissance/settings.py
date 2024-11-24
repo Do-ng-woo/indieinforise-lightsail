@@ -15,13 +15,12 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-# .env 파일의 환경 변수 로드
-load_dotenv()
 
 from django.contrib.messages import constants as messages
 
 
 import environ
+
 env = environ.Env(
     DEBUG=(bool,False)
 )
@@ -46,9 +45,24 @@ KAKAO_JS_API_KEY = env('KAKAO_JS_API_KEY')
 KAKAO_API_KEY =env('KAKAO_API_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
+# DEBUG 설정 (환경 변수에서 읽음)
+DEBUG = env('DEBUG')
+
+# HTTPS 설정 분리
+if DEBUG:  # 로컬 환경
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+else:  # 서버 환경
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = ['*']
+
+
 
 # Application definition
 
@@ -109,8 +123,7 @@ SOCIALACCOUNT_PROVIDERS = {
         'APP': {
             'client_id': '137673191859-6mr8tt40qpgchjqjhmetrbjv2nl3djek.apps.googleusercontent.com',
             'secret': env('GOOGLE_CLIENT_SECRET'),
-            'key': '',
-            'redirect_uri': 'https://www.indieboost.co.kr/accounts/google/login/callback/'
+            'key': ''
         }
     },
     'naver': {
@@ -123,7 +136,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SOCIALACCOUNT_ADAPTER = 'accountapp.adapters.CustomSocialAccountAdapter'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -164,27 +177,29 @@ WSGI_APPLICATION = 'Renaissance.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',  # MySQL 엔진 사용
-        'NAME': env('DB_NAME'),  # 데이터베이스 이름
-        'USER': env('DB_USER'),  # 데이터베이스 사용자 이름
-        'PASSWORD': env('DB_PASSWORD'),  # 데이터베이스 비밀번호
-        'HOST': env('DB_HOST'),  # 데이터베이스 호스트 (MySQL 서버 주소)
-        'PORT': env('DB_PORT', default='3306'),  # 포트 번호 (기본값 3306)
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1;",
-        },
+# 데이터베이스 설정
+if DEBUG:  # 로컬 환경
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',  # SQLite 엔진 사용
+            'NAME': BASE_DIR / 'db.sqlite3',  # SQLite 파일 경로
+        }
     }
-}
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',  # SQLite 엔진 사용
-#         'NAME': BASE_DIR / 'db.sqlite3',  # 데이터베이스 파일 경로
-#      } 
-# }
+else:  # 서버 환경
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',  # MySQL 엔진 사용
+            'NAME': env('DB_NAME'),  # 데이터베이스 이름
+            'USER': env('DB_USER'),  # 데이터베이스 사용자 이름
+            'PASSWORD': env('DB_PASSWORD'),  # 데이터베이스 비밀번호
+            'HOST': env('DB_HOST'),  # 데이터베이스 호스트 주소
+            'PORT': env('DB_PORT', default='3306'),  # 포트 번호 (기본값 3306)
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1;",
+            },
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
