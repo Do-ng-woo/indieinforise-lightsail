@@ -665,7 +665,9 @@ input[type="password"] {
 <div class="entire_main">
     <div class="left_main">
         <div class="banner">
-            <img src="{% static 'defalut_image/indieboost_default_banner.png' %}" alt="배너 광고" class="banner-image">
+            <a href="{% url 'homepageapp:storypage' %}">
+                <img src="{% static 'defalut_image/indieboost_default_banner.png' %}" alt="배너 광고" class="banner-image">
+            </a>
         </div>
         <div class="entire-container">
             <div class="article-header">
@@ -885,7 +887,7 @@ input[type="password"] {
 <div class="notice-popup" id="noticePopup">
     <div class="notice-popup-content">
         <h2>현재 사이트는 개발 중입니다!</h2>
-        <p>Indieboost는 곧 공식 오픈 예정입니다. 지금은 개발 중이지만, 멋진 인디 밴드 정보와 기능들을 준비 중이니 기대해 주세요!</p>
+        <p>Indieboost는 곧 공식 오픈 예정입니다. 지금은 베타 테스트 중이지만, 멋진 인디 밴드 정보와 기능들을 준비 중이니 기대해 주세요!</p>
         <!-- 공지 팝업 닫기 버튼 -->
     <button class="notice-popup-button" onclick="closeNoticePopup()">알겠습니다</button>
     </div>

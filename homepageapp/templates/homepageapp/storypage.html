@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+{% load bootstrap4 %}
+<style>    
+    /* 공통 섹션 스타일 */
+    .section {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        position: relative; /* 배경 이미지를 절대 위치로 설정 */
+        overflow: hidden; /* 배경이 섹션 밖으로 나가지 않도록 설정 */
+        z-index: 1; /* 내용이 배경 위에 보이도록 설정 */
+        color: black; /* 텍스트를 흰색으로 변경 */
+    }
+
+    .section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        z-index: -1; /* 배경이 내용 뒤로 가도록 설정 */
+        opacity: 0.7; /* 반투명 효과 */
+        transition: opacity 1s ease; /* 페이드 효과 */
+    }
+    /* 배경 애니메이션 */
+        .section::before {
+        opacity: 0;
+        transform: scale(1.05); /* 약간 확대된 상태에서 시작 */
+        transition: opacity 1s ease-in-out, transform 1s ease-in-out; /* 배경 애니메이션 속도 */
+    }
+
+    .background-visible::before {
+        opacity: 0.7; /* 완전히 보이도록 설정 */
+        transform: scale(1); /* 확대 효과 해제 */
+    }
+
+    /* 각 섹션별 배경 이미지 */
+    .hero-section::before{
+        background-image: url("{% static 'defalut_image/story_hero_back.jpg' %}");
+        background-size: cover; /* 이미지를 영역에 맞게 조정 */
+        background-position: center; /* 이미지를 가운데 정렬 */
+        background-repeat: no-repeat; /* 이미지 반복 방지 */
+        height: 100vh; /* 섹션 높이를 뷰포트 크기에 맞춤 */
+    }
+
+    .story-section::before {
+        background-image: url("{% static 'defalut_image/story_idea_back.jpg' %}");
+        background-size: cover; /* 이미지를 영역에 맞게 조정 */
+        background-position: center; /* 이미지를 가운데 정렬 */
+        background-repeat: no-repeat; /* 이미지 반복 방지 */
+        height: 100vh; /* 섹션 높이를 뷰포트 크기에 맞춤 */
+    }
+
+    .features-section::before {
+        background-image: url("{% static 'defalut_image/story_feature_back.jpg' %}");
+        background-size: cover; /* 이미지를 영역에 맞게 조정 */
+        background-position: center; /* 이미지를 가운데 정렬 */
+        background-repeat: no-repeat; /* 이미지 반복 방지 */
+        height: 100vh; /* 섹션 높이를 뷰포트 크기에 맞춤 */
+    }
+
+    .beta-section::before {
+        background-image: url("{% static 'defalut_image/story_beta_back.jpg' %}");
+        background-size: cover; /* 이미지를 영역에 맞게 조정 */
+        background-position: center; /* 이미지를 가운데 정렬 */
+        background-repeat: no-repeat; /* 이미지 반복 방지 */
+        height: 100vh; /* 섹션 높이를 뷰포트 크기에 맞춤 */
+    }
+    
+    /* 텍스트 스타일 */
+    h1, h2 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        max-width: 700px;
+    }
+    /* 텍스트 애니메이션 */
+        .fade-in {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 1.5s ease, transform 1.5s ease; /* 텍스트 애니메이션 속도 */
+    }
+
+    .fade-in-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* 버튼 스타일 */
+    .buttons a {
+        display: inline-block;
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 1em;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-primary {
+        background: #007bff;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+</style>
+
+<div class="story_container">
+    <!-- Hero Section -->
+    <div class="section hero-section">
+        <h1>Indieboost에 오신 걸 환영합니다.</h1>
+        <p>여러분은 마지막으로 라이브 공연을 다녀온 게 언제인가요?</p>
+        <p>티켓을 예매하려고 검색창에 이런 문구를 적어본 적 있나요?</p>
+        <blockquote>
+            <p>“이번 주말 인디 밴드 공연 추천”</p>
+            <p>“서울에서 열리는 어쿠스틱 공연”</p>
+            <p>“내가 좋아하는 아티스트, 다음 공연 일정”</p>
+        </blockquote>
+        <p>하지만 원하는 답을 얻기 위해 헤매던 경험, 한 번쯤 있으셨을 겁니다. 저 역시 인디 공연 마니아로서 비슷한 어려움을 겪었습니다.</p>
+    </div>
+    <!-- Story Section -->
+    <div class="section story-section">
+        <h2>이 웹사이트를 만들게 된 계기</h2>
+        <p>몇 달 전, 대학 생활에서 잠시 휴식을 얻은 저는 오랜만에 마음껏 공연을 즐기고 싶었습니다.</p>
+        <p>그런데 공연 정보를 찾아보는 과정은 결코 간단하지 않았습니다.</p>
+        <ul>
+            <p>SNS와 티켓 사이트를 넘나들며 날짜를 확인하고,</p>
+            <p>밴드 이름을 검색해 어떤 장르의 음악인지 찾아보고,</p>
+            <p>심지어 공연을 보고 나서도 그 순간을 제대로 기록할 방법을 고민해야 했죠.</p>
+        </ul>
+        <p>저는 그때 결심했습니다.</p>
+        <blockquote>
+            <p>"공연을 사랑하는 사람들을 위한, 사용하기 쉽고 신뢰할 수 있는 플랫폼을 만들자."</p>
+        </blockquote>
+        <p>그리고 그렇게 탄생한 것이 Indieboost입니다.</p>
+    </div>
+    <!-- Features Section -->
+    <div class="section features-section">
+        <h2>Indieboost는 이런 분들을 위해 만들어졌습니다.</h2>
+        <div class="features">
+            <div class="feature">
+                <h4>공연 정보 찾기에 지친 분들</h4>
+                <p>SNS를 뒤질 필요 없이, 인디 밴드와 아티스트의 공연 일정을 한눈에 볼 수 있습니다.</p>
+            </div>
+            <div class="feature">
+                <h4>공연을 기록하고 싶은 공연 마니아</h4>
+                <p>스탬프를 모으듯 내가 본 공연을 저장하고, 나만의 공연 다이어리를 만들어보세요.</p>
+            </div>
+            <div class="feature">
+                <h4>인디 음악의 새로운 팬들</h4>
+                <p>“이 밴드는 어떤 음악을 할까?” 공연장에 가기 전 아티스트와 장르 정보를 확인해보세요.</p>
+            </div>
+            <div class="feature">
+                <h4>커뮤니티와 리뷰 공유</h4>
+                <p>다른 팬들과 공연의 추억을 나누고 새로운 공연을 추천받아보세요.</p>
+            </div>
+        </div>
+    </div>
+    <!-- Beta Test Info Section -->
+    <div class="section beta-section">
+        <h2>현재 Indieboost는 베타 테스트 단계에 있습니다.</h2>
+        <p>여러분의 피드백은 이 플랫폼의 완성도를 높이는 데 큰 역할을 합니다.</p>
+        <p><strong>베타 테스트 기간:</strong> 2024년 12월 1일 ~ 12월 31일</p>
+        <div class="buttons">
+            <a href="{% url 'homepageapp:main' %}" class="btn-primary">베타 테스트 참여하기</a>
+            <a href="#" class="btn-secondary">피드백 남기기</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(".section");
+        const backgrounds = document.querySelectorAll(".section::before");
+
+        // 텍스트에 대한 IntersectionObserver
+        const textObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                        entry.target.classList.add("fade-in-visible");
+                    } else {
+                        entry.target.classList.remove("fade-in-visible");
+                    }
+                });
+            },
+            {
+                threshold: 0.5, // 화면의 50%가 보여야 나타남
+            }
+        );
+
+        // 배경에 대한 IntersectionObserver
+        const backgroundObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.2) {
+                        entry.target.classList.add("background-visible");
+                    } else {
+                        entry.target.classList.remove("background-visible");
+                    }
+                });
+            },
+            {
+                threshold: 0.2, // 화면의 20%가 보여야 나타남
+            }
+        );
+
+        // 각각의 observer를 적용
+        sections.forEach((section) => {
+            textObserver.observe(section);
+            backgroundObserver.observe(section);
+        });
+    });
+</script>
+    
+{% endblock %}
