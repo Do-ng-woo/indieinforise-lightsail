@@ -29,17 +29,20 @@
     min-width: 950px;
     max-width: 950px;
     margin: 0 auto;
-    height: 300px; /* 배너의 높이. 실제 광고 크기에 맞춰 조정해야 할 수 있음 */
+    height: 300px; /* 배너의 높이를 고정 */
     border-radius: 1rem; /* 모서리 둥글기 */
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden; /* 컨테이너를 벗어나는 이미지 부분을 잘라냄 */
     margin-bottom: 2rem; /* 아래 요소와의 여백 */
-    margin-top:30px;
-}    
+    margin-top: 30px;
+}
+
 .banner-image {
-    max-width: 100%; /* 컨테이너 너비를 초과하지 않음 */
-    max-height: 100%; /* 컨테이너 높이를 초과하지 않음 */
+    width: 100%; /* 배너 컨테이너의 너비를 채움 */
+    height: 100%; /* 배너 컨테이너의 높이를 채움 */
+    object-fit: cover; /* 이미지의 비율을 유지하며 잘리도록 설정 */
     border-radius: 1rem; /* 이미지의 모서리 둥글기 */
 }
 .entire-container {
@@ -666,7 +669,7 @@ input[type="password"] {
     <div class="left_main">
         <div class="banner">
             <a href="{% url 'homepageapp:storypage' %}">
-                <img src="{% static 'defalut_image/indieboost_default_banner.png' %}" alt="배너 광고" class="banner-image">
+                <img src="{% static 'defalut_image/indieboost_beta_open_winter.png' %}" alt="배너 광고" class="banner-image">
             </a>
         </div>
         <div class="entire-container">
