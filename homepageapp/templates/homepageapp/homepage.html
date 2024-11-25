@@ -736,7 +736,7 @@ input[type="password"] {
                         <div class="google"><a href="{% provider_login_url 'google' %}"><img src="{% static 'defalut_image/google-login-icon.png' %}" alt="Google"></a></div>
                         <div class="naver"><a href="{% provider_login_url 'naver' %}"><img src="{% static 'defalut_image/naver-login-icon.png' %}" alt="Naver"></a></div>
                         <div class="kakao"><a href="{% provider_login_url 'kakao' %}"><img src="{% static 'defalut_image/kakao-login-icon.jpg' %}" alt="Kakao"></a></div>
-                        <div class="facebook"><a href="#"><img src="{% static 'defalut_image/facebook-login-icon.png' %}" alt="Facebook"></a></div>
+                        <div class="facebook"><a href="{% provider_login_url 'facebook' %}"><img src="{% static 'defalut_image/facebook-login-icon.png' %}" alt="Facebook"></a></div>
                     </div>
                     <div class="sign_and_find">
                         <div><a href="{% url 'accountapp:create' %}" class="signup-button">회원가입</a></div>

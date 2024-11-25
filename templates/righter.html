@@ -146,7 +146,7 @@
                     <div class="google-popup-new"><a href="{% provider_login_url 'google' %}"><img src="{% static 'defalut_image/google-login-icon.png' %}" alt="Google"></a></div>
                     <div class="naver-popup-new"><a href="{% provider_login_url 'naver' %}"><img src="{% static 'defalut_image/naver-login-icon.png' %}" alt="Naver"></a></div>
                     <div class="kakao-popup-new"><a href="{% provider_login_url 'kakao' %}"><img src="{% static 'defalut_image/kakao-login-icon.jpg' %}" alt="Kakao"></a></div>
-                    <div class="facebook-popup-new"><a href="#"><img src="{% static 'defalut_image/facebook-login-icon.png' %}" alt="Facebook"></a></div>
+                    <div class="facebook-popup-new"><a href="{% provider_login_url 'facebook' %}"><img src="{% static 'defalut_image/facebook-login-icon.png' %}" alt="Facebook"></a></div>
                 </div>
                 <div class="sign-and-find-popup-new">
                     <div><a href="{% url 'accountapp:create' %}" class="signup-button-popup-new">회원가입</a></div>
