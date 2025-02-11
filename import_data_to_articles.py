@@ -115,6 +115,6 @@ def import_data_to_articles(file_path):
         print(f"'{title}' Article이 생성되었습니다.")
 
 # 파일 경로 설정
-file_path = 'articleapp/mydata/filtered_data_final_output_20241118.csv'  # 본인의 데이터 파일 경로로 변경
+file_path = 'articleapp/mydata/filtered_data_final_output_20250212.csv'  # 본인의 데이터 파일 경로로 변경
 import_data_to_articles(file_path)
 
