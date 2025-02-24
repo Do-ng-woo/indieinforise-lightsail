@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from django.views.generic import TemplateView
 
 from articleapp.views import ArticleCreateView, ArticleDetailView, ArticleUpdateView, ArticleDeleteView, ArticleListView, ArticleEventsAPIView, CalendarDetailAPIView, article_update_log_view
@@ -15,6 +15,7 @@ urlpatterns = [
     path('api/events/', ArticleEventsAPIView.as_view(), name='api-events'),
     path('calendar_detail/', CalendarDetailAPIView.as_view(), name='calendar_detail'),  # 경로 이름 변경
     path('articles/<int:pk>/logs/', article_update_log_view, name='article-update-logs'),
+    path('api/', include('articleapp.api.urls')),  
 ]
     
         

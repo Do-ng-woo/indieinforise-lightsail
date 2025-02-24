@@ -13,5 +13,5 @@ urlpatterns = [
     path('project_delete_description/', project_delete_description, name='project_delete_description'),
     path('path-to-events-api/', events_api, name='events-api'),
     path('projects/<int:pk>/logs/', project_update_log_view, name='project-update-logs'),
-    
+    path('api/', include('projectapp.api.urls')),  
 ]

@@ -108,7 +108,8 @@ INSTALLED_APPS = [
     'searchapp',
     'instrumentapp',
     'myshowapp',
-    'analyticsapp'
+    'analyticsapp',
+    'rest_framework'
 ]
 # 구글 로그인을 위한 설정
 SITE_ID = 1
