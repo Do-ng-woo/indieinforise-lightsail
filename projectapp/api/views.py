@@ -70,3 +70,35 @@ class ProjectDetailAPIView(APIView):
             'sort': sort,
             'initial_slide_index': initial_slide_index
         }, status=status.HTTP_200_OK)
+
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.generics import ListAPIView
+from django.db.models import F
+from projectapp.models import Project
+from projectapp.api.serializers import ProjectSerializer
+
+class ProjectPagination(PageNumberPagination):
+    page_size = 10  # 기본 페이지 크기
+    page_size_query_param = 'page_size'
+    max_page_size = 100  # 최대 페이지 크기
+
+class ProjectListAPIView(ListAPIView):
+    serializer_class = ProjectSerializer
+    pagination_class = ProjectPagination
+
+    def get_queryset(self):
+        queryset = Project.objects.filter(hide=False)  # 숨겨진 프로젝트 제외
+
+        # 정렬 기준 추가
+        order_by = self.request.GET.get('order_by', 'title')  # 기본값: 'title'
+
+        if order_by == 'popularity':
+            # 인기순: 좋아요(like) 80%, 조회수(views) 20% 가중치 부여
+            queryset = queryset.annotate(
+                weighted_score=F('like') * 0.8 + F('views') * 0.2
+            ).order_by('-weighted_score')
+        else:
+            # 기본값: 제목(title) 기준 오름차순 정렬
+            queryset = queryset.order_by('title')
+
+        return queryset

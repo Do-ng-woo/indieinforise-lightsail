@@ -15,4 +15,5 @@ urlpatterns = [
     path('get-persons-by-instrument/<int:instrument_id>/', get_persons_by_instrument, name='get_persons_by_instrument'),
     path('artists/<int:artist_id>/use_points/', artist_use_points, name='use_points'),
     path('honorary_list/', HonoraryEntryListView.as_view(), name='honorary_list'),
+    path('api/', include('artistapp.api.urls')), 
 ]
