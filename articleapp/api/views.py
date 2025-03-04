@@ -116,3 +116,71 @@ class ArticleListAPIView(ListAPIView):
             queryset = queryset.order_by('-created_at')
 
         return queryset
+    
+from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
+from collections import OrderedDict
+from datetime import timedelta
+from django.utils import timezone
+from articleapp.models import Article
+from artistapp.models import Artist
+from articleapp.api.serializers import ArticleSerializer
+
+class SearchPerformanceAPIView(APIView, PageNumberPagination):
+    """🔍 공연 검색 API (미래, 최근 1년, 1년 이상 전)"""
+    page_size = 10 # 페이지당 개수
+
+    def get(self, request):
+        query = request.GET.get('q', '').replace(' ', '')  # 검색어에서 공백 제거
+        if len(query) < 2:
+            return Response({"error": "두 글자 이상 입력해주세요."}, status=400)
+
+        current_time = timezone.now()
+        one_year_ago = current_time - timedelta(days=365)  # 1년 전
+        more_than_one_year_ago = current_time - timedelta(days=365 * 2)  # 2년 전 (더 과거)
+
+        # 🎵 아티스트 검색 (제목과 부제목)
+        matching_artists = Artist.objects.filter(
+            Q(title__icontains=query) | 
+            Q(sub_titles__name__icontains=query),
+            hide=False
+        ).distinct()
+        artist_ids = matching_artists.values_list('id', flat=True)
+
+        # 🎭 공연 검색
+        articles = Article.objects.filter(
+            Q(title__icontains=query) | 
+            Q(artist__title__icontains=query) | 
+            Q(project__title__icontains=query) |
+            Q(artist__id__in=artist_ids),
+            hide=False
+        ).distinct()
+
+        # ✅ 미래 공연 (현재 ~ 미래)
+        future_performances = articles.filter(
+            Q(datetime__gte=current_time) | 
+            Q(date__gte=current_time.date())
+        ).order_by('datetime')
+
+        # ✅ 최근 1년 공연 (현재 ~ 1년 전)
+        past_one_year_performances = articles.filter(
+            Q(datetime__range=(one_year_ago, current_time)) | 
+            Q(date__range=(one_year_ago.date(), current_time.date()))
+        ).order_by('-datetime')
+
+        # ✅ 1년 이상 지난 공연 (1년 전 ~ 2년 전)
+        older_performances = articles.filter(
+            Q(datetime__lt=one_year_ago) | 
+            Q(date__lt=one_year_ago.date())
+        ).order_by('-datetime')
+
+        # 🔄 중복 제거
+        all_results = list(future_performances) + list(past_one_year_performances) + list(older_performances)
+        unique_results = list(OrderedDict((article.id, article) for article in all_results).values())
+
+        # 📌 페이지네이션 적용
+        page_results = self.paginate_queryset(unique_results, request, view=self)
+        serializer = ArticleSerializer(page_results, many=True)
+
+        return self.get_paginated_response(serializer.data)
