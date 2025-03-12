@@ -71,6 +71,7 @@ class ProjectDetailAPIView(APIView):
             'initial_slide_index': initial_slide_index
         }, status=status.HTTP_200_OK)
 
+
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
 from django.db.models import F
@@ -102,3 +103,50 @@ class ProjectListAPIView(ListAPIView):
             queryset = queryset.order_by('title')
 
         return queryset
+    
+
+from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from django.db.models import Q, F
+from collections import OrderedDict
+from projectapp.models import Project
+from projectapp.api.serializers import ProjectSerializer
+
+class SearchPagination(PageNumberPagination):
+    """🔄 페이지네이션 설정"""
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+class SearchProjectAPIView(APIView):
+    """🔍 공연장 검색 API (이름, 주소, 인기순 정렬)"""
+    pagination_class = SearchPagination  # ✅ 페이지네이션 클래스 추가
+
+    def get(self, request):
+        query = request.GET.get('q', '').strip()  # 검색어에서 앞뒤 공백 제거
+        if len(query) < 2:
+            return Response({"error": "두 글자 이상 입력해주세요."}, status=400)
+
+        # 🎭 공연장 검색 (이름 & 주소)
+        stages = Project.objects.filter(
+            Q(title__icontains=query) | 
+            Q(address__icontains=query),
+            hide=False
+        ).distinct()
+
+        # 🔄 중복 제거
+        unique_results = list(OrderedDict((stage.id, stage) for stage in stages).values())
+
+        # 🔥 인기순 정렬 (가중치 적용)
+        sorted_results = sorted(unique_results, key=lambda x: (x.like * 0.8 + x.views * 0.2), reverse=True)
+
+        # 📌 페이지네이션 적용
+        paginator = self.pagination_class()
+        page_results = paginator.paginate_queryset(sorted_results, request, view=self)
+
+        if page_results is not None:
+            serializer = ProjectSerializer(page_results, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        return Response({"results": []})  # ✅ 빈 응답 방지

@@ -32,7 +32,7 @@ OAuth 2.0 기반 로그인 (Google, Naver, Kakao) 지원
 Frontend
 HTML
 CSS
-JavaScript
+JavaScript.
 
 Backend
 Django 

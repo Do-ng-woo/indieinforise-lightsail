@@ -119,6 +119,7 @@ class ArticleListAPIView(ListAPIView):
     
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 from django.db.models import Q
 from collections import OrderedDict
 from datetime import timedelta
@@ -127,9 +128,15 @@ from articleapp.models import Article
 from artistapp.models import Artist
 from articleapp.api.serializers import ArticleSerializer
 
-class SearchPerformanceAPIView(APIView, PageNumberPagination):
+class SearchPagination(PageNumberPagination):
+    """🔄 페이지네이션 설정"""
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
+class SearchPerformanceAPIView(APIView):
     """🔍 공연 검색 API (미래, 최근 1년, 1년 이상 전)"""
-    page_size = 10 # 페이지당 개수
+    pagination_class = SearchPagination  # ✅ 페이지네이션 클래스 추가
 
     def get(self, request):
         query = request.GET.get('q', '').replace(' ', '')  # 검색어에서 공백 제거
@@ -138,7 +145,7 @@ class SearchPerformanceAPIView(APIView, PageNumberPagination):
 
         current_time = timezone.now()
         one_year_ago = current_time - timedelta(days=365)  # 1년 전
-        more_than_one_year_ago = current_time - timedelta(days=365 * 2)  # 2년 전 (더 과거)
+        two_years_ago = current_time - timedelta(days=730)  # 2년 전 (더 과거)
 
         # 🎵 아티스트 검색 (제목과 부제목)
         matching_artists = Artist.objects.filter(
@@ -180,7 +187,11 @@ class SearchPerformanceAPIView(APIView, PageNumberPagination):
         unique_results = list(OrderedDict((article.id, article) for article in all_results).values())
 
         # 📌 페이지네이션 적용
-        page_results = self.paginate_queryset(unique_results, request, view=self)
-        serializer = ArticleSerializer(page_results, many=True)
+        paginator = self.pagination_class()
+        page_results = paginator.paginate_queryset(unique_results, request, view=self)
 
-        return self.get_paginated_response(serializer.data)
+        if page_results is not None:
+            serializer = ArticleSerializer(page_results, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        return Response({"results": []})  # ✅ 빈 응답 방지

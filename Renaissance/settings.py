@@ -111,6 +111,7 @@ INSTALLED_APPS = [
     'analyticsapp',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
 ]
 # 구글 로그인을 위한 설정
 SITE_ID = 1
@@ -179,6 +180,12 @@ MIDDLEWARE = [
     'analyticsapp.middleware.VisitorSessionMiddleware',  # VisitorSession 미들웨어 추가
     'accountapp.middleware.ProfileCompletionMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
 
 ROOT_URLCONF = 'Renaissance.urls'

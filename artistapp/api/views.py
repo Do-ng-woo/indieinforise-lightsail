@@ -112,3 +112,50 @@ class ArtistListAPIView(ListAPIView):
             queryset = queryset.order_by('title')
 
         return queryset
+
+
+from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from django.db.models import Q, F
+from collections import OrderedDict
+from artistapp.models import Artist
+from artistapp.api.serializers import ArtistSerializer
+
+class ArtistPagination(PageNumberPagination):
+    """✅ 아티스트 리스트 페이지네이션 (기본 10개)"""
+    page_size = 10  
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+class ArtistSearchAPIView(APIView):
+    """🔍 아티스트 검색 API (이름, 부제목, 인물 기반 검색)"""
+    pagination_class = ArtistPagination  
+
+    def get(self, request):
+        query = request.GET.get('q', '').strip()  # 🔍 검색어 (공백 제거)
+        if len(query) < 2:
+            return Response({"error": "두 글자 이상 입력해주세요."}, status=400)
+
+        # 🔍 아티스트 검색 (이름, 부제목, 인물)
+        artists = Artist.objects.filter(
+            Q(title__icontains=query) | 
+            Q(sub_titles__name__icontains=query) |
+            Q(person__title__icontains=query),  # ✅ 참여 인물 검색 추가
+            hide=False
+        ).distinct()
+
+        # 🔄 중복 제거 & 정렬 (인기순)
+        artists = artists.annotate(
+            weighted_score=F('like') * 0.8 + F('views') * 0.2
+        ).order_by('-weighted_score')
+
+        # 📌 페이지네이션 적용
+        paginator = self.pagination_class()
+        page_results = paginator.paginate_queryset(artists, request, view=self)
+
+        if page_results is not None:
+            serializer = ArtistSerializer(page_results, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        return Response({"results": []})  # ✅ 빈 응답 방지
