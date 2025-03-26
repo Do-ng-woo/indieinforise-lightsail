@@ -69,49 +69,76 @@ class UserProfileAPIView(RetrieveAPIView):
         })
     
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-import requests
 from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.authtoken.models import Token
 
 User = get_user_model()
 
-class GoogleLoginAPIView(APIView):
-    """🔑 Google 로그인 API"""
+class OAuthLoginAPIView(APIView):
+    """
+    ✅ Google / Kakao / Naver 통합 로그인 API
+    """
+    permission_classes = [AllowAny]
 
     def post(self, request):
-        id_token = request.data.get("id_token")
+        email = request.data.get("email")
+        provider = request.data.get("provider")  # "google", "kakao", "naver" 중 하나
 
-        # ✅ Google OAuth2 API로 ID Token 검증
-        google_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}"
-        google_response = requests.get(google_url)
+        if not email or not provider:
+            return Response({"error": "이메일과 OAuth 제공자를 입력해야 합니다."}, status=400)
 
-        if google_response.status_code != 200:
-            return Response({"error": "Google 인증 실패"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.get(email=email)
+            # ✅ 기존 계정이 있으면 로그인 처리
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
+                "status": "success",
+                "token": token.key,
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "nickname": user.nickname,
+                    "provider": provider
+                }
+            })
+        except User.DoesNotExist:
+            # ❌ 사용자가 없으면 회원가입 필요
+            return Response({"status": "register", "email": email, "provider": provider})
 
-        user_data = google_response.json()
-        email = user_data.get("email")
-        name = user_data.get("name")
-        picture = user_data.get("picture")
 
-        if not email:
-            return Response({"error": "Google에서 이메일을 가져올 수 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
+class OAuthRegisterAPIView(APIView):
+    """
+    ✅ Google / Kakao / Naver 통합 회원가입 API
+    """
+    permission_classes = [AllowAny]
 
-        # ✅ 유저 생성 또는 가져오기
-        user, created = User.objects.get_or_create(email=email, defaults={"username": email, "name": name})
+    def post(self, request):
+        email = request.data.get("email")
+        nickname = request.data.get("nickname")
+        provider = request.data.get("provider")  # "google", "kakao", "naver"
 
-        # ✅ JWT 토큰 생성
-        refresh = RefreshToken.for_user(user)
+        if not (email and nickname and provider):
+            return Response({"error": "모든 필드를 입력해주세요."}, status=400)
+
+        # 📌 이메일 중복 체크
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "이미 가입된 이메일입니다."}, status=400)
+
+        # ✅ 회원가입 진행
+        user = User.objects.create_user(email=email, nickname=nickname, password=None)
+        token, _ = Token.objects.get_or_create(user=user)
 
         return Response({
-            "access_token": str(refresh.access_token),
-            "refresh_token": str(refresh),
+            "status": "success",
+            "token": token.key,
             "user": {
+                "id": user.id,
                 "email": user.email,
-                "name": user.name,
-                "profile_image": picture,
-            },
-        }, status=status.HTTP_200_OK)
+                "nickname": user.nickname,
+                "provider": provider
+            }
+        })
 
